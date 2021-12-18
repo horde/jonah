@@ -24,11 +24,11 @@
         }
     ],
     "require": {
-        "horde/horde-installer-plugin": "*",
-        "php": "^7",
-        "horde/db": "^3",
-        "horde/core": "^3",
-        "horde/horde": "^6"
+        "horde/horde-installer-plugin": "^2 || dev-FRAMEWORK_6_0",
+        "php": "^7.4 || ^8",
+        "horde/db": "^3 || dev-FRAMEWORK_6_0",
+        "horde/core": "^3 || dev-FRAMEWORK_6_0",
+        "horde/horde": "^6 || dev-FRAMEWORK_6_0"
     },
     "suggest": {},
     "autoload": {
