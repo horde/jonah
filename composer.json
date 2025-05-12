@@ -16,24 +16,29 @@
             "role": "lead"
         }
     ],
-    "time": "2021-03-21",
-    "repositories": [
-        {
-            "type": "composer",
-            "url": "https://horde-satis.maintaina.com/"
-        }
-    ],
+    "time": "2025-05-12",
+    "repositories": [],
     "require": {
-        "horde/horde-installer-plugin": "^2 || dev-FRAMEWORK_6_0",
-        "php": "^7.4 || ^8",
+        "horde/horde-installer-plugin": "dev-FRAMEWORK_6_0 || ^2",
+        "php": "^8",
         "horde/db": "^3 || dev-FRAMEWORK_6_0",
         "horde/core": "^3 || dev-FRAMEWORK_6_0",
         "horde/horde": "^6 || dev-FRAMEWORK_6_0"
     },
+    "require-dev": {},
     "suggest": {},
     "autoload": {
-        "psr-0": {
-            "Jonah": "lib/"
+        "classmap": [
+            "lib/"
+        ],
+        "psr-4": {
+            "Horde\\Nag\\": "/src"
+        }
+    },
+    "autoload-dev": {},
+    "config": {
+        "allow-plugins": {
+            "horde/horde-installer-plugin": true
         }
     }
 }
