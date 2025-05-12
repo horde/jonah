@@ -44,6 +44,5 @@
         "allow-plugins": {
             "horde/horde-installer-plugin": true
         }
-    },
-    "minimum-stability": "dev"
+    }
 }
