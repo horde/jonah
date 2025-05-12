@@ -41,4 +41,4 @@ autoload:
   classmap:
     - lib/
   psr-4:
-    Horde\Nag\: /src
+    Horde\Jonah\: /src

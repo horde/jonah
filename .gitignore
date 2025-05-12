@@ -35,4 +35,6 @@ run-tests.log
 /config/menu.php
 /config/*.local.php
 /config/*-*.php
-
+## Tools
+composer.lock
+.php-cs-fixer.cache

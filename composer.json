@@ -32,13 +32,18 @@
             "lib/"
         ],
         "psr-4": {
-            "Horde\\Nag\\": "/src"
+            "Horde\\Jonah\\": "/src"
         }
     },
-    "autoload-dev": {},
+    "autoload-dev": {
+        "psr-4": {
+            "Horde\\Jonah\\Test\\": "test/"
+        }
+    },
     "config": {
         "allow-plugins": {
             "horde/horde-installer-plugin": true
         }
-    }
+    },
+    "minimum-stability": "dev"
 }
