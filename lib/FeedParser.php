@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Jonah_FeedParser.
  *
@@ -14,104 +15,104 @@
  * @author  Chuck Hagenbuch <chuck@horde.org>
  * @package Jonah
  */
-class Jonah_FeedParser {
-
+class Jonah_FeedParser
+{
     /**
      * XML parser resource.
      *
      * @var resource
      */
-    var $parser;
+    public $parser;
 
     /**
      * The current parent tag - CHANNEL, STORY, etc.
      *
      * @var string
      */
-    var $parent = '';
+    public $parent = '';
 
     /**
      * The current child tag - TITLE, DESCRIPTION, URL, etc.
      *
      * @var string
      */
-    var $child = '';
+    public $child = '';
 
     /**
      * All the attributes of the channel description.
      *
      * @var array
      */
-    var $channel;
+    public $channel;
 
     /**
      * All the attributes of the channel image.
      *
      * @var array
      */
-    var $image;
+    public $image;
 
     /**
      * All the attributes of the current story being parsed.
      *
      * @var array
      */
-    var $story;
+    public $story;
 
     /**
      * All the attributes of the current item being parsed.
      *
      * @var array
      */
-    var $item;
+    public $item;
 
     /**
      * The array that all the parsed information gets dumped into.
      *
      * @var array
      */
-    var $structure;
+    public $structure;
 
     /**
      * What kind of feed are we parsing?
      *
      * @var string
      */
-    var $format = 'rss';
+    public $format = 'rss';
 
     /**
      * Error string.
      *
      * @var string
      */
-    var $error;
+    public $error;
 
     /**
      * Feed charset.
      *
      * @var string
      */
-    var $charset;
+    public $charset;
 
     /**
      * Constructs a new Jonah_FeedParser parser object.
      */
-    function Jonah_FeedParser($charset)
+    public function Jonah_FeedParser($charset)
     {
-        $this->channel = array();
-        $this->image = array();
-        $this->item = array();
-        $this->story = array();
+        $this->channel = [];
+        $this->image = [];
+        $this->item = [];
+        $this->story = [];
         $this->charset = $charset;
     }
 
     /**
      * Initialize the XML parser.
      */
-    function init()
+    public function init()
     {
         // Check that the charset is supported by the XML parser.
-        $allowed_charsets = array('us-ascii', 'iso-8859-1', 'utf-8', 'utf-16');
+        $allowed_charsets = ['us-ascii', 'iso-8859-1', 'utf-8', 'utf-16'];
         if (!in_array($this->charset, $allowed_charsets)) {
             $this->charset = 'utf-8';
         }
@@ -134,13 +135,13 @@ class Jonah_FeedParser {
      * Clean up any existing data - reset to a state where we can
      * cleanly open a new file.
      */
-    function cleanup()
+    public function cleanup()
     {
-        $this->channel = array();
-        $this->image = array();
-        $this->item = array();
-        $this->story = array();
-        $this->structure = array();
+        $this->channel = [];
+        $this->image = [];
+        $this->item = [];
+        $this->story = [];
+        $this->structure = [];
     }
 
     /**
@@ -150,7 +151,7 @@ class Jonah_FeedParser {
      *
      * @param $data  The XML feed data to parse.
      */
-    function parse($data)
+    public function parse($data)
     {
         $this->init();
 
@@ -175,216 +176,217 @@ class Jonah_FeedParser {
     /**
      * Start collecting data about a new element.
      */
-    function startElement($parser, $name, $attribs)
+    public function startElement($parser, $name, $attribs)
     {
         $name = Horde_String::upper($name);
         $attribs = array_change_key_case($attribs, CASE_LOWER);
 
         switch ($name) {
-        case 'FEED':
-            $this->format = 'atom';
+            case 'FEED':
+                $this->format = 'atom';
 
-        case 'CHANNEL':
-        case 'IMAGE':
-        case 'ITEM':
-        case 'ENTRY':
-        case 'TEXTINPUT':
-            $this->parent = $name;
-            break;
+                // no break
+            case 'CHANNEL':
+            case 'IMAGE':
+            case 'ITEM':
+            case 'ENTRY':
+            case 'TEXTINPUT':
+                $this->parent = $name;
+                break;
 
-        case 'LINUXTODAY':
-        case 'UUTISET':
-            $this->parent = 'channel';
-            break;
+            case 'LINUXTODAY':
+            case 'UUTISET':
+                $this->parent = 'channel';
+                break;
 
-        case 'UUTINEN':
-            $this->parent = 'item';
-            break;
-
-        case 'STORYLIST':
-            $this->structure['type'] = 'storylist';
-            break;
-
-        case 'RATING':
-        case 'DESCRIPTION':
-        case 'WIDTH':
-        case 'HEIGHT':
-        case 'LANGUAGE':
-        case 'MANAGINGEDITOR':
-        case 'WEBMASTER':
-        case 'COPYRIGHT':
-        case 'LASTBUILDDATE':
-        case 'AUTHOR':
-        case 'TOPIC':
-        case 'COMMENTS':
-            // Userland story format.
-        case 'POSTTIME':
-        case 'CHANNELTITLE':
-        case 'CHANNELURL':
-        case 'USERLANDCHANNELID':
-        case 'STORYTEXT':
-            $this->child = Horde_String::lower($name);
-            break;
-
-        case 'LINK':
-            $this->child = 'link';
-            if ($this->format == 'atom' && !empty($attribs['href'])) {
-                if ($this->parent == 'FEED') {
-                    $target = &$this->channel;
-                } else {
-                    $target = &$this->item;
-                }
-
-                // For now, make the alternate link, which is most likely to
-                // point to the HTML copy of the article, the default one - or,
-                // if there isn't yet a link and the rel is empty, use it.
-                if ((empty($target['link']) && empty($attribs['rel'])) ||
-                    (isset($attribs['rel']) && $attribs['rel'] == 'alternate')) {
-                    $target['link'] = $attribs['href'];
-                }
-
-                // Store all links named by their rel.
-                if (!empty($attribs['rel'])) {
-                    $rel = 'link-' . $attribs['rel'];
-                    if (isset($target[$rel])) {
-                        if (!is_array($target[$rel])) {
-                            $target[$rel] = array($target[$rel]);
-                        }
-                        $target[$rel][] = $attribs['href'];
-                    } else {
-                        $target[$rel] = $attribs['href'];
-                    }
-                }
-            }
-            break;
-
-        case 'NAME':
-            if ($this->child != 'author') {
-                $this->child = Horde_String::lower($name);
-            }
-            break;
-
-            // Atom feed entry body.
-        case 'CONTENT':
-            $this->child = 'body';
-            if (isset($attribs['type']) && ($attribs['type'] == 'text/html' || $attribs['type'] == 'html')) {
-                $this->item['body_type'] = 'html';
-            }
-            break;
-
-            // Atom feed entry summary.
-        case 'SUMMARY':
-            $this->child = 'description';
-            break;
-
-            // If we're inside an ITEM, consider this a LINK.
-        case 'URL':
-            if ($this->parent == 'item') {
-                $this->child = 'link';
-            } else {
-                $this->child = 'url';
-            }
-            break;
-
-            // For My.Userland channels, let these be STORY tags;
-            // otherwise, map them to ITEMs.
-        case 'STORY':
-            if ($this->parent == 'storylist') {
-                $this->parent = 'story';
-            } else {
+            case 'UUTINEN':
                 $this->parent = 'item';
-            }
-            break;
+                break;
 
-            // Nonstandard bits that we want to map to standard bits.
-        case 'TITLE':
-        case 'OTSIKKO':
-            $this->child = 'title';
-            break;
+            case 'STORYLIST':
+                $this->structure['type'] = 'storylist';
+                break;
 
-        case 'PUBLISHED':
-        case 'PUBDATE':
-        case 'TIME':
-        case 'PVM':
-            $this->child = 'pubdate';
-            break;
+            case 'RATING':
+            case 'DESCRIPTION':
+            case 'WIDTH':
+            case 'HEIGHT':
+            case 'LANGUAGE':
+            case 'MANAGINGEDITOR':
+            case 'WEBMASTER':
+            case 'COPYRIGHT':
+            case 'LASTBUILDDATE':
+            case 'AUTHOR':
+            case 'TOPIC':
+            case 'COMMENTS':
+                // Userland story format.
+            case 'POSTTIME':
+            case 'CHANNELTITLE':
+            case 'CHANNELURL':
+            case 'USERLANDCHANNELID':
+            case 'STORYTEXT':
+                $this->child = Horde_String::lower($name);
+                break;
 
-        case 'MODIFIED':
-        case 'UPDATED':
-            $this->child = 'moddate';
-            break;
-
-            // More Atom dates.
-        case 'CREATED':
-        case 'ISSUED':
-            $this->child = Horde_String::lower($name);
-            break;
-
-        case 'RDF:RDF':
-        case 'RSS':
-            $this->child = 'junk';
-            break;
-
-        // For Yahoo's media namespace extensions
-        // see http://search.yahoo.com/mrss
-        // Specs say that elements other than content may be
-        // either children of media:content OR siblings, so
-        // we don't nest these elements.
-        case 'MEDIA:CONTENT':
-            $this->child = 'media:content';
-            foreach ($attribs as $aname => $avalue) {
-                $this->item[$this->child][$aname] = $avalue;
-            }
-            break;
-        case 'MEDIA:THUMBNAIL':
-            $this->child = 'media:thumbnail';
-            foreach ($attribs as $aname => $avalue) {
-                $this->item[$this->child][$aname] = $avalue;
-            }
-            break;
-        case 'MEDIA:TITLE':
-            $this->child = 'media:title';
-            break;
-        case 'MEDIA:DESCRIPTION':
-            $this->child = 'media:description';
-            foreach ($attribs as $aname => $avalue) {
-                $this->item[$this->child][$aname] = $avalue;
-            }
-            // Ensure we have a default
-            $this->item[$this->child]['value'] = '';
-            break;
-        case 'MEDIA:GROUP':
-            $this->child='media:group';
-            break;
-        case 'MEDIA:KEYWORDS':
-            $this->child='media:keywords';
-            break;
-
-        default:
-            if ($this->format == 'atom' && in_array($this->child, array('body', 'description'))) {
-                if (!isset($this->item[$this->child])) {
-                    $this->item[$this->child] = '';
-                }
-
-                $tag = Horde_String::lower($name);
-                switch ($tag) {
-                case 'br':
-                case 'hr':
-                    $this->item[$this->child] .= '<' . $tag . '/>';
-                    break;
-
-                default:
-                    $this->item[$this->child] .= '<' . $tag;
-                    foreach ($attribs as $aname => $avalue) {
-                        $this->item[$this->child] .= ' ' . $aname . '="' . $avalue . '"';
+            case 'LINK':
+                $this->child = 'link';
+                if ($this->format == 'atom' && !empty($attribs['href'])) {
+                    if ($this->parent == 'FEED') {
+                        $target = &$this->channel;
+                    } else {
+                        $target = &$this->item;
                     }
-                    $this->item[$this->child] .= '>';
-                    break;
+
+                    // For now, make the alternate link, which is most likely to
+                    // point to the HTML copy of the article, the default one - or,
+                    // if there isn't yet a link and the rel is empty, use it.
+                    if ((empty($target['link']) && empty($attribs['rel'])) ||
+                        (isset($attribs['rel']) && $attribs['rel'] == 'alternate')) {
+                        $target['link'] = $attribs['href'];
+                    }
+
+                    // Store all links named by their rel.
+                    if (!empty($attribs['rel'])) {
+                        $rel = 'link-' . $attribs['rel'];
+                        if (isset($target[$rel])) {
+                            if (!is_array($target[$rel])) {
+                                $target[$rel] = [$target[$rel]];
+                            }
+                            $target[$rel][] = $attribs['href'];
+                        } else {
+                            $target[$rel] = $attribs['href'];
+                        }
+                    }
                 }
-            } else {
+                break;
+
+            case 'NAME':
+                if ($this->child != 'author') {
+                    $this->child = Horde_String::lower($name);
+                }
+                break;
+
+                // Atom feed entry body.
+            case 'CONTENT':
+                $this->child = 'body';
+                if (isset($attribs['type']) && ($attribs['type'] == 'text/html' || $attribs['type'] == 'html')) {
+                    $this->item['body_type'] = 'html';
+                }
+                break;
+
+                // Atom feed entry summary.
+            case 'SUMMARY':
+                $this->child = 'description';
+                break;
+
+                // If we're inside an ITEM, consider this a LINK.
+            case 'URL':
+                if ($this->parent == 'item') {
+                    $this->child = 'link';
+                } else {
+                    $this->child = 'url';
+                }
+                break;
+
+                // For My.Userland channels, let these be STORY tags;
+                // otherwise, map them to ITEMs.
+            case 'STORY':
+                if ($this->parent == 'storylist') {
+                    $this->parent = 'story';
+                } else {
+                    $this->parent = 'item';
+                }
+                break;
+
+                // Nonstandard bits that we want to map to standard bits.
+            case 'TITLE':
+            case 'OTSIKKO':
+                $this->child = 'title';
+                break;
+
+            case 'PUBLISHED':
+            case 'PUBDATE':
+            case 'TIME':
+            case 'PVM':
+                $this->child = 'pubdate';
+                break;
+
+            case 'MODIFIED':
+            case 'UPDATED':
+                $this->child = 'moddate';
+                break;
+
+                // More Atom dates.
+            case 'CREATED':
+            case 'ISSUED':
+                $this->child = Horde_String::lower($name);
+                break;
+
+            case 'RDF:RDF':
+            case 'RSS':
                 $this->child = 'junk';
-            }
-            break;
+                break;
+
+                // For Yahoo's media namespace extensions
+                // see http://search.yahoo.com/mrss
+                // Specs say that elements other than content may be
+                // either children of media:content OR siblings, so
+                // we don't nest these elements.
+            case 'MEDIA:CONTENT':
+                $this->child = 'media:content';
+                foreach ($attribs as $aname => $avalue) {
+                    $this->item[$this->child][$aname] = $avalue;
+                }
+                break;
+            case 'MEDIA:THUMBNAIL':
+                $this->child = 'media:thumbnail';
+                foreach ($attribs as $aname => $avalue) {
+                    $this->item[$this->child][$aname] = $avalue;
+                }
+                break;
+            case 'MEDIA:TITLE':
+                $this->child = 'media:title';
+                break;
+            case 'MEDIA:DESCRIPTION':
+                $this->child = 'media:description';
+                foreach ($attribs as $aname => $avalue) {
+                    $this->item[$this->child][$aname] = $avalue;
+                }
+                // Ensure we have a default
+                $this->item[$this->child]['value'] = '';
+                break;
+            case 'MEDIA:GROUP':
+                $this->child = 'media:group';
+                break;
+            case 'MEDIA:KEYWORDS':
+                $this->child = 'media:keywords';
+                break;
+
+            default:
+                if ($this->format == 'atom' && in_array($this->child, ['body', 'description'])) {
+                    if (!isset($this->item[$this->child])) {
+                        $this->item[$this->child] = '';
+                    }
+
+                    $tag = Horde_String::lower($name);
+                    switch ($tag) {
+                        case 'br':
+                        case 'hr':
+                            $this->item[$this->child] .= '<' . $tag . '/>';
+                            break;
+
+                        default:
+                            $this->item[$this->child] .= '<' . $tag;
+                            foreach ($attribs as $aname => $avalue) {
+                                $this->item[$this->child] .= ' ' . $aname . '="' . $avalue . '"';
+                            }
+                            $this->item[$this->child] .= '>';
+                            break;
+                    }
+                } else {
+                    $this->child = 'junk';
+                }
+                break;
         }
     }
 
@@ -392,57 +394,57 @@ class Jonah_FeedParser {
      * Handle the ends of XML elements - wrap up whatever we've been
      * putting together and store it for safekeeping.
      */
-    function endElement($parser, $name)
+    public function endElement($parser, $name)
     {
         $name = Horde_String::upper($name);
         switch ($name) {
-        case 'CHANNEL':
-        case 'FEED':
-            $this->format = 'atom';
-            $this->structure['channel'] = $this->channel;
-            break;
+            case 'CHANNEL':
+            case 'FEED':
+                $this->format = 'atom';
+                $this->structure['channel'] = $this->channel;
+                break;
 
-        case 'IMAGE':
-            $this->structure['image'] = $this->image;
-            break;
+            case 'IMAGE':
+                $this->structure['image'] = $this->image;
+                break;
 
-        case 'STORY':
-            if ($this->parent == 'storylist') {
-                $this->structure['stories'][] = $this->story;
-                $this->story = array();
-            } else {
+            case 'STORY':
+                if ($this->parent == 'storylist') {
+                    $this->structure['stories'][] = $this->story;
+                    $this->story = [];
+                } else {
+                    $this->structure['items'][] = $this->item;
+                    $this->item = [];
+                }
+                break;
+
+            case 'TEXTINPUT':
+                $this->item['textinput'] = true;
+                // no break here; continue to the next case.
+
+            case 'UUTINEN':
+            case 'ITEM':
+            case 'ENTRY':
                 $this->structure['items'][] = $this->item;
-                $this->item = array();
-            }
-            break;
+                $this->item = [];
+                break;
+            default:
+                if ($this->format == 'atom' && in_array($this->child, ['body', 'description'])) {
+                    if (!isset($this->item[$this->child])) {
+                        $this->item[$this->child] = '';
+                    }
 
-        case 'TEXTINPUT':
-            $this->item['textinput'] = true;
-            // No break here; continue to the next case.
+                    $tag = Horde_String::lower($name);
+                    switch ($tag) {
+                        case 'br':
+                        case 'hr':
+                            break;
 
-        case 'UUTINEN':
-        case 'ITEM':
-        case 'ENTRY':
-            $this->structure['items'][] = $this->item;
-            $this->item = array();
-            break;
-        default:
-            if ($this->format == 'atom' && in_array($this->child, array('body', 'description'))) {
-                if (!isset($this->item[$this->child])) {
-                    $this->item[$this->child] = '';
+                        default:
+                            $this->item[$this->child] .= '</' . $tag . '>';
+                            break;
+                    }
                 }
-
-                $tag = Horde_String::lower($name);
-                switch ($tag) {
-                case 'br':
-                case 'hr':
-                    break;
-
-                default:
-                    $this->item[$this->child] .= '</' . $tag . '>';
-                    break;
-                }
-            }
 
         }
     }
@@ -450,46 +452,46 @@ class Jonah_FeedParser {
     /**
      * The handler for character data encountered in the XML file.
      */
-    function characterData($parser, $data)
+    public function characterData($parser, $data)
     {
         if (preg_match('|\S|', $data)) {
             switch ($this->parent) {
-            case 'CHANNEL':
-            case 'FEED':
-                if (!isset($this->channel[$this->child])) {
-                    $this->channel[$this->child] = '';
-                }
-                $this->channel[$this->child] = $data;
-                break;
+                case 'CHANNEL':
+                case 'FEED':
+                    if (!isset($this->channel[$this->child])) {
+                        $this->channel[$this->child] = '';
+                    }
+                    $this->channel[$this->child] = $data;
+                    break;
 
-            case 'IMAGE':
-                if (!isset($this->image[$this->child])) {
-                    $this->image[$this->child] = '';
-                }
-                $this->image[$this->child] .= $data;
-                break;
+                case 'IMAGE':
+                    if (!isset($this->image[$this->child])) {
+                        $this->image[$this->child] = '';
+                    }
+                    $this->image[$this->child] .= $data;
+                    break;
 
-            case 'STORY':
-                if (!isset($this->story[$this->child])) {
-                    $this->story[$this->child] = '';
-                }
-                $this->story[$this->child] .= $data;
-                break;
-
-            default:
-                switch ($this->child) {
-                case 'media:description':
-                    $this->item[$this->child]['value'] = $data;
+                case 'STORY':
+                    if (!isset($this->story[$this->child])) {
+                        $this->story[$this->child] = '';
+                    }
+                    $this->story[$this->child] .= $data;
                     break;
 
                 default:
+                    switch ($this->child) {
+                        case 'media:description':
+                            $this->item[$this->child]['value'] = $data;
+                            break;
 
-                    if (!isset($this->item[$this->child])) {
-                        $this->item[$this->child] = '';
+                        default:
+
+                            if (!isset($this->item[$this->child])) {
+                                $this->item[$this->child] = '';
+                            }
+                            $this->item[$this->child] .= $data;
+                            break;
                     }
-                    $this->item[$this->child] .= $data;
-                    break;
-                }
             }
         }
     }
@@ -497,8 +499,6 @@ class Jonah_FeedParser {
     /**
      * Handles things that we don't recognize. A no-op.
      */
-    function defaultHandler($parser, $data)
-    {
-    }
+    public function defaultHandler($parser, $data) {}
 
 }

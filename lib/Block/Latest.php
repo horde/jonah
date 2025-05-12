@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Provide the api to embed the lates news story in other Horde applications.
  *
@@ -18,7 +19,7 @@ class Jonah_Block_Latest extends Horde_Core_Block
 
     /**
      */
-    public function __construct($app, $params = array())
+    public function __construct($app, $params = [])
     {
         parent::__construct($app, $params);
 
@@ -29,9 +30,9 @@ class Jonah_Block_Latest extends Horde_Core_Block
      */
     protected function _params()
     {
-        $params['source'] = array('name' => _("News Source"),
-                                  'type' => 'enum',
-                                  'values' => array());
+        $params['source'] = ['name' => _("News Source"),
+            'type' => 'enum',
+            'values' => []];
 
         $channels = $GLOBALS['injector']->getInstance('Jonah_Driver')->getChannels();
         foreach ($channels as $channel) {
@@ -43,10 +44,10 @@ class Jonah_Block_Latest extends Horde_Core_Block
         $channel = reset($channels);
         $params['source']['default'] = $channel['channel_id'];
 
-        $params['countReads'] = array(
+        $params['countReads'] = [
             'name' => _("Count reads of the latest story when this block is displayed"),
             'type' => 'boolean',
-            'default' => false);
+            'default' => false];
 
         return $params;
     }
@@ -86,7 +87,7 @@ class Jonah_Block_Latest extends Horde_Core_Block
         }
 
         if (empty($story['body_type']) || $story['body_type'] == 'text') {
-            $story['body'] = $GLOBALS['injector']->getInstance('Horde_Core_Factory_TextFilter')->filter($story['body'], 'text2html', array('parselevel' => Horde_Text_Filter_Text2html::MICRO));
+            $story['body'] = $GLOBALS['injector']->getInstance('Horde_Core_Factory_TextFilter')->filter($story['body'], 'text2html', ['parselevel' => Horde_Text_Filter_Text2html::MICRO]);
         }
 
         return '<p class="storySubtitle">' . htmlspecialchars($story['description']) . '</p><div class="storyBody">' . $story['body'] . '</div>';

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Jonah_Driver:: is responsible for storing, searching, sorting and filtering
  * locally generated and managed articles.  Aggregation is left to Hippo.
@@ -22,14 +23,14 @@ class Jonah_Driver
      *
      * @var array
      */
-    protected $_params = array();
+    protected $_params = [];
 
     /**
      * Constructs a new Driver storage object.
      *
      * @param array $params  A hash containing connection parameters.
      */
-    public function __construct($params = array())
+    public function __construct($params = [])
     {
         $this->_params = $params;
     }
@@ -67,7 +68,7 @@ class Jonah_Driver
      */
     public function getChannel($channel_id)
     {
-        static $channel = array();
+        static $channel = [];
 
         /* We need a non empty channel id. */
         if (empty($channel_id)) {
@@ -81,7 +82,7 @@ class Jonah_Driver
                 $channel[$channel_id]['channel_official'] =
                     Horde::url('delivery/html.php', true, -1)->add('channel_id', $channel_id)->setRaw(false);
             } else {
-                $channel[$channel_id]['channel_official'] = str_replace(array('%25c', '%c'), array('%c', $channel_id), $channel[$channel_id]['channel_link']);
+                $channel[$channel_id]['channel_official'] = str_replace(['%25c', '%c'], ['%c', $channel_id], $channel[$channel_id]['channel_link']);
             }
 
         }
@@ -130,7 +131,7 @@ class Jonah_Driver
         }
 
         if (!isset($criteria['channel']) && empty($criteria['channel_id'])) {
-            $criteria['channel_id'] = array_map(function($ar) { return $ar['channel_id']; }, $this->getChannels());
+            $criteria['channel_id'] = array_map(function ($ar) { return $ar['channel_id']; }, $this->getChannels());
         }
 
         // Validate that we have proper Horde_Date objects
@@ -158,7 +159,7 @@ class Jonah_Driver
         if (!empty($criteria['tags'])) {
             $criteria['ids'] = $GLOBALS['injector']
                 ->getInstance('Jonah_Tagger')
-                ->search($criteria['tags'], array('channel_ids' => $criteria['channel_id']));
+                ->search($criteria['tags'], ['channel_ids' => $criteria['channel_id']]);
             unset($criteria['tags']);
         }
 
@@ -218,12 +219,14 @@ class Jonah_Driver
             !empty($channel['channel_story_url'])) {
             $url = $channel['channel_story_url'];
         } else {
-            $url = Horde::url('stories/view.php', true, -1)->add(array('channel_id' => '%c', 'id' => '%s'))->setRaw(false);
+            $url = Horde::url('stories/view.php', true, -1)->add(['channel_id' => '%c', 'id' => '%s'])->setRaw(false);
         }
 
-        return new Horde_Url(str_replace(array('%25c', '%25s', '%c', '%s'),
-                                         array('%c', '%s', $channel['channel_id'], $story['id']),
-                                         $url));
+        return new Horde_Url(str_replace(
+            ['%25c', '%25s', '%c', '%s'],
+            ['%c', '%s', $channel['channel_id'], $story['id']],
+            $url
+        ));
     }
 
     /**
@@ -237,14 +240,14 @@ class Jonah_Driver
      */
     public function getIntervalLabel($seconds = null)
     {
-        $interval = array(1 => _("none"),
-                          1800 => _("30 mins"),
-                          3600 => _("1 hour"),
-                          7200 => _("2 hours"),
-                          14400 => _("4 hours"),
-                          28800 => _("8 hours"),
-                          43200 => _("12 hours"),
-                          86400 => _("24 hours"));
+        $interval = [1 => _("none"),
+            1800 => _("30 mins"),
+            3600 => _("1 hour"),
+            7200 => _("2 hours"),
+            14400 => _("4 hours"),
+            28800 => _("8 hours"),
+            43200 => _("12 hours"),
+            86400 => _("24 hours")];
 
         if ($seconds === null) {
             return $interval;
@@ -287,15 +290,18 @@ class Jonah_Driver
         /* Get one story more than requested to see if there are more stories. */
         if ($max !== null) {
             $stories = $this->getStories(
-                    array('channel_id' => $channel_id,
-                          'published' => true,
-                          'startnumber' => $from,
-                          'limit' => $max),
-                    $order);
+                ['channel_id' => $channel_id,
+                    'published' => true,
+                    'startnumber' => $from,
+                    'limit' => $max],
+                $order
+            );
         } else {
-            $stories = $this->getStories(array('channel_id' => $channel_id,
-                                               'published' => true),
-                                         $order);
+            $stories = $this->getStories(
+                ['channel_id' => $channel_id,
+                    'published' => true],
+                $order
+            );
             $max = count($stories);
         }
 
@@ -307,11 +313,11 @@ class Jonah_Driver
         } else {
             /* Escape. */
             if ($escape) {
-                array_walk($stories, array($this, '_escapeStories'));
+                array_walk($stories, [$this, '_escapeStories']);
             }
 
             /* Process story summaries. */
-            array_walk($stories, array($this, '_escapeStoryDescriptions'));
+            array_walk($stories, [$this, '_escapeStoryDescriptions']);
 
             $template->set('error', false, true);
             $template->set('story_marker', Horde::img('story_marker.png'));
@@ -323,12 +329,15 @@ class Jonah_Driver
                 $template->set('previous', false, true);
             }
             if ($from && !empty($channel['channel_page_link'])) {
-                $template->set('previous_link',
-                               str_replace(
-                                   array('%25c', '%25n', '%c', '%n'),
-                                   array('%c', '%n', $channel['channel_id'], max(0, $from - $max)),
-                                   $channel['channel_page_link']),
-                               true);
+                $template->set(
+                    'previous_link',
+                    str_replace(
+                        ['%25c', '%25n', '%c', '%n'],
+                        ['%c', '%n', $channel['channel_id'], max(0, $from - $max)],
+                        $channel['channel_page_link']
+                    ),
+                    true
+                );
             } else {
                 $template->set('previous_link', false, true);
             }
@@ -340,12 +349,15 @@ class Jonah_Driver
                 $template->set('next', false, true);
             }
             if ($more && !empty($channel['channel_page_link'])) {
-                $template->set('next_link',
-                               str_replace(
-                                   array('%25c', '%25n', '%c', '%n'),
-                                   array('%c', '%n', $channel['channel_id'], $from + $max),
-                                   $channel['channel_page_link']),
-                               true);
+                $template->set(
+                    'next_link',
+                    str_replace(
+                        ['%25c', '%25n', '%c', '%n'],
+                        ['%c', '%n', $channel['channel_id'], $from + $max],
+                        $channel['channel_page_link']
+                    ),
+                    true
+                );
             } else {
                 $template->set('next_link', false, true);
             }
@@ -393,40 +405,44 @@ class Jonah_Driver
 
         /* Add the story to the message based on the story's body type. */
         switch ($story['body_type']) {
-        case 'richtext':
-            /* Get a plain text version of a richtext story. */
-            $body_html = $story['body'];
-            $body_text = $GLOBALS['injector']->getInstance('Horde_Core_Factory_TextFilter')->filter($body_html, 'html2text');
+            case 'richtext':
+                /* Get a plain text version of a richtext story. */
+                $body_html = $story['body'];
+                $body_text = $GLOBALS['injector']->getInstance('Horde_Core_Factory_TextFilter')->filter($body_html, 'html2text');
 
-            /* Add description. */
-            $body_html = '<p>' . $GLOBALS['injector']->getInstance('Horde_Core_Factory_TextFilter')->filter($story['desc'], 'text2html', array('parselevel' => Horde_Text_Filter_Text2html::MICRO, 'callback' => null)) . "</p>\n" . $body_html;
-            $body_text = Horde_String::wrap('  ' . $story['description'], 70) . "\n\n" . $body_text;
+                /* Add description. */
+                $body_html = '<p>' . $GLOBALS['injector']->getInstance('Horde_Core_Factory_TextFilter')->filter($story['desc'], 'text2html', ['parselevel' => Horde_Text_Filter_Text2html::MICRO, 'callback' => null]) . "</p>\n" . $body_html;
+                $body_text = Horde_String::wrap('  ' . $story['description'], 70) . "\n\n" . $body_text;
 
-            /* Add the text version of the story to the base message. */
-            $message_text = new MIME_Part('text/plain');
-            $message_text->setCharset('UTF-8');
-            $message_text->setContents($message_text->replaceEOL($body_text));
-            $message_text->setDescription(_("Plaintext Version of Story"));
+                /* Add the text version of the story to the base message. */
+                $message_text = new MIME_Part('text/plain');
+                $message_text->setCharset('UTF-8');
+                $message_text->setContents($message_text->replaceEOL($body_text));
+                $message_text->setDescription(_("Plaintext Version of Story"));
 
-            /* Add an HTML version of the story to the base message. */
-            $message_html = new MIME_Part('text/html', Horde_String::wrap($body_html),
-                                          'UTF-8', 'inline');
-            $message_html->setDescription(_("HTML Version of Story"));
+                /* Add an HTML version of the story to the base message. */
+                $message_html = new MIME_Part(
+                    'text/html',
+                    Horde_String::wrap($body_html),
+                    'UTF-8',
+                    'inline'
+                );
+                $message_html->setDescription(_("HTML Version of Story"));
 
-            /* Add the two parts as multipart/alternative. */
-            $basepart = new MIME_Part('multipart/alternative');
-            $basepart->addPart($message_text);
-            $basepart->addPart($message_html);
+                /* Add the two parts as multipart/alternative. */
+                $basepart = new MIME_Part('multipart/alternative');
+                $basepart->addPart($message_text);
+                $basepart->addPart($message_html);
 
-            return $basepart;
+                return $basepart;
 
-        case 'text':
-            /* This is just a plain text story. */
-            $message_text = new MIME_Part('text/plain');
-            $message_text->setContents($message_text->replaceEOL($story['description'] . "\n\n" . $story['body']));
-            $message_text->setCharset('UTF-8');
+            case 'text':
+                /* This is just a plain text story. */
+                $message_text = new MIME_Part('text/plain');
+                $message_text->setContents($message_text->replaceEOL($story['description'] . "\n\n" . $story['body']));
+                $message_text->setCharset('UTF-8');
 
-            return $message_text;
+                return $message_text;
         }
     }
 

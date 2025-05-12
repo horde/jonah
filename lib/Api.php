@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Jonah external API interface.
  *
@@ -38,24 +39,24 @@ class Jonah_Api extends Horde_Registry_Api
      *
      * @return array An array of story information
      */
-    public function stories($channel_id, $filter = array())
+    public function stories($channel_id, $filter = [])
     {
         $filter = new Horde_Support_Array($filter);
 
         $stories = $GLOBALS['injector']
             ->getInstance('Jonah_Driver')
             ->getStories(
-                array(
+                [
                     'channel_id' => $channel_id,
                     'limit' => $filter->get('max_stories', 10),
                     'startnumber' => $filter->get('start_at', 0),
                     'published' => true,
-                )
-        );
+                ]
+            );
 
         foreach (array_keys($stories) as $s) {
             if (empty($stories[$s]['body_type']) || $stories[$s]['body_type'] == 'text') {
-                $stories[$s]['body_html'] = $GLOBALS['injector']->getInstance('Horde_Core_Factory_TextFilter')->filter($stories[$s]['body'], 'text2html', array('parselevel' => Horde_Text_Filter_Text2html::MICRO));
+                $stories[$s]['body_html'] = $GLOBALS['injector']->getInstance('Horde_Core_Factory_TextFilter')->filter($stories[$s]['body'], 'text2html', ['parselevel' => Horde_Text_Filter_Text2html::MICRO]);
             } else {
                 $stories[$s]['body_html'] = $stories[$s]['body'];
             }
@@ -77,7 +78,7 @@ class Jonah_Api extends Horde_Registry_Api
     {
         $story = $GLOBALS['injector']->getInstance('Jonah_Driver')->getStory($story_id, $read);
         if (empty($story['body_type']) || $story['body_type'] == 'text') {
-            $story['body_html'] = $GLOBALS['injector']->getInstance('Horde_Core_Factory_TextFilter')->filter($story['body'], 'text2html', array('parselevel' => Horde_Text_Filter_Text2html::MICRO));
+            $story['body_html'] = $GLOBALS['injector']->getInstance('Horde_Core_Factory_TextFilter')->filter($story['body'], 'text2html', ['parselevel' => Horde_Text_Filter_Text2html::MICRO]);
         } else {
             $story['body_html'] = $story['body'];
         }
@@ -107,7 +108,7 @@ class Jonah_Api extends Horde_Registry_Api
         $driver = $GLOBALS['injector']->getInstance('Jonah_Driver');
         $channel = $driver->getChannel($channel_id);
         /* Check permissions. */
-        if (!Jonah::checkPermissions('channels', Horde_Perms::EDIT, array($channel_id))) {
+        if (!Jonah::checkPermissions('channels', Horde_Perms::EDIT, [$channel_id])) {
             throw new Horde_Exception_PermissionDenied(_("You are not authorised for this action."));
         }
         $story['author'] = $GLOBALS['registry']->getAuth();
@@ -158,7 +159,7 @@ class Jonah_Api extends Horde_Registry_Api
      *
      * @return array  An array containing tag_name, and total
      */
-    public function listTagInfo($tags = array(), $channel_id = null)
+    public function listTagInfo($tags = [], $channel_id = null)
     {
         return $GLOBALS['injector']
             ->getInstance('Jonah_Driver')
@@ -206,7 +207,7 @@ class Jonah_Api extends Horde_Registry_Api
      *
      * @TODO Refactor to match the other application's searchTags API signature.
      */
-    public function searchTags($names, $filter = array(), $raw = false)
+    public function searchTags($names, $filter = [], $raw = false)
     {
         global $registry, $injector;
 
@@ -215,16 +216,16 @@ class Jonah_Api extends Horde_Registry_Api
             ? array_pop($filter->channel_id)
             : $filter->channel_id;
 
-        $criteria = array(
+        $criteria = [
             'tags' => $names,
             'startnumber' => $filter->from,
             'limit' => $filter->max,
-            'channel_id' => $channel_id
-        );
+            'channel_id' => $channel_id,
+        ];
         $results = $injector
             ->getInstance('Jonah_Driver')
             ->getStories($criteria, $filter->order);
-        $return = array();
+        $return = [];
 
         if ($raw) {
             // Requesting the raw story information as returned from searchTags,
@@ -240,7 +241,7 @@ class Jonah_Api extends Horde_Registry_Api
                         ->filter(
                             $story['body'],
                             'text2html',
-                            array('parselevel' => Horde_Text_Filter_Text2html::MICRO)
+                            ['parselevel' => Horde_Text_Filter_Text2html::MICRO]
                         );
                 } else {
                     $story['body_html'] = $story['body'];
@@ -249,21 +250,21 @@ class Jonah_Api extends Horde_Registry_Api
                 if ($comments) {
                     $story['num_comments'] = $registry->call(
                         'forums/numMessages',
-                         array($story['id'],
-                         $registry->getApp())
+                        [$story['id'],
+                            $registry->getApp()]
                     );
                 }
                 $return[$story['id']] = $story;
             }
         } else {
-            foreach($results as $story) {
+            foreach ($results as $story) {
                 if (!empty($story)) {
-                    $return[] = array(
+                    $return[] = [
                         'title' => $story['title'],
                         'desc' => $story['desc'],
                         'view_url' => $story['link'],
-                        'app' => 'jonah'
-                    );
+                        'app' => 'jonah',
+                    ];
                 }
             }
         }

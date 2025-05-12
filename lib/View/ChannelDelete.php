@@ -1,4 +1,5 @@
 <?php
+
 /**
  * View for handling deletion of channels.
  *
@@ -43,14 +44,14 @@ class Jonah_View_ChannelDelete extends Jonah_View_Base
         }
 
         /* Check permissions and deny if not allowed. */
-        if (!Jonah::checkPermissions('channels', Horde_Perms::DELETE, array($channel_id))) {
+        if (!Jonah::checkPermissions('channels', Horde_Perms::DELETE, [$channel_id])) {
             $notification->push(_("You are not authorised for this action."), 'horde.warning');
             throw new Horde_Exception_AuthenticationFailure();
         }
 
         $title = sprintf(_("Delete News Channel \"%s\"?"), $vars->get('channel_name'));
         $form = new Horde_Form($vars, $title);
-        $form->setButtons(array(_("Delete"), _("Do not delete")));
+        $form->setButtons([_("Delete"), _("Do not delete")]);
         $form->addHidden('', 'channel_id', 'int', true, true);
         $msg = _("Really delete this News Channel? All stories created in this channel will be lost!");
         $form->addVariable($msg, 'confirm', 'description', false);
@@ -72,10 +73,10 @@ class Jonah_View_ChannelDelete extends Jonah_View_Base
             exit;
         }
 
-        $GLOBALS['page_output']->header(array(
-            'title' => $title
-        ));
-        $notification->notify(array('listeners' => 'status'));
+        $GLOBALS['page_output']->header([
+            'title' => $title,
+        ]);
+        $notification->notify(['listeners' => 'status']);
         $form->renderActive(null, $vars, Horde::selfUrl(), 'post');
         $GLOBALS['page_output']->footer();
     }

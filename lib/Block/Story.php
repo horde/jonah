@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Provide API to embed news in other Horde applications.
  *
@@ -17,7 +18,7 @@ class Jonah_Block_Story extends Horde_Core_Block
 
     /**
      */
-    public function __construct($app, $params = array())
+    public function __construct($app, $params = [])
     {
         parent::__construct($app, $params);
 
@@ -29,28 +30,28 @@ class Jonah_Block_Story extends Horde_Core_Block
     protected function _params()
     {
         $channels = $GLOBALS['injector']->getInstance('Jonah_Driver')->getChannels();
-        $channel_choices = array();
+        $channel_choices = [];
         foreach ($channels as $channel) {
             $channel_choices[$channel['channel_id']] = $channel['channel_name'];
         }
         natcasesort($channel_choices);
 
-        return array(
-            'source' => array(
+        return [
+            'source' => [
                 'name' => _("Feed"),
                 'type' => 'enum',
-                'values' => $channel_choices
-            ),
-            'story' => array(
+                'values' => $channel_choices,
+            ],
+            'story' => [
                 'name' => _("Story"),
-                'type' => 'int'
-            ),
-            'countReads' => array(
+                'type' => 'int',
+            ],
+            'countReads' => [
                 'name' => _("Count reads of this story when this block is displayed"),
                 'type' => 'boolean',
-                'default' => false
-            )
-        );
+                'default' => false,
+            ],
+        ];
     }
 
     /**
@@ -88,12 +89,12 @@ class Jonah_Block_Story extends Horde_Core_Block
         }
 
         if (empty($story['body_type']) || $story['body_type'] == 'text') {
-            $story['body'] =  $GLOBALS['injector']->getInstance('Horde_Core_Factory_TextFilter')->filter($story['body'], 'text2html', array('parselevel' => Horde_Text_Filter_Text2html::MICRO));
+            $story['body'] =  $GLOBALS['injector']->getInstance('Horde_Core_Factory_TextFilter')->filter($story['body'], 'text2html', ['parselevel' => Horde_Text_Filter_Text2html::MICRO]);
         }
 
-        $tag_html = array();
+        $tag_html = [];
         foreach ($story['tags'] as $id => $tag) {
-            $tag_html[] = Horde::url('results.php')->add(array('tag_id' => $id, 'channel_id' => $this->_prams['source']))->link() . $tag . '</a>';
+            $tag_html[] = Horde::url('results.php')->add(['tag_id' => $id, 'channel_id' => $this->_prams['source']])->link() . $tag . '</a>';
         }
 
         return '<p class="storyTags">' . _("Tags: ")

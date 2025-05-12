@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Script to handle requests for html delivery of stories.
  *
@@ -11,10 +12,10 @@
  */
 
 require_once __DIR__ . '/lib/Application.php';
-$jonah = Horde_Registry::appInit('jonah', array(
+$jonah = Horde_Registry::appInit('jonah', [
     'authentication' => 'none',
-    'session_control' => 'readonly'
-));
+    'session_control' => 'readonly',
+]);
 $jonah = Horde_Registry::appInit('jonah');
 $templates = Horde::loadConfiguration('templates.php', 'templates', 'jonah');
 
@@ -25,7 +26,7 @@ if (empty($criteria['channel_format'])) {
     $criteria['channel_format'] = key($templates);
 }
 
-$options = array();
+$options = [];
 foreach ($templates as $key => $info) {
     $options[] = '<option value="' . $key . '"' . ($key == $criteria['channel_format'] ? ' selected="selected"' : '') . '>' . $info['name'] . '</option>';
 }
@@ -56,7 +57,7 @@ $template->set('stories', $news->renderChannel($criteria['channel_id'], $criteri
 
 // Buffer the notifications and send to the template
 Horde::startBuffer();
-$GLOBALS['notification']->notify(array('listeners' => 'status'));
+$GLOBALS['notification']->notify(['listeners' => 'status']);
 $template->set('notify', Horde::endBuffer());
 
 $page_output->header();

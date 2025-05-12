@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Jonah application API.
  *
@@ -6,13 +7,13 @@
  */
 
 if (!defined('JONAH_BASE')) {
-    define('JONAH_BASE', __DIR__. '/..');
+    define('JONAH_BASE', __DIR__ . '/..');
 }
 
 if (!defined('HORDE_BASE')) {
     /* If horde does not live directly under the app directory, the HORDE_BASE
      * constant should be defined in config/horde.local.php. */
-    if (file_exists(JONAH_BASE. '/config/horde.local.php')) {
+    if (file_exists(JONAH_BASE . '/config/horde.local.php')) {
         include JONAH_BASE . '/config/horde.local.php';
     } else {
         define('HORDE_BASE', JONAH_BASE . '/..');
@@ -45,18 +46,19 @@ class Jonah_Application extends Horde_Registry_Application
                 $url->add('tag_id', $tag_id);
             }
 
-            $GLOBALS['page_output']->addLinkTag(array(
+            $GLOBALS['page_output']->addLinkTag([
                 'href' => $url,
-                'title' => 'RSS 0.91'
-            ));
+                'title' => 'RSS 0.91',
+            ]);
         }
 
-       /* For now, autoloading the Content_* classes depend on there being a
-         * registry entry for the 'content' application that contains at least
-         * the fileroot entry. */
+        /* For now, autoloading the Content_* classes depend on there being a
+          * registry entry for the 'content' application that contains at least
+          * the fileroot entry. */
         $GLOBALS['injector']->getInstance('Horde_Autoloader')
             ->addClassPathMapper(
-                new Horde_Autoloader_ClassPathMapper_Prefix('/^Content_/', $GLOBALS['registry']->get('fileroot', 'content') . '/lib/'));
+                new Horde_Autoloader_ClassPathMapper_Prefix('/^Content_/', $GLOBALS['registry']->get('fileroot', 'content') . '/lib/')
+            );
 
     }
 
@@ -64,26 +66,26 @@ class Jonah_Application extends Horde_Registry_Application
      */
     public function perms()
     {
-        $perms = array(
-            'admin' => array(
-                'title' => _("Administrator")
-            ),
-            'news' => array(
-                'title' => _("News")
-            ),
-            'news:channels' => array(
-                'title' => _("Channels")
-            )
-        );
+        $perms = [
+            'admin' => [
+                'title' => _("Administrator"),
+            ],
+            'news' => [
+                'title' => _("News"),
+            ],
+            'news:channels' => [
+                'title' => _("Channels"),
+            ],
+        ];
 
         /* Loop through internal channels and add them to the perms
          * titles. */
         $channels = $GLOBALS['injector']->getInstance('Jonah_Driver')->getChannels();
 
         foreach ($channels as $channel) {
-            $perms['news:channels:' . $channel['channel_id']] = array(
-                'title' => $channel['channel_name']
-            );
+            $perms['news:channels:' . $channel['channel_id']] = [
+                'title' => $channel['channel_name'],
+            ];
         }
 
         return $perms;
@@ -95,28 +97,28 @@ class Jonah_Application extends Horde_Registry_Application
     {
         /* If authorized, show admin links. */
         if (Jonah::checkPermissions('jonah:news', Horde_Perms::EDIT)) {
-            $menu->addArray(array(
+            $menu->addArray([
                 'icon' => 'jonah.png',
                 'text' => _("_Feeds"),
-                'url' => Horde::url('channels/index.php')
-            ));
-            $menu->addArray(array(
+                'url' => Horde::url('channels/index.php'),
+            ]);
+            $menu->addArray([
                 'icon' => 'new.png',
                 'text' => _("New Feed"),
-                'url' => Horde::url('channels/edit.php')
-            ));
+                'url' => Horde::url('channels/edit.php'),
+            ]);
         }
 
         /* If viewing a channel, show new story links if authorized */
         if ($channel_id = Horde_Util::getFormData('channel_id')) {
             $news = $GLOBALS['injector']->getInstance('Jonah_Driver');
             $channel = $news->getChannel($channel_id);
-            if (Jonah::checkPermissions('channels', Horde_Perms::EDIT, array($channel_id))) {
-                $menu->addArray(array(
+            if (Jonah::checkPermissions('channels', Horde_Perms::EDIT, [$channel_id])) {
+                $menu->addArray([
                     'icon' => 'new.png',
                     'text' => _("_New Story"),
-                    'url' => Horde::url('stories/edit.php')->add('channel_id', (int)$channel_id)
-                ));
+                    'url' => Horde::url('stories/edit.php')->add('channel_id', (int) $channel_id),
+                ]);
             }
         }
     }
@@ -125,9 +127,11 @@ class Jonah_Application extends Horde_Registry_Application
 
     /**
      */
-    public function topbarCreate(Horde_Tree_Renderer_Base $tree, $parent = null,
-                                 array $params = array())
-    {
+    public function topbarCreate(
+        Horde_Tree_Renderer_Base $tree,
+        $parent = null,
+        array $params = []
+    ) {
         if (!Jonah::checkPermissions('jonah:news', Horde_Perms::EDIT)) {
             return;
         }
@@ -145,16 +149,16 @@ class Jonah_Application extends Horde_Registry_Application
         $story_img = Horde_Themes::img('editstory.png');
 
         foreach ($channels as $channel) {
-            $tree->addNode(array(
+            $tree->addNode([
                 'id' => $parent . $channel['channel_id'],
                 'parent' => $parent,
                 'label' => $channel['channel_name'],
                 'expanded' => false,
-                'params' => array(
+                'params' => [
                     'icon' => $story_img,
-                    'url' => $url->add('channel_id', $channel['channel_id'])
-                )
-            ));
+                    'url' => $url->add('channel_id', $channel['channel_id']),
+                ],
+            ]);
         }
     }
 

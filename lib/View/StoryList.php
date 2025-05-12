@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Turba_View_StoryList:: A view to handle displaying a list of stories in a
  * channel.
@@ -28,7 +29,7 @@ class Jonah_View_StoryList extends Jonah_View_Base
         extract($this->_params, EXTR_REFS);
 
         $channel = $GLOBALS['injector']->getInstance('Jonah_Driver')->getChannel($channel_id);
-        if (!Jonah::checkPermissions('channels', Horde_Perms::EDIT, array($channel_id))) {
+        if (!Jonah::checkPermissions('channels', Horde_Perms::EDIT, [$channel_id])) {
             $notification->push(_("You are not authorised for this action."), 'horde.warning');
             throw new Horde_Exception_AuthenticationFailure();
         }
@@ -41,7 +42,7 @@ class Jonah_View_StoryList extends Jonah_View_Base
         }
 
         try {
-            $stories = $GLOBALS['injector']->getInstance('Jonah_Driver')->getStories(array('channel_id' => $channel_id));
+            $stories = $GLOBALS['injector']->getInstance('Jonah_Driver')->getStories(['channel_id' => $channel_id]);
         } catch (Exception $e) {
             $notification->push(sprintf(_("Invalid channel requested. %s"), $e->getMessage()), 'horde.error');
             Horde::url('channels/index.php', true)->redirect();
@@ -71,23 +72,23 @@ class Jonah_View_StoryList extends Jonah_View_Base
             $stories[$key]['view_link'] = Horde::link($GLOBALS['injector']->getInstance('Jonah_Driver')->getStoryLink($channel, $story), $story['description']) . htmlspecialchars($story['title']) . '</a>';
 
             /* PDF link. */
-            $url = Horde::url('stories/pdf.php')->add(array('id' => $story['id'], 'channel_id' => $channel_id));
-            $stories[$key]['pdf_link'] = $url->link(array('title' => _("PDF version"))) . Horde::img('mime/pdf.png') . '</a>';
+            $url = Horde::url('stories/pdf.php')->add(['id' => $story['id'], 'channel_id' => $channel_id]);
+            $stories[$key]['pdf_link'] = $url->link(['title' => _("PDF version")]) . Horde::img('mime/pdf.png') . '</a>';
 
             /* Edit story link. */
-            $url = Horde::url('stories/edit.php')->add(array('id' => $story['id'], 'channel_id' => $channel_id));
-            $stories[$key]['edit_link'] = $url->link(array('title' => _("Edit story"))) . Horde::img('edit.png') . '</a>';
+            $url = Horde::url('stories/edit.php')->add(['id' => $story['id'], 'channel_id' => $channel_id]);
+            $stories[$key]['edit_link'] = $url->link(['title' => _("Edit story")]) . Horde::img('edit.png') . '</a>';
 
             /* Delete story link. */
-            if (Jonah::checkPermissions('channels', Horde_Perms::DELETE, array($channel_id))) {
-                $url = Horde::url('stories/delete.php')->add(array('id' => $story['id'], 'channel_id' => $channel_id));
-                $stories[$key]['delete_link'] = $url->link(array('title' => _("Delete story"))) . Horde::img('delete.png') . '</a>';
+            if (Jonah::checkPermissions('channels', Horde_Perms::DELETE, [$channel_id])) {
+                $url = Horde::url('stories/delete.php')->add(['id' => $story['id'], 'channel_id' => $channel_id]);
+                $stories[$key]['delete_link'] = $url->link(['title' => _("Delete story")]) . Horde::img('delete.png') . '</a>';
             }
 
             /* Comment counter. */
             if ($conf['comments']['allow'] &&
                 $registry->hasMethod('forums/numMessages')) {
-                $comments = $registry->call('forums/numMessages', array($stories[$key]['id'], 'jonah'));
+                $comments = $registry->call('forums/numMessages', [$stories[$key]['id'], 'jonah']);
                 if (!is_a($comments, 'PEAR_Error')) {
                     $stories[$key]['comments'] = $comments;
                 }
@@ -97,15 +98,15 @@ class Jonah_View_StoryList extends Jonah_View_Base
 
         /* Render page */
         $title = $channel['channel_name'];
-        $view = new Horde_View(array('templatePath' => JONAH_TEMPLATES . '/stories'));
+        $view = new Horde_View(['templatePath' => JONAH_TEMPLATES . '/stories']);
         $view->stories = $stories;
         $view->read = true;
         $view->comments = $conf['comments']['allow'] && $registry->hasMethod('forums/numMessages');
 
-        $GLOBALS['page_output']->header(array(
-            'title' => $title
-        ));
-        $notification->notify(array('listeners' => 'status'));
+        $GLOBALS['page_output']->header([
+            'title' => $title,
+        ]);
+        $notification->notify(['listeners' => 'status']);
         echo $view->render('index');
         $GLOBALS['page_output']->footer();
     }

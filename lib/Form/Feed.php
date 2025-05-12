@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This class extends Horde_Form to provide the form to add/edit
  * feeds.
@@ -16,7 +17,7 @@ class Jonah_Form_Feed extends Horde_Form
 {
     /**
      */
-    function __construct(&$vars)
+    public function __construct(&$vars)
     {
         $channel_id = $vars->get('channel_id');
         $editing = (!empty($channel_id));
@@ -30,14 +31,21 @@ class Jonah_Form_Feed extends Horde_Form
 
     /**
      */
-    function setExtraFields($channel_id = null)
+    public function setExtraFields($channel_id = null)
     {
         $this->addVariable(_("Description"), 'channel_desc', 'text', false);
         $this->addVariable(
-            _("Channel Slug"), 'channel_slug', 'text', true, false,
-           sprintf(_("Slugs allows direct access to this channel's content by visiting: %s. <br /> Slug names may contain only letters, numbers or the _ (underscore) character."),
-                    Horde::url('slugname')),
-            array('/^[a-zA-Z1-9_]*$/'));
+            _("Channel Slug"),
+            'channel_slug',
+            'text',
+            true,
+            false,
+            sprintf(
+                _("Slugs allows direct access to this channel's content by visiting: %s. <br /> Slug names may contain only letters, numbers or the _ (underscore) character."),
+                Horde::url('slugname')
+            ),
+            ['/^[a-zA-Z1-9_]*$/']
+        );
 
         $this->addVariable(_("Include full story content in syndicated feeds?"), 'channel_full_feed', 'boolean', false);
         $this->addVariable(_("Channel URL if not the default one. %c gets replaced by the feed ID."), 'channel_link', 'text', false);

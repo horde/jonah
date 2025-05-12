@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Jonah_Driver factory.
  *
@@ -18,7 +19,7 @@ class Jonah_Factory_Driver extends Horde_Core_Factory_Injector
      *
      * @var array
      */
-    private $_instances = array();
+    private $_instances = [];
 
     /**
      * Return the driver instance.
@@ -33,7 +34,7 @@ class Jonah_Factory_Driver extends Horde_Core_Factory_Injector
     {
         $driver = Horde_String::ucfirst($GLOBALS['conf']['news']['storage']['driver']);
         $driver = basename($driver);
-        $params = Horde::getDriverConfig(array('news', 'storage'), $driver);
+        $params = Horde::getDriverConfig(['news', 'storage'], $driver);
 
         $sig = md5($driver . serialize($params));
         if (isset($this->_instances[$sig])) {

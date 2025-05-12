@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Jonah_View_StoryView:: class to display an individual story.
  *
@@ -31,38 +32,38 @@ class Jonah_View_StoryView extends Jonah_View_Base
         $page_output->addScriptFile('syntaxhighlighter/scripts/shAutoloader.js', 'horde');
         $path = $GLOBALS['registry']->get('jsuri', 'horde') . '/syntaxhighlighter/scripts/';
         $brushes = <<<EOT
-          SyntaxHighlighter.autoloader(
-          'applescript            {$path}shBrushAppleScript.js',
-          'actionscript3 as3      {$path}shBrushAS3.js',
-          'bash shell             {$path}shBrushBash.js',
-          'coldfusion cf          {$path}shBrushColdFusion.js',
-          'cpp c                  {$path}shBrushCpp.js',
-          'c# c-sharp csharp      {$path}shBrushCSharp.js',
-          'css                    {$path}shBrushCss.js',
-          'delphi pascal          {$path}shBrushDelphi.js',
-          'diff patch pas         {$path}shBrushDiff.js',
-          'erl erlang             {$path}shBrushErlang.js',
-          'groovy                 {$path}shBrushGroovy.js',
-          'java                   {$path}shBrushJava.js',
-          'jfx javafx             {$path}shBrushJavaFX.js',
-          'js jscript javascript  {$path}shBrushJScript.js',
-          'perl pl                {$path}shBrushPerl.js',
-          'php                    {$path}shBrushPhp.js',
-          'text plain             {$path}shBrushPlain.js',
-          'py python              {$path}shBrushPython.js',
-          'ruby rails ror rb      {$path}shBrushRuby.js',
-          'sass scss              {$path}shBrushSass.js',
-          'scala                  {$path}shBrushScala.js',
-          'sql                    {$path}shBrushSql.js',
-          'vb vbnet               {$path}shBrushVb.js',
-          'xml xhtml xslt html    {$path}shBrushXml.js'
-        );
-EOT;
-        $page_output->addInlineScript(array(
+                      SyntaxHighlighter.autoloader(
+                      'applescript            {$path}shBrushAppleScript.js',
+                      'actionscript3 as3      {$path}shBrushAS3.js',
+                      'bash shell             {$path}shBrushBash.js',
+                      'coldfusion cf          {$path}shBrushColdFusion.js',
+                      'cpp c                  {$path}shBrushCpp.js',
+                      'c# c-sharp csharp      {$path}shBrushCSharp.js',
+                      'css                    {$path}shBrushCss.js',
+                      'delphi pascal          {$path}shBrushDelphi.js',
+                      'diff patch pas         {$path}shBrushDiff.js',
+                      'erl erlang             {$path}shBrushErlang.js',
+                      'groovy                 {$path}shBrushGroovy.js',
+                      'java                   {$path}shBrushJava.js',
+                      'jfx javafx             {$path}shBrushJavaFX.js',
+                      'js jscript javascript  {$path}shBrushJScript.js',
+                      'perl pl                {$path}shBrushPerl.js',
+                      'php                    {$path}shBrushPhp.js',
+                      'text plain             {$path}shBrushPlain.js',
+                      'py python              {$path}shBrushPython.js',
+                      'ruby rails ror rb      {$path}shBrushRuby.js',
+                      'sass scss              {$path}shBrushSass.js',
+                      'scala                  {$path}shBrushScala.js',
+                      'sql                    {$path}shBrushSql.js',
+                      'vb vbnet               {$path}shBrushVb.js',
+                      'xml xhtml xslt html    {$path}shBrushXml.js'
+                    );
+            EOT;
+        $page_output->addInlineScript([
             $brushes,
             'SyntaxHighlighter.defaults[\'toolbar\'] = false',
-            'SyntaxHighlighter.all()'
-        ), true);
+            'SyntaxHighlighter.all()',
+        ], true);
 
         $sh_js_fs = $GLOBALS['registry']->get('jsfs', 'horde') . '/syntaxhighlighter/styles/';
         $sh_js_uri = Horde::url($GLOBALS['registry']->get('jsuri', 'horde'), false, -1) . '/syntaxhighlighter/styles/';
@@ -76,7 +77,7 @@ EOT;
         } catch (Exception $e) {
             $notification->push(sprintf(_("Error fetching story: %s"), $e->getMessage()), 'horde.warning');
             $page_output->header();
-            $notification->notify(array('listeners' => 'status'));
+            $notification->notify(['listeners' => 'status']);
             $page_output->footer();
             exit;
         }
@@ -90,10 +91,10 @@ EOT;
             $cloud->addElement(
                 $taginfo['tag_name'],
                 Horde::url('stories/results.php')->add(
-                    array(
+                    [
                         'tag' => trim($taginfo['tag_name']),
-                        'channel_id' => $channel_id
-                    )
+                        'channel_id' => $channel_id,
+                    ]
                 ),
                 $taginfo['count']
             );
@@ -110,7 +111,7 @@ EOT;
 
         /* Filter and prepare story content. */
         if (!empty($story['body_type']) && $story['body_type'] == 'text') {
-            $story['body'] = $GLOBALS['injector']->getInstance('Horde_Core_Factory_TextFilter')->filter($story['body'], 'text2html', array('parselevel' => Horde_Text_Filter_Text2html::MICRO));
+            $story['body'] = $GLOBALS['injector']->getInstance('Horde_Core_Factory_TextFilter')->filter($story['body'], 'text2html', ['parselevel' => Horde_Text_Filter_Text2html::MICRO]);
         }
 
         // If URL is present, it's used instead of a story body. I.e., Provides
@@ -124,9 +125,9 @@ EOT;
             $story['published_date'] = false;
         }
 
-        $view = new Horde_View(array('templatePath' => array(JONAH_TEMPLATES . '/stories',
-                                                             JONAH_TEMPLATES . '/stories/partial',
-                                                             JONAH_TEMPLATES . '/stories/layout')));
+        $view = new Horde_View(['templatePath' => [JONAH_TEMPLATES . '/stories',
+            JONAH_TEMPLATES . '/stories/partial',
+            JONAH_TEMPLATES . '/stories/layout']]);
         $view->addHelper('Tag');
         $view->addHelper('Text');
         $view->tagcloud = $cloud->buildHTML();
@@ -134,7 +135,7 @@ EOT;
 
         /* Insert link for sharing. */
         if ($conf['sharing']['allow']) {
-            $url = Horde::url('stories/share.php')->add(array('id' => $story['id'], 'channel_id' => $channel_id));
+            $url = Horde::url('stories/share.php')->add(['id' => $story['id'], 'channel_id' => $channel_id]);
             $view->sharelink = $url->link() . _("Share this story") . '</a>';
         }
 
@@ -145,17 +146,17 @@ EOT;
                 Horde::log($err, 'ERR');
             } else {
                 try {
-                    $comments = $registry->call('forums/doComments', array('jonah', $story_id, 'commentCallback'));
+                    $comments = $registry->call('forums/doComments', ['jonah', $story_id, 'commentCallback']);
                 } catch (Exception $e) {
                     Horde::log($e, 'ERR');
-                    $comments = array('threads' => '', 'comments' => '');
+                    $comments = ['threads' => '', 'comments' => ''];
                 }
                 $view->comments = $comments;
             }
         }
 
         $page_output->header();
-        $notification->notify(array('listeners' => 'status'));
+        $notification->notify(['listeners' => 'status']);
         echo $view->render('view');
         $page_output->footer();
     }

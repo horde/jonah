@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Script to handle requests for html delivery of stories.
  *
@@ -35,7 +36,7 @@ class Jonah_View_DeliveryHtml extends Jonah_View_Base
 
         $title = sprintf(_("HTML Delivery for \"%s\""), $channel['channel_name']);
 
-        $options = array();
+        $options = [];
         foreach ($templates as $key => $info) {
             $options[] = '<option value="' . $key . '"' . ($key == $criteria['format'] ? ' selected="selected"' : '') . '>' . $info['name'] . '</option>';
         }
@@ -55,12 +56,12 @@ class Jonah_View_DeliveryHtml extends Jonah_View_Base
 
         // Buffer the notifications and send to the template
         Horde::startBuffer();
-        $GLOBALS['notification']->notify(array('listeners' => 'status'));
+        $GLOBALS['notification']->notify(['listeners' => 'status']);
         $template->set('notify', Horde::endBuffer());
 
-        $GLOBALS['page_output']->header(array(
-            'title' => $title
-        ));
+        $GLOBALS['page_output']->header([
+            'title' => $title,
+        ]);
         echo $template->fetch(JONAH_TEMPLATES . '/delivery/html.html');
         $GLOBALS['page_output']->footer();
     }

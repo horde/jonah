@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Provide an api to embed news in other Horde applications.
  *
@@ -13,7 +14,7 @@ class Jonah_Block_News extends Horde_Core_Block
 {
     /**
      */
-    public function __construct($app, $params = array())
+    public function __construct($app, $params = [])
     {
         parent::__construct($app, $params);
 
@@ -25,9 +26,9 @@ class Jonah_Block_News extends Horde_Core_Block
     protected function _params()
     {
         $templates = Horde::loadConfiguration('templates.php', 'templates', 'jonah');
-        $params['source'] = array('name' => _("Feed"),
-                                  'type' => 'enum',
-                                  'values' => array());
+        $params['source'] = ['name' => _("Feed"),
+            'type' => 'enum',
+            'values' => []];
 
         $channels = $GLOBALS['injector']->getInstance('Jonah_Driver')->getChannels();
         foreach ($channels as $channel) {
@@ -35,23 +36,23 @@ class Jonah_Block_News extends Horde_Core_Block
         }
         natcasesort($params['source']['values']);
 
-        $params['view'] = array('name' => _("View"),
-                                'type' => 'enum',
-                                'values' => array(),
-                                );
+        $params['view'] = ['name' => _("View"),
+            'type' => 'enum',
+            'values' => [],
+        ];
         foreach ($templates as $key => $template) {
             $params['view']['values'][$key] = $template['name'];
         }
 
-        $params['max'] = array('name' => _("Maximum Stories"),
-                               'type' => 'int',
-                               'default' => 10,
-                               'required' => false);
+        $params['max'] = ['name' => _("Maximum Stories"),
+            'type' => 'int',
+            'default' => 10,
+            'required' => false];
 
-        $params['from'] = array('name' => _("First Story"),
-                                'type' => 'int',
-                                'default' => 0,
-                                'required' => false);
+        $params['from'] = ['name' => _("First Story"),
+            'type' => 'int',
+            'default' => 0,
+            'required' => false];
 
         return $params;
     }
@@ -85,13 +86,14 @@ class Jonah_Block_News extends Horde_Core_Block
             return _("No feed specified.");
         }
 
-        $view = isset($this->_params['view']) ? $this->_params['view'] : 'standard';
+        $view = $this->_params['view'] ?? 'standard';
 
         return $GLOBALS['injector']->getInstance('Jonah_Driver')->renderChannel(
-                $this->_params['source'],
-                $view,
-                $this->_params['max'],
-                $this->_params['from']);
+            $this->_params['source'],
+            $view,
+            $this->_params['max'],
+            $this->_params['from']
+        );
     }
 
 }

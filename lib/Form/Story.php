@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Form for editing a new Story.
  *
@@ -26,7 +27,7 @@ class Jonah_Form_Story extends Horde_Form
 {
     /**
      */
-    function __construct(&$vars)
+    public function __construct(&$vars)
     {
         parent::__construct($vars, $vars->get('id') ? _("Edit Story") : _("Add New Story"));
 
@@ -39,15 +40,15 @@ class Jonah_Form_Story extends Horde_Form
         $this->addHidden('', 'id', 'int', false);
         $this->addHidden('', 'read', 'int', false);
         $this->addVariable(_("Story Title (Headline)"), 'title', 'text', true);
-        $this->addVariable(_("Short Description"), 'description', 'longtext', true, false, null, array(2, 80));
+        $this->addVariable(_("Short Description"), 'description', 'longtext', true, false, null, [2, 80]);
         $this->addVariable(_("Publish Now?"), 'publish_now', 'boolean', false);
 
         $published = $vars->get('published');
         if ($published) {
-            $date_params = array(min(date('Y', $published), date('Y') - 2),
-                                 max(date('Y', $published), date('Y') + 10));
+            $date_params = [min(date('Y', $published), date('Y') - 2),
+                max(date('Y', $published), date('Y') + 10)];
         } else {
-            $date_params = array(date('Y') - 2, date('Y') + 10);
+            $date_params = [date('Y') - 2, date('Y') + 10];
         }
 
         $d = $this->addVariable(_("Or publish on this date:"), 'publish_date', 'monthdayyear', false, false, null, $date_params);
@@ -56,7 +57,7 @@ class Jonah_Form_Story extends Horde_Form
         $t = $this->addVariable('', 'publish_time', 'hourminutesecond', false);
         $t->setDefault($published);
 
-        $v = $this->addVariable(_("Story body type"), 'body_type', 'enum', false, false, null, array(Jonah::getBodyTypes()));
+        $v = $this->addVariable(_("Story body type"), 'body_type', 'enum', false, false, null, [Jonah::getBodyTypes()]);
         $v->setAction(Horde_Form_Action::factory('submit'));
         $v->setOption('trackchange', true);
 
@@ -69,9 +70,9 @@ class Jonah_Form_Story extends Horde_Form
 
         /* Set up the fields according to what the type of body requested. */
         if ($body_type == 'text') {
-            $this->addVariable(_("Full Story Text"), 'body', 'longtext', false, false, null, array(15, 80));
+            $this->addVariable(_("Full Story Text"), 'body', 'longtext', false, false, null, [15, 80]);
         } elseif ($body_type == 'richtext') {
-            $this->addVariable(_("Full Story Text"), 'body', 'longtext', false, false, null, array(20, 80, array('rte')));
+            $this->addVariable(_("Full Story Text"), 'body', 'longtext', false, false, null, [20, 80, ['rte']]);
         }
 
         $this->addVariable(_("Tags"), 'tags', 'text', false, false, _("Enter keywords to tag this story, separated by commas"));
@@ -83,7 +84,7 @@ class Jonah_Form_Story extends Horde_Form
 
     /**
      */
-    function getInfo(&$vars, &$info)
+    public function getInfo(&$vars, &$info)
     {
         parent::getInfo($vars, $info);
 
@@ -92,12 +93,13 @@ class Jonah_Form_Story extends Horde_Form
             $info['published'] = time();
         } elseif (!empty($info['publish_date'])) {
             $info['published'] = mktime(
-                (int)$info['publish_time']['hour'],
-                (int)$info['publish_time']['minute'],
+                (int) $info['publish_time']['hour'],
+                (int) $info['publish_time']['minute'],
                 0,
                 date('n', $info['publish_date']),
                 date('j', $info['publish_date']),
-                date('Y', $info['publish_date']));
+                date('Y', $info['publish_date'])
+            );
         } else {
             $info['published'] = null;
         }

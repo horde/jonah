@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Jonah interface to the Horde_Content tagger
  *
@@ -8,10 +9,10 @@
  */
 class Jonah_Tagger extends Horde_Core_Tagger
 {
-    const TYPE_STORY = 'story';
+    public const TYPE_STORY = 'story';
 
     protected $_app = 'jonah';
-    protected $_types = array(self::TYPE_STORY);
+    protected $_types = [self::TYPE_STORY];
 
     /**
      * Searches for resources that are tagged with all of the requested tags.
@@ -21,9 +22,9 @@ class Jonah_Tagger extends Horde_Core_Tagger
      *
      * @return  array  An array of story ids matching the search criteria.
      */
-    public function search($tags, $filter = array())
+    public function search($tags, $filter = [])
     {
-        $args = array('typeId' => $this->_type_ids[self::TYPE_STORY]);
+        $args = ['typeId' => $this->_type_ids[self::TYPE_STORY]];
 
         /* Add the tags to the search */
         $args['tagId'] = $GLOBALS['injector']
@@ -33,10 +34,11 @@ class Jonah_Tagger extends Horde_Core_Tagger
         if (!empty($filter['channel_ids'])) {
             $channels = $filter['channel_ids'];
         } else {
-            $channels = array();
+            $channels = [];
         }
 
-        return array_values($GLOBALS['injector']
+        return array_values(
+            $GLOBALS['injector']
             ->getInstance('Content_Tagger')
             ->getObjects($args)
         );

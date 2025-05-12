@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Display Tag Cloud
  *
@@ -13,7 +14,7 @@ class Jonah_Block_Cloud extends Horde_Core_Block
 {
     /**
      */
-    public function __construct($app, $params = array())
+    public function __construct($app, $params = [])
     {
         parent::__construct($app, $params);
 
@@ -24,13 +25,13 @@ class Jonah_Block_Cloud extends Horde_Core_Block
      */
     protected function _params()
     {
-        return array(
-            'results_url' => array(
+        return [
+            'results_url' => [
                 'name' => _("Results URL"),
                 'type' => 'text',
                 'default' => Horde::url('stories/results.php?tag=@tag@'),
-            ),
-        );
+            ],
+        ];
     }
 
     protected function _content()
@@ -46,8 +47,8 @@ class Jonah_Block_Cloud extends Horde_Core_Block
                 $cloud->addElement(
                     $tag['tag_name'],
                     str_replace(
-                        array('%40id%40', '%40tag%40', '@id@', '@tag@'),
-                        array($id, $tag['tag_name']),
+                        ['%40id%40', '%40tag%40', '@id@', '@tag@'],
+                        [$id, $tag['tag_name']],
                         $this->_params['results_url']
                     ),
                     $tag['count']

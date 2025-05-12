@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Base exception class for Jonah.
  *
@@ -7,6 +8,4 @@
  * @author  Michael J. Rubinsky <mrubinsk@horde.org>
  * @package Jonah
  */
-class Jonah_Exception extends Horde_Exception_Wrapped
-{
-}
+class Jonah_Exception extends Horde_Exception_Wrapped {}

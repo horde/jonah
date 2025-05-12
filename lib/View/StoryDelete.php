@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Jonah_View_StoryDelete:: handle story deletion
  *
@@ -35,7 +36,7 @@ class Jonah_View_StoryDelete extends Jonah_View_Base
         }
 
         /* Check permissions. */
-        if (!Jonah::checkPermissions('channels', Horde_Perms::DELETE, array($channel_id))) {
+        if (!Jonah::checkPermissions('channels', Horde_Perms::DELETE, [$channel_id])) {
             $notification->push(_("You are not authorised for this action."), 'horde.warning');
             throw new Horde_Exception_AuthenticationFailure();
         }
@@ -56,7 +57,7 @@ class Jonah_View_StoryDelete extends Jonah_View_Base
         $title = sprintf(_("Delete News Story \"%s\"?"), $vars->get('title'));
 
         $form = new Horde_Form($vars, $title);
-        $form->setButtons(array(_("Delete"), _("Do not delete")));
+        $form->setButtons([_("Delete"), _("Do not delete")]);
         $form->addHidden('', 'channel_id', 'int', true, true);
         $form->addHidden('', 'id', 'int', true, true);
         $form->addVariable(_("Really delete this News Story?"), 'confirm', 'description', false);
@@ -77,10 +78,10 @@ class Jonah_View_StoryDelete extends Jonah_View_Base
             Horde::url('stories/index.php', true)->add('channel_id', $channel_id)->setRaw(true)->redirect();
         }
 
-        $GLOBALS['page_output']->header(array(
-            'title' => $title
-        ));
-        $notification->notify(array('listeners' => 'status'));
+        $GLOBALS['page_output']->header([
+            'title' => $title,
+        ]);
+        $notification->notify(['listeners' => 'status']);
         $form->renderActive(null, $vars, Horde::url('stories/delete.php'), 'post');
         $GLOBALS['page_output']->footer();
     }

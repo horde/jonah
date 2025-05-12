@@ -1,4 +1,5 @@
 <?php
+
 /**
  * View for displaying Jonah channels.
  *
@@ -32,11 +33,11 @@ class Jonah_View_ChannelList extends Jonah_View_Base
             foreach ($channels as $key => $channel) {
                 /* Edit channel link. */
                 $url = Horde::url('channels/edit.php')->add('channel_id', $channel['channel_id']);
-                $channels[$key]['edit_link'] = $url->link(array('title' => _("Edit channel"))) . Horde::img('edit.png') . '</a>';
+                $channels[$key]['edit_link'] = $url->link(['title' => _("Edit channel")]) . Horde::img('edit.png') . '</a>';
 
                 /* Delete channel link. */
                 $url = Horde::url('channels/delete.php')->add('channel_id', $channel['channel_id']);
-                $channels[$key]['delete_link'] = $url->link(array('title' => _("Delete channel"))) . Horde::img('delete.png') . '</a>';
+                $channels[$key]['delete_link'] = $url->link(['title' => _("Delete channel")]) . Horde::img('delete.png') . '</a>';
 
                 /* View stories link. */
                 $channels[$key]['stories_url'] = Horde::url('stories/index.php')->add('channel_id', $channel['channel_id']);
@@ -47,11 +48,11 @@ class Jonah_View_ChannelList extends Jonah_View_Base
 
                 /* Add story link. */
                 $url = Horde::url('stories/edit.php')->add('channel_id', $channel['channel_id']);
-                $channels[$key]['addstory_link'] = $url->link(array('title' => _("Add story"))) . Horde::img('new.png') . '</a>';
+                $channels[$key]['addstory_link'] = $url->link(['title' => _("Add story")]) . Horde::img('new.png') . '</a>';
             }
         }
 
-        $view = new Horde_View(array('templatePath' => JONAH_TEMPLATES . '/view'));
+        $view = new Horde_View(['templatePath' => JONAH_TEMPLATES . '/view']);
         $view->addHelper('Tag');
         $view->channels = $channels;
         $view->search_img = Horde::img('search.png');
@@ -59,10 +60,10 @@ class Jonah_View_ChannelList extends Jonah_View_Base
         $page_output->addScriptFile('tables.js', 'horde');
         $page_output->addScriptFile('quickfinder.js', 'horde');
 
-        $page_output->header(array(
-            'title' => _("Feeds")
-        ));
-        $notification->notify(array('listeners' => 'status'));
+        $page_output->header([
+            'title' => _("Feeds"),
+        ]);
+        $notification->notify(['listeners' => 'status']);
         echo $view->render('channellist');
         $page_output->footer();
     }

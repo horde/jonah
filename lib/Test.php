@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This class provides the Jonah configuration for the test script.
  *
@@ -9,6 +10,7 @@
  *
  * @author  Michael Slusarz <slusarz@horde.org>
  * @package Jonah
+ * @coversNothing
  */
 class Jonah_Test extends Horde_Test
 {
@@ -17,45 +19,43 @@ class Jonah_Test extends Horde_Test
      *
      * @var array
      */
-    protected $_moduleList = array(
-        'gettext'  =>  array(
+    protected $_moduleList = [
+        'gettext'  =>  [
             'descrip' => 'Gettext Support',
-            'error' => 'Jonah will not run without gettext support. Compile php <code>--with-gettext</code> before continuing.'
-        ),
-        'xml'  =>  array(
+            'error' => 'Jonah will not run without gettext support. Compile php <code>--with-gettext</code> before continuing.',
+        ],
+        'xml'  =>  [
             'descrip' => 'XML Support',
-            'error' => 'Without XML support, Jonah WILL NOT WORK. You must fix this before going any further.'
-        )
-    );
+            'error' => 'Without XML support, Jonah WILL NOT WORK. You must fix this before going any further.',
+        ],
+    ];
 
     /**
      * PHP settings list.
      *
      * @var array
      */
-    protected $_settingsList = array();
+    protected $_settingsList = [];
 
     /**
      * PEAR modules list.
      *
      * @var array
      */
-    protected $_pearList = array();
+    protected $_pearList = [];
 
     /**
      * Inter-Horde application dependencies.
      *
      * @var array
      */
-    protected $_appList = array();
+    protected $_appList = [];
 
     /**
      * Any application specific tests that need to be done.
      *
      * @return string  HTML output.
      */
-    public function appTests()
-    {
-    }
+    public function appTests() {}
 
 }

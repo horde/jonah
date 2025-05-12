@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2003-2017 Horde LLC (http://www.horde.org/)
  *
@@ -34,7 +35,7 @@ class Jonah_View_StoryPdf extends Jonah_View
         }
 
         // Set up the PDF object.
-        $pdf = new Horde_Pdf_Writer(array('format' => 'Letter', 'unit' => 'pt'));
+        $pdf = new Horde_Pdf_Writer(['format' => 'Letter', 'unit' => 'pt']);
         $pdf->setMargins(50, 50);
 
         // Enable automatic page breaks.

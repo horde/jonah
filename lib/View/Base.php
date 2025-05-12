@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Jonah_View:: class wraps display or the various channel and story views.
  *
@@ -24,7 +25,7 @@ abstract class Jonah_View_Base
      *
      * @param array $params  View parameters
      */
-    public function __construct($params = array())
+    public function __construct($params = [])
     {
         $this->_params = $params;
     }
@@ -34,7 +35,7 @@ abstract class Jonah_View_Base
         extract($this->_params, EXTR_REFS);
         $notification->push(sprintf(_("Error fetching story: %s"), $message), 'horde.error');
         $GLOBALS['page_output']->header();
-        $notification->notify(array('listeners' => 'status'));
+        $notification->notify(['listeners' => 'status']);
         $GLOBALS['page_output']->footer();
         exit;
     }
@@ -45,4 +46,3 @@ abstract class Jonah_View_Base
     abstract public function run();
 
 }
-

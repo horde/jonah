@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Provides a list of deliverable internal channels.
  *
@@ -13,7 +14,7 @@ class Jonah_Block_Delivery extends Horde_Core_Block
 {
     /**
      */
-    public function __construct($app, $params = array())
+    public function __construct($app, $params = [])
     {
         parent::__construct($app, $params);
 
@@ -27,7 +28,7 @@ class Jonah_Block_Delivery extends Horde_Core_Block
         try {
             $channels = $GLOBALS['injector']->getInstance('Jonah_Driver')->getChannels();
         } catch (Jonah_Exception $e) {
-            $channels = array();
+            $channels = [];
         }
 
         $html = '';
@@ -38,16 +39,16 @@ class Jonah_Block_Delivery extends Horde_Core_Block
             $label = sprintf(_("\"%s\" stories in HTML"), $channel['channel_name']);
             $html .= '<tr><td width="140">' .
                 Horde::img('story_marker.png') . ' ' .
-                $url->link(array('title' => $label)) .
+                $url->link(['title' => $label]) .
                 htmlspecialchars($channel['channel_name']) . '</a></td>';
 
-            $html .= '<td>' . ($channel['channel_updated'] ? date('M d, Y H:i', (int)$channel['channel_updated']) : '-') . '</td>';
+            $html .= '<td>' . ($channel['channel_updated'] ? date('M d, Y H:i', (int) $channel['channel_updated']) : '-') . '</td>';
 
             /* Link for feed delivery. */
             $url = Horde::url('delivery/rss.php', true, -1)->add('channel_id', $channel['channel_id']);
             $label = sprintf(_("RSS Feed of \"%s\""), $channel['channel_name']);
             $html .= '<td align="right" class="nowrap">' .
-                     $url->link(array('title' => $label)) .
+                     $url->link(['title' => $label]) .
                      Horde::img('feed.png') . '</a> ';
         }
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Provide an API to embed the most popular news stories in other Horde
  * applications.
@@ -15,7 +16,7 @@ class Jonah_Block_NewsPopular extends Horde_Core_Block
 {
     /**
      */
-    public function __construct($app, $params = array())
+    public function __construct($app, $params = [])
     {
         parent::__construct($app, $params);
 
@@ -27,11 +28,11 @@ class Jonah_Block_NewsPopular extends Horde_Core_Block
     protected function _params()
     {
         $templates = Horde::loadConfiguration('templates.php', 'templates', 'jonah');
-        $params['source'] = array(
+        $params['source'] = [
             'name' => _("Feed"),
             'type' => 'enum',
-            'values' => array()
-        );
+            'values' => [],
+        ];
 
         $channels = $GLOBALS['injector']
             ->getInstance('Jonah_Driver')
@@ -42,21 +43,21 @@ class Jonah_Block_NewsPopular extends Horde_Core_Block
         }
         natcasesort($params['source']['values']);
 
-        $params['view'] = array(
+        $params['view'] = [
             'name' => _("View"),
             'type' => 'enum',
-            'values' => array()
-        );
+            'values' => [],
+        ];
         foreach ($templates as $key => $template) {
             $params['view']['values'][$key] = $template['name'];
         }
 
-        $params['max'] = array(
+        $params['max'] = [
             'name' => _("Maximum Stories"),
             'type' => 'int',
             'default' => 10,
-            'required' => false
-        );
+            'required' => false,
+        ];
 
         return $params;
     }
@@ -93,7 +94,7 @@ class Jonah_Block_NewsPopular extends Horde_Core_Block
 
         $params = $this->_params();
 
-        $view = isset($this->_params['view']) ? $this->_params['view'] : 'standard';
+        $view = $this->_params['view'] ?? 'standard';
         if (!isset($this->_params['max'])) {
             $this->_params['max'] = $params['max']['default'];
         }

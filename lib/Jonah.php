@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Jonah Base Class.
  *
@@ -16,9 +17,9 @@ class Jonah
 {
     /**
      */
-    const ORDER_PUBLISHED = 0;
-    const ORDER_READ = 1;
-    const ORDER_COMMENTS = 2;
+    public const ORDER_PUBLISHED = 0;
+    public const ORDER_READ = 1;
+    public const ORDER_COMMENTS = 2;
 
     /**
      * Obtain the list of stories from the passed in URI.
@@ -43,7 +44,7 @@ class Jonah
         if ($response->code <> '200') {
             throw new Jonah_Exception(sprintf(_("Could not open %s: %s"), $url, $response->code));
         }
-        $result = array('body' => $response->getBody());
+        $result = ['body' => $response->getBody()];
         $content_type = $response->getHeader('Content-Type');
         if (preg_match('/.*;\s?charset="?([^"]*)/', $content_type, $match)) {
             $result['charset'] = $match[1];
@@ -67,13 +68,13 @@ class Jonah
     {
         global $registry, $injector;
 
-        if ($registry->isAdmin(array('permission' => 'jonah:admin', 'permlevel' =>  $permission))) {
+        if ($registry->isAdmin(['permission' => 'jonah:admin', 'permlevel' =>  $permission])) {
             if (empty($in)) {
                 // Calls with no $in parameter are checking whether this user
                 // has permission.  Since this user is an admin, they always
                 // have permission.  If the $in parameter is an empty array,
                 // the method is expected to return an array too.
-                return is_array($in) ? array() : true;
+                return is_array($in) ? [] : true;
             } else {
                 return $in;
             }
@@ -81,20 +82,20 @@ class Jonah
 
         $perms = $injector->getInstance('Horde_Perms');
 
-        $out = array();
+        $out = [];
 
         switch ($filter) {
-        case 'channels':
-            foreach ($in as $key => $val) {
-                if ($perms->hasPermission('jonah:news',  $registry->getAuth(), $permission) ||
-                    $perms->hasPermission('jonah:news:' . $val['channel_id'], $registry->getAuth(), $permission)) {
-                    $out[$key] = $in[$key];
+            case 'channels':
+                foreach ($in as $key => $val) {
+                    if ($perms->hasPermission('jonah:news', $registry->getAuth(), $permission) ||
+                        $perms->hasPermission('jonah:news:' . $val['channel_id'], $registry->getAuth(), $permission)) {
+                        $out[$key] = $in[$key];
+                    }
                 }
-            }
-            break;
+                break;
 
-        default:
-            return $perms->hasPermission($filter, $registry->getAuth(), Horde_Perms::EDIT);
+            default:
+                return $perms->hasPermission($filter, $registry->getAuth(), Horde_Perms::EDIT);
         }
 
         return $out;
@@ -107,7 +108,7 @@ class Jonah
      */
     public static function getBodyTypes()
     {
-        static $types = array();
+        static $types = [];
         if (!empty($types)) {
             return $types;
         }
