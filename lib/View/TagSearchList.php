@@ -78,18 +78,18 @@ class Jonah_View_TagSearchList extends Jonah_View_Base
 
             /* PDF link. */
             $url = Horde::url('stories/pdf.php')->add(['id' => $story['id'], 'channel_id' => $channel_id]);
-            $stories[$key]['pdf_link'] = $url->link(['title' => _("PDF version")]) . Horde::img('mime/pdf.png') . '</a>';
+            $stories[$key]['pdf_link'] = $url->link(['title' => _("PDF version")]) . Horde_Themes_Image::tag('mime/pdf.png') . '</a>';
 
             /* Edit story link. */
             if (Jonah::checkPermissions('channels', Horde_Perms::EDIT, [$channel_id])) {
                 $url = Horde::url('stories/edit.php')->add(['id' => $story['id'], 'channel_id' => $channel_id]);
-                $stories[$key]['edit_link'] = $url->link(['title' => _("Edit story")]) . Horde::img('edit.png') . '</a>';
+                $stories[$key]['edit_link'] = $url->link(['title' => _("Edit story")]) . Horde_Themes_Image::tag('edit.png') . '</a>';
             }
 
             /* Delete story link. */
             if (Jonah::checkPermissions('channels', Horde_Perms::DELETE, [$channel_id])) {
                 $url = Horde::url('stories/delete.php')->add(['id' => $story['id'], 'channel_id' => $channel_id]);
-                $stories[$key]['delete_link'] = $url->link(['title' => _("Delete story")]) . Horde::img('delete.png') . '</a>';
+                $stories[$key]['delete_link'] = $url->link(['title' => _("Delete story")]) . Horde_Themes_Image::tag('delete.png') . '</a>';
             }
 
             /* Comment counter. */

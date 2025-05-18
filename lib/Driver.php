@@ -320,7 +320,7 @@ class Jonah_Driver
             array_walk($stories, [$this, '_escapeStoryDescriptions']);
 
             $template->set('error', false, true);
-            $template->set('story_marker', Horde::img('story_marker.png'));
+            $template->set('story_marker', Horde_Themes_Image::tag('story_marker.png'));
             $template->set('image', false, true);
             $template->set('form', false, true);
             if ($from) {

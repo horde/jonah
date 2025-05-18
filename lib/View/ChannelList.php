@@ -33,11 +33,11 @@ class Jonah_View_ChannelList extends Jonah_View_Base
             foreach ($channels as $key => $channel) {
                 /* Edit channel link. */
                 $url = Horde::url('channels/edit.php')->add('channel_id', $channel['channel_id']);
-                $channels[$key]['edit_link'] = $url->link(['title' => _("Edit channel")]) . Horde::img('edit.png') . '</a>';
+                $channels[$key]['edit_link'] = $url->link(['title' => _("Edit channel")]) . Horde_Themes_Image::tag('edit.png') . '</a>';
 
                 /* Delete channel link. */
                 $url = Horde::url('channels/delete.php')->add('channel_id', $channel['channel_id']);
-                $channels[$key]['delete_link'] = $url->link(['title' => _("Delete channel")]) . Horde::img('delete.png') . '</a>';
+                $channels[$key]['delete_link'] = $url->link(['title' => _("Delete channel")]) . Horde_Themes_Image::tag('delete.png') . '</a>';
 
                 /* View stories link. */
                 $channels[$key]['stories_url'] = Horde::url('stories/index.php')->add('channel_id', $channel['channel_id']);
@@ -48,14 +48,14 @@ class Jonah_View_ChannelList extends Jonah_View_Base
 
                 /* Add story link. */
                 $url = Horde::url('stories/edit.php')->add('channel_id', $channel['channel_id']);
-                $channels[$key]['addstory_link'] = $url->link(['title' => _("Add story")]) . Horde::img('new.png') . '</a>';
+                $channels[$key]['addstory_link'] = $url->link(['title' => _("Add story")]) . Horde_Themes_Image::tag('new.png') . '</a>';
             }
         }
 
         $view = new Horde_View(['templatePath' => JONAH_TEMPLATES . '/view']);
         $view->addHelper('Tag');
         $view->channels = $channels;
-        $view->search_img = Horde::img('search.png');
+        $view->search_img = Horde_Themes_Image::tag('search.png');
         global $page_output;
         $page_output->addScriptFile('tables.js', 'horde');
         $page_output->addScriptFile('quickfinder.js', 'horde');

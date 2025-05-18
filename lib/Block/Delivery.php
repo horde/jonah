@@ -38,7 +38,7 @@ class Jonah_Block_Delivery extends Horde_Core_Block
             $url = Horde::url('delivery/html.php')->add('channel_id', $channel['channel_id']);
             $label = sprintf(_("\"%s\" stories in HTML"), $channel['channel_name']);
             $html .= '<tr><td width="140">' .
-                Horde::img('story_marker.png') . ' ' .
+                Horde_Themes_Image::tag('story_marker.png') . ' ' .
                 $url->link(['title' => $label]) .
                 htmlspecialchars($channel['channel_name']) . '</a></td>';
 
@@ -49,7 +49,7 @@ class Jonah_Block_Delivery extends Horde_Core_Block
             $label = sprintf(_("RSS Feed of \"%s\""), $channel['channel_name']);
             $html .= '<td align="right" class="nowrap">' .
                      $url->link(['title' => $label]) .
-                     Horde::img('feed.png') . '</a> ';
+                     Horde_Themes_Image::tag('feed.png') . '</a> ';
         }
 
         if ($html) {
