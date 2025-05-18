@@ -113,7 +113,7 @@ class Jonah_Application extends Horde_Registry_Application
         if ($channel_id = Horde_Util::getFormData('channel_id')) {
             $news = $GLOBALS['injector']->getInstance('Jonah_Driver');
             $channel = $news->getChannel($channel_id);
-            if (Jonah::checkPermissions('channels', Horde_Perms::EDIT, [$channel_id])) {
+            if (Jonah::checkPermissions('channels', Horde_Perms::EDIT, ['val' => (int) $channel_id])) {
                 $menu->addArray([
                     'icon' => 'new.png',
                     'text' => _("_New Story"),
