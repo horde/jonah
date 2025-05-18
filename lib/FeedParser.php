@@ -18,9 +18,9 @@
 class Jonah_FeedParser
 {
     /**
-     * XML parser resource.
+     * XML parser. As of PHP 8 this is a class, not a resource.
      *
-     * @var resource
+     * @var XMLParser
      */
     public $parser;
 
