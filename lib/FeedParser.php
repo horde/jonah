@@ -97,7 +97,7 @@ class Jonah_FeedParser
     /**
      * Constructs a new Jonah_FeedParser parser object.
      */
-    public function Jonah_FeedParser($charset)
+    public function __construct($charset = 'utf-8')
     {
         $this->channel = [];
         $this->image = [];
