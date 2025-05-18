@@ -5,10 +5,6 @@
  *
  * @package Jonah
  */
-/**
- * Horde_Form_Action
- */
-require_once 'Horde/Form/Action.php';
 
 /**
  * This class extends Horde_Form to provide the form to add/edit
@@ -27,7 +23,7 @@ class Jonah_Form_Story extends Horde_Form
 {
     /**
      */
-    public function __construct(&$vars)
+    public function __construct($vars)
     {
         parent::__construct($vars, $vars->get('id') ? _("Edit Story") : _("Add New Story"));
 
@@ -84,7 +80,7 @@ class Jonah_Form_Story extends Horde_Form
 
     /**
      */
-    public function getInfo(&$vars, &$info)
+    public function getInfo($vars, $info)
     {
         parent::getInfo($vars, $info);
 
