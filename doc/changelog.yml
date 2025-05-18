@@ -1,4 +1,19 @@
 ---
+1.0.0-alpha4:
+  api: 1.0.0-alpha1
+  state:
+    release: alpha
+    api: alpha
+  date: 2025-05-18
+  license:
+    identifier: BSD-2-Clause
+    uri: http://www.horde.org/licenses/bsd
+  notes: |
+    fix: Replace deprecated call to Horde::img
+    fix: Remove reference symbol from Jonah_Form_Story signature and remove explicit require_once of Horde_Form_Action
+    fix: Turn php4 style constructor into a __construct()
+    fix: PHPDoc Type annotation, by PHP 8 the XMLParser Resource was turned into a class.
+    fix: Fix key name for permission check of individual channels
 1.0.0-alpha3:
   api: 1.0.0-alpha1
   state:
