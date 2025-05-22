@@ -80,9 +80,9 @@ class Jonah_Form_Story extends Horde_Form
 
     /**
      */
-    public function getInfo($vars, $info)
+    public function getInfo($vars = null, $info = [])
     {
-        parent::getInfo($vars, $info);
+        $info = parent::getInfo($vars, $info);
 
         /* Build release date. */
         if (!empty($info['publish_now'])) {
@@ -103,6 +103,7 @@ class Jonah_Form_Story extends Horde_Form
         unset($info['publish_now']);
         unset($info['publish_date']);
         unset($info['publish_time']);
+        return $info;
     }
 
 }
