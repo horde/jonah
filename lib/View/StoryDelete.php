@@ -64,7 +64,7 @@ class Jonah_View_StoryDelete extends Jonah_View_Base
 
         if ($form_submit == _("Delete")) {
             if ($form->validate($vars)) {
-                $form->getInfo($vars, $info);
+                $info = $form->getInfo($vars, $info);
                 try {
                     $driver->deleteStory($info['channel_id'], $info['id']);
                     $notification->push(_("The story has been deleted."), 'horde.success');
