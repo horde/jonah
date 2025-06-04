@@ -1,4 +1,16 @@
 ---
+1.0.0-alpha5:
+  api: 1.0.0-alpha1
+  state:
+    release: alpha
+    api: alpha
+  date: 2025-06-04
+  license:
+    identifier: BSD-2-Clause
+    uri: http://www.horde.org/licenses/bsd
+  notes: |
+    fix: Use return value from Horde_Form as returning by parameter reference is no longer supported in Horde_Form::getInfo
+    fix: Signature of getInfo in Story form
 1.0.0-alpha4:
   api: 1.0.0-alpha1
   state:
