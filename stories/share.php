@@ -89,7 +89,7 @@ $form->addVariable(_("Include"), 'include', 'enum', true, false, null, array(arr
 $form->addVariable(_("Message"), 'message', 'longtext', false, false, null, array(4, 40));
 
 if ($form->validate($vars)) {
-    $form->getInfo($vars, $info);
+    $info = $form->getInfo($vars, $info);
 
     $channel = $GLOBALS['injector']->getInstance('Jonah_Driver')->getChannel($channel_id);
     if (empty($channel['channel_story_url'])) {
