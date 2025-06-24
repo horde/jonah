@@ -57,7 +57,7 @@ class Jonah_View_ChannelDelete extends Jonah_View_Base
         $form->addVariable($msg, 'confirm', 'description', false);
         if ($form_submit == _("Delete")) {
             if ($form->validate($vars)) {
-                $info = $form->getInfo($vars, $info);
+                $info = $form->getInfo($vars);
                 try {
                     $delete = $GLOBALS['injector']->getInstance('Jonah_Driver')->deleteChannel($info);
                     $notification->push(_("The channel has been deleted."), 'horde.success');

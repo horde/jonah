@@ -47,7 +47,7 @@ class Jonah_View_ChannelEdit extends Jonah_View_Base
         $form->setExtraFields($channel_id);
         if ($formname && empty($changed_type)) {
             if ($form->validate($vars)) {
-                $info = $form->getInfo($vars, $info);
+                $info = $form->getInfo($vars);
                 try {
                     $save = $GLOBALS['injector']->getInstance('Jonah_Driver')->saveChannel($info);
                     $notification->push(sprintf(_("The feed \"%s\" has been saved."), $info['channel_name']), 'horde.success');
