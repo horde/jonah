@@ -1,4 +1,16 @@
 ---
+1.0.0-alpha6:
+  api: 1.0.0-alpha6
+  state:
+    release: alpha
+    api: alpha
+  date: 2026-03-07
+  license:
+    identifier: BSD-2-Clause
+    uri: https://spdx.org/licenses/BSD-2-Clause.html
+  notes: |-
+    fix: Drop unnecessary / uninitialized form parameter
+    fix: getInfo() no longer writes back to second parameter. Use return value.
 1.0.0-alpha5:
   api: 1.0.0-alpha1
   state:
