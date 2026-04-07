@@ -68,20 +68,20 @@ try {
     $stories = array();
 }
 
-// Build the template (@TODO: Use Horde_View)
-$template = new Horde_Template();
-$template->set('jonah', 'Jonah ' . $registry->getVersion() . ' (http://www.horde.org/jonah/)');
-$template->set('xsl', Horde_Themes::getFeedXsl());
+// Build the template
+$view = new Horde_View(['templatePath' => JONAH_TEMPLATES . '/delivery']);
+$view->jonah = 'Jonah ' . $registry->getVersion() . ' (http://www.horde.org/jonah/)';
+$view->xsl = Horde_Themes::getFeedXsl();
 if (!empty($criteria['tag_id'])) {
-    $template->set('channel_name', sprintf(_("Stories tagged with %s in %s"), implode(',', $criteria['tags']), htmlspecialchars($channel['channel_name'])));
+    $view->channel_name = sprintf(_("Stories tagged with %s in %s"), implode(',', $criteria['tags']), htmlspecialchars($channel['channel_name']));
 } else {
-    $template->set('channel_name', htmlspecialchars($channel['channel_name']));
+    $view->channel_name = htmlspecialchars($channel['channel_name']);
 }
-$template->set('channel_desc', htmlspecialchars($channel['channel_desc']));
-$template->set('channel_updated', htmlspecialchars(date('r', $channel['channel_updated'])));
-$template->set('channel_official', htmlspecialchars($channel['channel_official']));
-$template->set('channel_rss', htmlspecialchars(Horde::url('delivery/rss.php', true, -1)->add(array('type' => 'rss', 'channel_id' => $channel['channel_id']))));
-$template->set('channel_rss2', htmlspecialchars(Horde::url('delivery/rss.php', true, -1)->add(array('type' => 'rss2', 'channel_id' => $channel['channel_id']))));
+$view->channel_desc = htmlspecialchars($channel['channel_desc']);
+$view->channel_updated = htmlspecialchars(date('r', $channel['channel_updated']));
+$view->channel_official = htmlspecialchars($channel['channel_official']);
+$view->channel_rss = htmlspecialchars(Horde::url('delivery/rss.php', true, -1)->add(array('type' => 'rss', 'channel_id' => $channel['channel_id'])));
+$view->channel_rss2 = htmlspecialchars(Horde::url('delivery/rss.php', true, -1)->add(array('type' => 'rss2', 'channel_id' => $channel['channel_id'])));
 foreach ($stories as &$story) {
     $story['title'] = htmlspecialchars($story['title']);
     $story['description'] = htmlspecialchars($story['description']);
@@ -98,11 +98,11 @@ foreach ($stories as &$story) {
         $story['body'] = $GLOBALS['injector']->getInstance('Horde_Core_Factory_TextFilter')->filter($story['body'], 'text2html', array('parselevel' => Horde_Text_Filter_Text2html::MICRO));
     }
 }
-$template->set('stories', $stories);
+$view->stories = $stories;
 
 $browser->downloadHeaders($channel['channel_name'] . '.rss', 'text/xml', true);
-$tpl = JONAH_TEMPLATES . '/delivery/' . $criteria['feed_type'];
+$tpl = $criteria['feed_type'];
 if (!empty($channel['channel_full_feed'])) {
     $tpl .= '_full';
 }
-echo $template->fetch($tpl . '.xml');
+echo $view->render($tpl . '.xml');

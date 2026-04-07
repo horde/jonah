@@ -279,13 +279,13 @@ class Jonah_Driver
 
         $templates = Horde::loadConfiguration('templates.php', 'templates', 'jonah');
         $escape = !isset($templates[$tpl]['escape']) || !empty($templates[$tpl]['escape']);
-        $template = new Horde_Template();
+        $view = new Horde_View(['templatePath' => JONAH_TEMPLATES . '/channels']);
 
         if ($escape) {
             $channel['channel_name'] = htmlspecialchars($channel['channel_name']);
             $channel['channel_desc'] = htmlspecialchars($channel['channel_desc']);
         }
-        $template->set('channel', $channel, true);
+        $view->channel = $channel;
 
         /* Get one story more than requested to see if there are more stories. */
         if ($max !== null) {
@@ -306,10 +306,10 @@ class Jonah_Driver
         }
 
         if (!$stories) {
-            $template->set('error', _("No stories are currently available."), true);
-            $template->set('stories', false, true);
-            $template->set('image', false, true);
-            $template->set('form', false, true);
+            $view->error = _("No stories are currently available.");
+            $view->stories = false;
+            $view->image = false;
+            $view->form = false;
         } else {
             /* Escape. */
             if ($escape) {
@@ -319,53 +319,45 @@ class Jonah_Driver
             /* Process story summaries. */
             array_walk($stories, [$this, '_escapeStoryDescriptions']);
 
-            $template->set('error', false, true);
-            $template->set('story_marker', Horde_Themes_Image::tag('story_marker.png'));
-            $template->set('image', false, true);
-            $template->set('form', false, true);
+            $view->error = false;
+            $view->story_marker = Horde_Themes_Image::tag('story_marker.png');
+            $view->image = false;
+            $view->form = false;
             if ($from) {
-                $template->set('previous', max(0, $from - $max), true);
+                $view->previous = max(0, $from - $max);
             } else {
-                $template->set('previous', false, true);
+                $view->previous = false;
             }
             if ($from && !empty($channel['channel_page_link'])) {
-                $template->set(
-                    'previous_link',
-                    str_replace(
-                        ['%25c', '%25n', '%c', '%n'],
-                        ['%c', '%n', $channel['channel_id'], max(0, $from - $max)],
-                        $channel['channel_page_link']
-                    ),
-                    true
+                $view->previous_link = str_replace(
+                    ['%25c', '%25n', '%c', '%n'],
+                    ['%c', '%n', $channel['channel_id'], max(0, $from - $max)],
+                    $channel['channel_page_link']
                 );
             } else {
-                $template->set('previous_link', false, true);
+                $view->previous_link = false;
             }
             $more = count($stories) > $max;
             if ($more) {
-                $template->set('next', $from + $max, true);
+                $view->next = $from + $max;
                 array_pop($stories);
             } else {
-                $template->set('next', false, true);
+                $view->next = false;
             }
             if ($more && !empty($channel['channel_page_link'])) {
-                $template->set(
-                    'next_link',
-                    str_replace(
-                        ['%25c', '%25n', '%c', '%n'],
-                        ['%c', '%n', $channel['channel_id'], $from + $max],
-                        $channel['channel_page_link']
-                    ),
-                    true
+                $view->next_link = str_replace(
+                    ['%25c', '%25n', '%c', '%n'],
+                    ['%c', '%n', $channel['channel_id'], $from + $max],
+                    $channel['channel_page_link']
                 );
             } else {
-                $template->set('next_link', false, true);
+                $view->next_link = false;
             }
 
-            $template->set('stories', $stories, true);
+            $view->stories = $stories;
         }
 
-        return $template->parse($templates[$tpl]['template']);
+        return $view->render($templates[$tpl]['view_template']);
     }
 
     /**

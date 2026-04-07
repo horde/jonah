@@ -41,28 +41,27 @@ class Jonah_View_DeliveryHtml extends Jonah_View_Base
             $options[] = '<option value="' . $key . '"' . ($key == $criteria['format'] ? ' selected="selected"' : '') . '>' . $info['name'] . '</option>';
         }
 
-        $template = new Horde_Template();
-        $template->setOption('gettext', 'true');
-        $template->set('url', Horde::selfUrl());
-        $template->set('session', Horde_Util::formInput());
-        $template->set('channel_id', $criteria['feed']);
-        $template->set('channel_name', $channel['channel_name']);
-        $template->set('format', $criteria['format']);
-        $template->set('options', $options);
+        $view = new Horde_View(['templatePath' => JONAH_TEMPLATES . '/delivery']);
+        $view->url = Horde::selfUrl();
+        $view->session = Horde_Util::formInput();
+        $view->channel_id = $criteria['feed'];
+        $view->channel_name = $channel['channel_name'];
+        $view->format = $criteria['format'];
+        $view->options = $options;
 
         // @TODO: This is ugly. storage driver shouldn't be rendering any display
         // refactor this to use individual views possibly with a choice of different templates
-        $template->set('stories', $GLOBALS['injector']->getInstance('Jonah_Driver')->renderChannel($criteria['feed'], $criteria['format']));
+        $view->stories = $GLOBALS['injector']->getInstance('Jonah_Driver')->renderChannel($criteria['feed'], $criteria['format']);
 
         // Buffer the notifications and send to the template
         Horde::startBuffer();
         $GLOBALS['notification']->notify(['listeners' => 'status']);
-        $template->set('notify', Horde::endBuffer());
+        $view->notify = Horde::endBuffer();
 
         $GLOBALS['page_output']->header([
             'title' => $title,
         ]);
-        echo $template->fetch(JONAH_TEMPLATES . '/delivery/html.html');
+        echo $view->render('html');
         $GLOBALS['page_output']->footer();
     }
 
