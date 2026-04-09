@@ -31,7 +31,13 @@ class Jonah_View_ChannelEdit extends Jonah_View_Base
 
         /* Form not yet submitted and is being edited. */
         if (!$formname && $channel_id) {
-            $vars = new Horde_Variables($GLOBALS['injector']->getInstance('Jonah_Driver')->getChannel($channel_id));
+            try {
+                $vars = new Horde_Variables($GLOBALS['injector']->getInstance('Jonah_Driver')->getChannel($channel_id));
+            } catch (Exception $e) {
+                $notification->push(sprintf(_("Invalid channel requested. %s"), $e->getMessage()), 'horde.error');
+                Horde::url('channels/index.php', true)->redirect();
+                exit;
+            }
         }
 
         /* Get the vars for channel type. */

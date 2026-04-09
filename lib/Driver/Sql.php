@@ -237,7 +237,7 @@ class Jonah_Driver_Sql extends Jonah_Driver
             $info['url'] ?? null,
             isset($info['published']) ? (int) $info['published'] : null,
             time(),
-            (int) $info['read'],
+            (int) ($info['read'] ?? 0),
         ];
         if (empty($info['id'])) {
             $channel = $this->getChannel($info['channel_id']);
@@ -289,7 +289,7 @@ class Jonah_Driver_Sql extends Jonah_Driver
                 $GLOBALS['registry']->getAuth(),
                 Jonah_Tagger::TYPE_STORY
             );
-        $this->_timestampChannel($info['id'], time());
+        $this->_timestampChannel($info['channel_id'], time());
 
         return true;
     }
@@ -347,8 +347,6 @@ class Jonah_Driver_Sql extends Jonah_Driver
         } catch (Horde_Db_Exception $e) {
             throw new Jonah_Exception($e);
         }
-
-        return $result;
     }
 
     /**
@@ -366,8 +364,6 @@ class Jonah_Driver_Sql extends Jonah_Driver
         } catch (Horde_Db_Exception $e) {
             throw new Jonah_Exception($e);
         }
-
-        return (int) $result;
     }
 
     protected function _getStoryIdsByChannel($channel_id)
@@ -485,7 +481,7 @@ class Jonah_Driver_Sql extends Jonah_Driver
             $limit = $criteria['limit'];
         }
         if (isset($criteria['startnumber']) && isset($criteria['endnumber'])) {
-            $limit = min($criteria['endnumber'] - $criteria['startnumber'], $criteria['limit']);
+            $limit = min($criteria['endnumber'] - $criteria['startnumber'], $criteria['limit'] ?? $limit);
         }
         $start = $criteria['startnumber'] ?? 0;
 
@@ -498,8 +494,13 @@ class Jonah_Driver_Sql extends Jonah_Driver
         } catch (Horde_Db_Exception $e) {
             throw new Jonah_Exception($e);
         }
-        $channel = $this->_getChannel($criteria['channel_id']);
+        if (!is_array($criteria['channel_id'])) {
+            $channel = $this->_getChannel($criteria['channel_id']);
+        }
         foreach ($results as &$row) {
+            if (is_array($criteria['channel_id'])) {
+                $channel = $this->_getChannel($row['channel_id']);
+            }
             $row['link'] = (string) $this->getStoryLink($channel, $row);
             $row['tags'] = $GLOBALS['injector']
                 ->getInstance('Jonah_Tagger')
@@ -588,7 +589,7 @@ class Jonah_Driver_Sql extends Jonah_Driver
                 [$link, $story['id']]
             );
         } catch (Horde_Db_Exception $e) {
-            throw new Jonah_Exception($result);
+            throw new Jonah_Exception($e->getMessage());
         }
         $story['permalink'] = $link;
     }
@@ -614,7 +615,7 @@ class Jonah_Driver_Sql extends Jonah_Driver
             throw new Jonah_Exception($e);
         }
         if (empty($result)) {
-            return Horde_Exception_NotFound(sprintf(_("Channel \"%s\" not found."), $channel_id));
+            throw new Horde_Exception_NotFound(sprintf(_("Channel \"%s\" not found."), $channel_id));
         }
 
         return $result;

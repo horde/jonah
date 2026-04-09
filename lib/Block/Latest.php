@@ -41,8 +41,10 @@ class Jonah_Block_Latest extends Horde_Core_Block
         natcasesort($params['source']['values']);
 
         // Get first news source.
-        $channel = reset($channels);
-        $params['source']['default'] = $channel['channel_id'];
+        if (!empty($channels)) {
+            $channel = reset($channels);
+            $params['source']['default'] = $channel['channel_id'];
+        }
 
         $params['countReads'] = [
             'name' => _("Count reads of the latest story when this block is displayed"),

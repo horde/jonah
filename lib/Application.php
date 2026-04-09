@@ -43,7 +43,7 @@ class Jonah_Application extends Horde_Registry_Application
             $url = Horde::url('delivery/rss.php', true, -1)
                 ->add('channel_id', $channel_id);
             if ($tag_id = Horde_Util::getFormData('tag_id')) {
-                $url->add('tag_id', $tag_id);
+                $url = $url->add('tag_id', $tag_id);
             }
 
             $GLOBALS['page_output']->addLinkTag([
@@ -112,8 +112,12 @@ class Jonah_Application extends Horde_Registry_Application
         /* If viewing a channel, show new story links if authorized */
         if ($channel_id = Horde_Util::getFormData('channel_id')) {
             $news = $GLOBALS['injector']->getInstance('Jonah_Driver');
-            $channel = $news->getChannel($channel_id);
-            if (Jonah::checkPermissions('channels', Horde_Perms::EDIT, ['val' => (int) $channel_id])) {
+            try {
+                $channel = $news->getChannel($channel_id);
+            } catch (Exception $e) {
+                return;
+            }
+            if (Jonah::checkPermissions('channels', Horde_Perms::EDIT, [['channel_id' => (int) $channel_id]])) {
                 $menu->addArray([
                     'icon' => 'new.png',
                     'text' => _("_New Story"),

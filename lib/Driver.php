@@ -197,9 +197,13 @@ class Jonah_Driver
 
         /* Format dates. */
         $date_format = $GLOBALS['prefs']->getValue('date_format');
-        $story['updated_date'] = strftime($date_format, $story['updated']);
+        if (!empty($story['updated'])) {
+            $story['updated_date'] = (new Horde_Date($story['updated']))->strftime($date_format);
+        } else {
+            $story['updated_date'] = '';
+        }
         if (!empty($story['published'])) {
-            $story['published_date'] = strftime($date_format, $story['published']);
+            $story['published_date'] = (new Horde_Date($story['published']))->strftime($date_format);
         }
 
         return $story;
@@ -235,7 +239,7 @@ class Jonah_Driver
      */
     public function getChecksum($story)
     {
-        return md5($story['title'] . $story['description']);
+        return md5(($story['title'] ?? '') . ($story['description'] ?? ''));
     }
 
     /**
@@ -254,7 +258,7 @@ class Jonah_Driver
         if ($seconds === null) {
             return $interval;
         } else {
-            return $interval[$seconds];
+            return $interval[$seconds] ?? '';
         }
     }
 
@@ -372,13 +376,13 @@ $templates = Horde::loadConfiguration('templates.php', 'templates', 'jonah');
      */
     protected function _escapeStories(&$value, $key)
     {
-        $value['title'] = htmlspecialchars($value['title']);
-        $value['description'] = htmlspecialchars($value['description']);
+        $value['title'] = htmlspecialchars($value['title'] ?? '');
+        $value['description'] = htmlspecialchars($value['description'] ?? '');
         if (isset($value['link'])) {
             $value['link'] = htmlspecialchars($value['link']);
         }
         if (empty($value['body_type']) || $value['body_type'] != 'richtext') {
-            $value['body'] = htmlspecialchars($value['body']);
+            $value['body'] = htmlspecialchars($value['body'] ?? '');
         }
     }
 
@@ -410,7 +414,7 @@ $templates = Horde::loadConfiguration('templates.php', 'templates', 'jonah');
                 $body_text = $GLOBALS['injector']->getInstance('Horde_Core_Factory_TextFilter')->filter($body_html, 'html2text');
 
                 /* Add description. */
-                $body_html = '<p>' . $GLOBALS['injector']->getInstance('Horde_Core_Factory_TextFilter')->filter($story['desc'], 'text2html', ['parselevel' => Horde_Text_Filter_Text2html::MICRO, 'callback' => null]) . "</p>\n" . $body_html;
+                $body_html = '<p>' . $GLOBALS['injector']->getInstance('Horde_Core_Factory_TextFilter')->filter($story['description'], 'text2html', ['parselevel' => Horde_Text_Filter_Text2html::MICRO, 'callback' => null]) . "</p>\n" . $body_html;
                 $body_text = Horde_String::wrap('  ' . $story['description'], 70) . "\n\n" . $body_text;
 
                 /* Add the text version of the story to the base message. */

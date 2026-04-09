@@ -111,10 +111,14 @@ class Jonah_Api extends Horde_Registry_Api
         if (!Jonah::checkPermissions('channels', Horde_Perms::EDIT, [$channel_id])) {
             throw new Horde_Exception_PermissionDenied(_("You are not authorised for this action."));
         }
+        if (empty($story['title']) || empty($story['description'])) {
+            throw new Jonah_Exception(_("Stories require a title and description."));
+        }
         $story['author'] = $GLOBALS['registry']->getAuth();
         $story['channel_id'] = $channel_id;
         $story['published'] = time();
-        if (empty($body) || empty($body_type)) {
+        $story['read'] = $story['read'] ?? 0;
+        if (empty($story['body']) || empty($story['body_type'])) {
             $story['body_type'] = 'text';
         }
         $driver->saveStory($story);
@@ -129,7 +133,7 @@ class Jonah_Api extends Horde_Registry_Api
      */
     public function commentCallback($story_id)
     {
-        if (!$GLOBALS['conf']['comments']['allow']) {
+        if (empty($GLOBALS['conf']['comments']['allow'])) {
             return false;
         }
         $story = $GLOBALS['injector']->getInstance('Jonah_Driver')->getStory($story_id);
@@ -144,7 +148,7 @@ class Jonah_Api extends Horde_Registry_Api
      */
     public function hasComments()
     {
-        return $GLOBALS['conf']['comments']['allow'];
+        return !empty($GLOBALS['conf']['comments']['allow']);
     }
 
     /**
@@ -163,7 +167,7 @@ class Jonah_Api extends Horde_Registry_Api
     {
         return $GLOBALS['injector']
             ->getInstance('Jonah_Driver')
-            ->listTagInfo(current($channel_id));
+            ->listTagInfo(is_array($channel_id) ? current($channel_id) : $channel_id);
     }
 
     /**
@@ -261,7 +265,7 @@ class Jonah_Api extends Horde_Registry_Api
                 if (!empty($story)) {
                     $return[] = [
                         'title' => $story['title'],
-                        'desc' => $story['desc'],
+                        'desc' => $story['description'],
                         'view_url' => $story['link'],
                         'app' => 'jonah',
                     ];

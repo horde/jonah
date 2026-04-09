@@ -39,6 +39,7 @@ class Jonah_View_StoryEdit extends Jonah_View_Base
         } catch (Exception $e) {
             $notification->push(sprintf(_("Story editing failed: %s"), $e->getMessage()), 'horde.error');
             Horde::url('channels/index.php', true)->redirect();
+            exit;
         }
 
         /* Check permissions. */
@@ -50,9 +51,15 @@ class Jonah_View_StoryEdit extends Jonah_View_Base
         /* Check if a story is being edited. */
         $story_id = $vars->get('id');
         if ($story_id && !$vars->get('formname')) {
-            $story = $driver->getStory($story_id);
-            $story['tags'] = implode(',', array_values($story['tags']));
-            $vars = new Horde_Variables($story);
+            try {
+                $story = $driver->getStory($story_id);
+                $story['tags'] = implode(',', array_values($story['tags'] ?? []));
+                $vars = new Horde_Variables($story);
+            } catch (Exception $e) {
+                $notification->push(sprintf(_("Error loading story: %s"), $e->getMessage()), 'horde.error');
+                Horde::url('stories/index.php')->add('channel_id', $channel_id)->redirect();
+                exit;
+            }
         }
 
         /* Set up the form. */
