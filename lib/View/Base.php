@@ -41,6 +41,24 @@ abstract class Jonah_View_Base
     }
 
     /**
+     * Validate that all required parameters are present before extract().
+     *
+     * @param array $keys  Required parameter keys.
+     *
+     * @throws InvalidArgumentException
+     */
+    protected function _requireParams(array $keys): void
+    {
+        foreach ($keys as $key) {
+            if (!array_key_exists($key, $this->_params)) {
+                throw new InvalidArgumentException(
+                    sprintf('Missing required view parameter: %s', $key)
+                );
+            }
+        }
+    }
+
+    /**
      * Render this view.
      */
     abstract public function run();

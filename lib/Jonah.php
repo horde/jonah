@@ -143,7 +143,7 @@ class Jonah
         }
         /* The two most common body types have not been found, so just return
          * the first one that is in the array. */
-        return array_shift(array_keys($types));
+        return array_key_first($types);
     }
 
 }

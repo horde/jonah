@@ -94,13 +94,13 @@ class Jonah_Block_Story extends Horde_Core_Block
 
         $tag_html = [];
         foreach ($story['tags'] as $id => $tag) {
-            $tag_html[] = Horde::url('results.php')->add(['tag_id' => $id, 'channel_id' => $this->_prams['source']])->link() . $tag . '</a>';
+            $tag_html[] = Horde::url('results.php')->add(['tag_id' => $id, 'channel_id' => $this->_params['source']])->link() . $tag . '</a>';
         }
 
         return '<p class="storyTags">' . _("Tags: ")
             . implode(', ', $story['tags'])
             . '</p><p class="storySubtitle">'
-            . htmlspecialchars($story['desc'])
+            . htmlspecialchars($story['description'])
             . '</p><div class="storyBody">' . $story['body']
             . '</div>';
     }

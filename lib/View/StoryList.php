@@ -28,7 +28,13 @@ class Jonah_View_StoryList extends Jonah_View_Base
     {
         extract($this->_params, EXTR_REFS);
 
-        $channel = $GLOBALS['injector']->getInstance('Jonah_Driver')->getChannel($channel_id);
+        try {
+            $channel = $GLOBALS['injector']->getInstance('Jonah_Driver')->getChannel($channel_id);
+        } catch (Exception $e) {
+            $notification->push(sprintf(_("Invalid channel requested. %s"), $e->getMessage()), 'horde.error');
+            Horde::url('channels/index.php', true)->redirect();
+            exit;
+        }
         if (!Jonah::checkPermissions('channels', Horde_Perms::EDIT, [$channel_id])) {
             $notification->push(_("You are not authorised for this action."), 'horde.warning');
             throw new Horde_Exception_AuthenticationFailure();
@@ -46,6 +52,7 @@ class Jonah_View_StoryList extends Jonah_View_Base
         } catch (Exception $e) {
             $notification->push(sprintf(_("Invalid channel requested. %s"), $e->getMessage()), 'horde.error');
             Horde::url('channels/index.php', true)->redirect();
+            exit;
         }
 
         /* Do some state tests. */
@@ -60,7 +67,8 @@ class Jonah_View_StoryList extends Jonah_View_Base
         foreach ($stories as $key => $story) {
             /* published is the publication/release date, updated is the last change date. */
             if (!empty($stories[$key]['published'])) {
-                $stories[$key]['published_date'] = strftime($prefs->getValue('date_format') . ', ' . ($prefs->getValue('twentyFour') ? '%H:%M' : '%I:%M%p'), $stories[$key]['published']);
+                $dateFormat = $prefs->getValue('date_format') . ', ' . ($prefs->getValue('twentyFour') ? '%H:%M' : '%I:%M%p');
+                $stories[$key]['published_date'] = (new Horde_Date($stories[$key]['published']))->strftime($dateFormat);
             } else {
                 $stories[$key]['published_date'] = '';
             }
@@ -86,7 +94,7 @@ class Jonah_View_StoryList extends Jonah_View_Base
             }
 
             /* Comment counter. */
-            if ($conf['comments']['allow']
+            if (!empty($conf['comments']['allow'])
                 && $registry->hasMethod('forums/numMessages')) {
                 $comments = $registry->call('forums/numMessages', [$stories[$key]['id'], 'jonah']);
                 if (!is_a($comments, 'PEAR_Error')) {
@@ -101,7 +109,7 @@ class Jonah_View_StoryList extends Jonah_View_Base
         $view = new Horde_View(['templatePath' => JONAH_TEMPLATES . '/stories']);
         $view->stories = $stories;
         $view->read = true;
-        $view->comments = $conf['comments']['allow'] && $registry->hasMethod('forums/numMessages');
+        $view->comments = !empty($conf['comments']['allow']) && $registry->hasMethod('forums/numMessages');
 
         $GLOBALS['page_output']->header([
             'title' => $title,

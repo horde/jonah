@@ -119,17 +119,15 @@ class Jonah_FeedParser
 
         // Create the XML parser.
         $this->parser = xml_parser_create($this->charset);
-        xml_set_object($this->parser, $this);
         xml_parser_set_option($this->parser, XML_OPTION_CASE_FOLDING, false);
         xml_parser_set_option($this->parser, XML_OPTION_TARGET_ENCODING, 'UTF-8');
-        // Passing method as bare string is deprecated in PHP 8.4
-        xml_set_element_handler($this->parser, 'startElement', 'endElement');
-        xml_set_character_data_handler($this->parser, 'characterData');
-        xml_set_default_handler($this->parser, 'defaultHandler');
+        xml_set_element_handler($this->parser, [$this, 'startElement'], [$this, 'endElement']);
+        xml_set_character_data_handler($this->parser, [$this, 'characterData']);
+        xml_set_default_handler($this->parser, [$this, 'defaultHandler']);
 
         // Disable processing instructions and external entities.
-        xml_set_processing_instruction_handler($this->parser, '');
-        xml_set_external_entity_ref_handler($this->parser, '');
+        xml_set_processing_instruction_handler($this->parser, null);
+        xml_set_external_entity_ref_handler($this->parser, null);
     }
 
     /**
@@ -462,7 +460,7 @@ class Jonah_FeedParser
                     if (!isset($this->channel[$this->child])) {
                         $this->channel[$this->child] = '';
                     }
-                    $this->channel[$this->child] = $data;
+                    $this->channel[$this->child] .= $data;
                     break;
 
                 case 'IMAGE':

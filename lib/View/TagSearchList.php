@@ -31,7 +31,13 @@ class Jonah_View_TagSearchList extends Jonah_View_Base
         if (is_null($channel_id)) {
             $channels = $driver->getChannels();
         } else {
-            $channels = [$channel_id];
+            try {
+                $channels = [$driver->getChannel($channel_id)];
+            } catch (Exception $e) {
+                $notification->push(sprintf(_("Invalid channel requested. %s"), $e->getMessage()), 'horde.error');
+                Horde::url('channels/index.php', true)->redirect();
+                exit;
+            }
         }
 
         $stories = [];
@@ -65,7 +71,8 @@ class Jonah_View_TagSearchList extends Jonah_View_Base
             $channel_id = $story['channel_id'];
 
             if (!empty($stories[$key]['published'])) {
-                $stories[$key]['published_date'] = strftime($prefs->getValue('date_format') . ', ' . ($prefs->getValue('twentyFour') ? '%H:%M' : '%I:%M%p'), $stories[$key]['published']);
+                $dateFormat = $prefs->getValue('date_format') . ', ' . ($prefs->getValue('twentyFour') ? '%H:%M' : '%I:%M%p');
+                $stories[$key]['published_date'] = (new Horde_Date($stories[$key]['published']))->strftime($dateFormat);
             } else {
                 $stories[$key]['published_date'] = '';
             }
@@ -93,22 +100,24 @@ class Jonah_View_TagSearchList extends Jonah_View_Base
             }
 
             /* Comment counter. */
-            if ($conf['comments']['allow']
+            if (!empty($conf['comments']['allow'])
                 && $registry->hasMethod('forums/numMessages')) {
+                $comments = 0;
                 try {
                     $comments = $registry->call('forums/numMessages', [$stories[$key]['id'], 'jonah']);
                 } catch (Exception $e) {
+                    $comments = 0;
                 }
                 $stories[$key]['comments'] = $comments;
             }
         }
 
         /* Render page */
-        //$title = $channel['channel_name'];
+        $title = _("Tag Search Results");
         $view = new Horde_View(['templatePath' => JONAH_TEMPLATES . '/stories']);
         $view->stories = $stories;
         $view->read = true;
-        $view->comments = $conf['comments']['allow'] && $registry->hasMethod('forums/numMessages');
+        $view->comments = !empty($conf['comments']['allow']) && $registry->hasMethod('forums/numMessages');
 
         $GLOBALS['page_output']->header([
             'title' => $title,
