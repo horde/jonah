@@ -66,9 +66,10 @@ if (empty($conf['sharing']['allow'])) {
     exit;
 }
 
-$story = $GLOBALS['injector']->getInstance('Jonah_Driver')->getStory($story_id);
-if (is_a($story, 'PEAR_Error')) {
-    $notification->push(sprintf(_("Error fetching story: %s"), $story->getMessage()), 'horde.warning');
+try {
+    $story = $GLOBALS['injector']->getInstance('Jonah_Driver')->getStory($story_id);
+} catch (Exception $e) {
+    $notification->push(sprintf(_("Error fetching story: %s"), $e->getMessage()), 'horde.warning');
     $story = ['title' => '', 'id' => '', 'body' => '', 'description' => ''];
 }
 $vars->set('subject', $story['title'] ?? '');
@@ -124,20 +125,19 @@ if ($form->validate($vars)) {
             $message_part = Jonah::getStoryAsMessage($story);
         }
 
-        $result = _mail(
-            $message_part,
-            $info['from'],
-            $info['recipients'],
-            $info['subject'],
-            $info['message']
-        );
-
-        if (is_a($result, 'PEAR_Error')) {
-            $notification->push(sprintf(_("Unable to send story: %s"), $result->getMessage()), 'horde.error');
-        } else {
+        try {
+            $result = _mail(
+                $message_part,
+                $info['from'],
+                $info['recipients'],
+                $info['subject'],
+                $info['message']
+            );
             $notification->push(_("The story was sent successfully."), 'horde.success');
             header('Location: ' . $story_url);
             exit;
+        } catch (Exception $e) {
+            $notification->push(sprintf(_("Unable to send story: %s"), $e->getMessage()), 'horde.error');
         }
     }
 }

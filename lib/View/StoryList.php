@@ -96,9 +96,10 @@ class Jonah_View_StoryList extends Jonah_View_Base
             /* Comment counter. */
             if (!empty($conf['comments']['allow'])
                 && $registry->hasMethod('forums/numMessages')) {
-                $comments = $registry->call('forums/numMessages', [$stories[$key]['id'], 'jonah']);
-                if (!is_a($comments, 'PEAR_Error')) {
-                    $stories[$key]['comments'] = $comments;
+                try {
+                    $stories[$key]['comments'] = $registry->call('forums/numMessages', [$stories[$key]['id'], 'jonah']);
+                } catch (Exception $e) {
+                    Horde::log($e, 'ERR');
                 }
             }
 
