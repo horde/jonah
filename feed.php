@@ -47,17 +47,27 @@ if (empty($criteria['channel_id'])) {
 }
 
 if (!empty($stories)) {
-    die(print_r($stories, true));
+    // @TODO: Implement proper story output
 }
 
 $view = new Horde_View(['templatePath' => JONAH_TEMPLATES . '/delivery']);
 $view->url = Horde::selfUrl();
 $view->session = Horde_Util::formInput();
-$view->channel_id = $criteria['channel_id'];
-$view->channel_name = $channel['channel_name'];
+$view->channel_id = $criteria['channel_id'] ?? '';
+$driver = $GLOBALS['injector']->getInstance('Jonah_Driver');
+try {
+    $channel = $driver->getChannel($criteria['channel_id']);
+    $view->channel_name = $channel['channel_name'];
+} catch (Exception $e) {
+    $view->channel_name = '';
+}
 $view->format = $criteria['channel_format'];
 $view->options = $options;
-$view->stories = $news->renderChannel($criteria['channel_id'], $criteria['channel_format']);
+try {
+    $view->stories = $driver->renderChannel($criteria['channel_id'], $criteria['channel_format']);
+} catch (Exception $e) {
+    $view->stories = '';
+}
 
 // Buffer the notifications and send to the template
 Horde::startBuffer();

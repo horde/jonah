@@ -117,7 +117,7 @@ class Jonah_Api extends Horde_Registry_Api
         $story['author'] = $GLOBALS['registry']->getAuth();
         $story['channel_id'] = $channel_id;
         $story['published'] = time();
-        $story['read'] = $story['read'] ?? 0;
+        $story['read'] ??= 0;
         if (empty($story['body']) || empty($story['body_type'])) {
             $story['body_type'] = 'text';
         }

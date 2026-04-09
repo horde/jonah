@@ -30,7 +30,7 @@ class Jonah_Block_News extends Horde_Core_Block
          * @deprecated Use $registry->loadConfigFile() instead
          * @see Horde_Deprecated::loadConfiguration()
          */
-$templates = Horde::loadConfiguration('templates.php', 'templates', 'jonah');
+        $templates = Horde::loadConfiguration('templates.php', 'templates', 'jonah');
         $params['source'] = ['name' => _("Feed"),
             'type' => 'enum',
             'values' => []];

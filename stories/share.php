@@ -59,7 +59,7 @@ $vars = Horde_Variables::getDefaultVariables();
 $channel_id = $vars->get('channel_id');
 $story_id = $vars->get('id');
 
-if (!$conf['sharing']['allow']) {
+if (empty($conf['sharing']['allow'])) {
     Horde::url('stories/view.php', true)
         ->add(['story_id' => $story_id, 'channel_id' => $channel_id])
         ->redirect();
@@ -69,9 +69,9 @@ if (!$conf['sharing']['allow']) {
 $story = $GLOBALS['injector']->getInstance('Jonah_Driver')->getStory($story_id);
 if (is_a($story, 'PEAR_Error')) {
     $notification->push(sprintf(_("Error fetching story: %s"), $story->getMessage()), 'horde.warning');
-    $story = '';
+    $story = ['title' => '', 'id' => '', 'body' => '', 'description' => ''];
 }
-$vars->set('subject', $story['title']);
+$vars->set('subject', $story['title'] ?? '');
 
 /* Set up the form. */
 $form = new Horde_Form($vars);
@@ -92,41 +92,53 @@ $form->addVariable(_("Message"), 'message', 'longtext', false, false, null, [4, 
 if ($form->validate($vars)) {
     $info = $form->getInfo($vars);
 
-    $channel = $GLOBALS['injector']->getInstance('Jonah_Driver')->getChannel($channel_id);
-    if (empty($channel['channel_story_url'])) {
-        $story_url = Horde::url('stories/view.php', true)->add(['channel_id' => '%c', 'id' => '%s']);
+    if (empty($channel_id)) {
+        $notification->push(_("No channel specified."), 'horde.error');
     } else {
-        $story_url = $channel['channel_story_url'];
+        try {
+            $channel = $GLOBALS['injector']->getInstance('Jonah_Driver')->getChannel($channel_id);
+        } catch (Exception $e) {
+            $notification->push(sprintf(_("Error fetching channel: %s"), $e->getMessage()), 'horde.error');
+            $channel = null;
+        }
     }
 
-    $story_url = str_replace(['%25c', '%25s'], ['%c', '%s'], $story_url);
-    $story_url = str_replace(['%c', '%s', '&amp;'], [$channel_id, $story['id'], '&'], $story_url);
+    if (!empty($channel)) {
+        if (empty($channel['channel_story_url'])) {
+            $story_url = Horde::url('stories/view.php', true)->add(['channel_id' => '%c', 'id' => '%s']);
+        } else {
+            $story_url = $channel['channel_story_url'];
+        }
 
-    if ($info['include'] == 0) {
-        require_once 'Horde/MIME/Part.php';
+        $story_url = str_replace(['%25c', '%25s'], ['%c', '%s'], $story_url);
+        $story_url = str_replace(['%c', '%s', '&amp;'], [$channel_id, $story['id'], '&'], $story_url);
 
-        /* TODO: Create a "URL link" MIME part instead. */
-        $message_part = new MIME_Part('text/plain');
-        $message_part->setContents($message_part->replaceEOL($story_url));
-        $message_part->setDescription(_("Story Link"));
-    } else {
-        $message_part = Jonah::getStoryAsMessage($story);
-    }
+        if ($info['include'] == 0) {
+            require_once 'Horde/MIME/Part.php';
 
-    $result = _mail(
-        $message_part,
-        $info['from'],
-        $info['recipients'],
-        $info['subject'],
-        $info['message']
-    );
+            /* TODO: Create a "URL link" MIME part instead. */
+            $message_part = new MIME_Part('text/plain');
+            $message_part->setContents($message_part->replaceEOL($story_url));
+            $message_part->setDescription(_("Story Link"));
+        } else {
+            $message_part = Jonah::getStoryAsMessage($story);
+        }
 
-    if (is_a($result, 'PEAR_Error')) {
-        $notification->push(sprintf(_("Unable to send story: %s"), $result->getMessage()), 'horde.error');
-    } else {
-        $notification->push(_("The story was sent successfully."), 'horde.success');
-        header('Location: ' . $story_url);
-        exit;
+        $result = _mail(
+            $message_part,
+            $info['from'],
+            $info['recipients'],
+            $info['subject'],
+            $info['message']
+        );
+
+        if (is_a($result, 'PEAR_Error')) {
+            $notification->push(sprintf(_("Unable to send story: %s"), $result->getMessage()), 'horde.error');
+        } else {
+            $notification->push(_("The story was sent successfully."), 'horde.success');
+            header('Location: ' . $story_url);
+            exit;
+        }
     }
 }
 
