@@ -1,8 +1,9 @@
 <?php
+
 /**
  * Move tags from trean to content storage.
  *
- * Copyright 2016-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2016-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (GPL). If you
  * did not receive this file, see http://www.horde.org/licenses/gpl.
@@ -29,8 +30,8 @@ class TreanUpgradeTagsToContent extends Horde_Db_Migration_Base
         }
 
         $type_mgr = $GLOBALS['injector']->getInstance('Content_Types_Manager');
-        $types = $type_mgr->ensureTypes(array('story'));
-        $this->_type_ids = array('story' => (int)$types[0]);
+        $types = $type_mgr->ensureTypes(['story']);
+        $this->_type_ids = ['story' => (int) $types[0]];
         $this->_tagger = $GLOBALS['injector']->getInstance('Content_Tagger');
 
         // An array of tag-ids => tag-name
@@ -39,10 +40,10 @@ class TreanUpgradeTagsToContent extends Horde_Db_Migration_Base
         foreach ($story_tags as $row) {
             $this->_tagger->tag(
                 null,
-                array(
-                    'object' => (string)$row['story_id'],
-                    'type' => $this->_type_ids['story']
-                ),
+                [
+                    'object' => (string) $row['story_id'],
+                    'type' => $this->_type_ids['story'],
+                ],
                 $row['tag_name']
             );
         }
@@ -57,19 +58,19 @@ class TreanUpgradeTagsToContent extends Horde_Db_Migration_Base
         $tableList = $this->tables();
 
         if (!in_array('jonah_stories_tags', $tableList)) {
-            $t = $this->createTable('jonah_stories_tags', array('autoincrementKey' => false));
-            $t->column('story_id', 'integer', array('null' => false));
-            $t->column('channel_id', 'integer', array('null' => false));
-            $t->column('tag_id', 'integer', array('null' => false));
-            $t->primaryKey(array('story_id', 'channel_id', 'tag_id'));
+            $t = $this->createTable('jonah_stories_tags', ['autoincrementKey' => false]);
+            $t->column('story_id', 'integer', ['null' => false]);
+            $t->column('channel_id', 'integer', ['null' => false]);
+            $t->column('tag_id', 'integer', ['null' => false]);
+            $t->primaryKey(['story_id', 'channel_id', 'tag_id']);
             $t->end();
         }
 
         if (!in_array('jonah_tags', $tableList)) {
-            $t = $this->createTable('jonah_tags', array('autoincrementKey' => array('tag_id')));
-            $t->column('tag_id', 'integer', array('null' => false));
-            $t->column('tag_name', 'string', array('limit' => 255, 'null' => false));
-            $t->primaryKey(array('tag_id'));
+            $t = $this->createTable('jonah_tags', ['autoincrementKey' => ['tag_id']]);
+            $t->column('tag_id', 'integer', ['null' => false]);
+            $t->column('tag_name', 'string', ['limit' => 255, 'null' => false]);
+            $t->primaryKey(['tag_id']);
             $t->end();
         }
     }

@@ -6,7 +6,7 @@
  * The table structure can be created by the scripts/db/jonah_news.sql
  * script. The needed tables are jonah_channels and jonah_stories.
  *
- * Copyright 2002-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2002-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (BSD). If you did not
  * did not receive this file, see http://cvs.horde.org/co.php/jonah/LICENSE.
@@ -81,8 +81,8 @@ class Jonah_Driver_Sql extends Jonah_Driver
                . ' (channel_slug, channel_name, '
                . ' channel_desc, channel_interval, channel_url,'
                . ' channel_link, channel_page_link, channel_story_url,'
-               . ' channel_img)' .
-               ' VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
+               . ' channel_img)'
+               . ' VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
         } else {
             $sql = 'UPDATE jonah_channels '
                 . 'SET channel_slug = ?, channel_name = ?, '
@@ -395,20 +395,20 @@ class Jonah_Driver_Sql extends Jonah_Driver
      */
     protected function _getStories($criteria, $order = Jonah::ORDER_PUBLISHED)
     {
-        $sql = 'SELECT stories.story_id AS id, ' .
-           'stories.channel_id, ' .
-           'stories.story_author AS author, ' .
-           'stories.story_title AS title, ' .
-           'stories.story_desc AS description, ' .
-           'stories.story_body_type AS body_type, ' .
-           'stories.story_body AS body, ' .
-           'stories.story_url AS url, ' .
-           'stories.story_permalink AS permalink, ' .
-           'stories.story_published AS published, ' .
-           'stories.story_updated AS updated, ' .
-           'stories.story_read AS readcount ' .
-           'FROM jonah_stories AS stories ' .
-           'WHERE stories.channel_id';
+        $sql = 'SELECT stories.story_id AS id, '
+           . 'stories.channel_id, '
+           . 'stories.story_author AS author, '
+           . 'stories.story_title AS title, '
+           . 'stories.story_desc AS description, '
+           . 'stories.story_body_type AS body_type, '
+           . 'stories.story_body AS body, '
+           . 'stories.story_url AS url, '
+           . 'stories.story_permalink AS permalink, '
+           . 'stories.story_published AS published, '
+           . 'stories.story_updated AS updated, '
+           . 'stories.story_read AS readcount '
+           . 'FROM jonah_stories AS stories '
+           . 'WHERE stories.channel_id';
 
         if (is_array($criteria['channel_id'])) {
             $channel_ids = ' IN (' . str_repeat('?,', count($criteria['channel_id']) - 1) . ' ?)';
@@ -463,7 +463,9 @@ class Jonah_Driver_Sql extends Jonah_Driver
         // Ensure any results are in the following story_id list.
         if (!empty($criteria['ids'])) {
             $sql .= ' AND stories.story_id IN ('
-                . implode(',', array_map(function ($v) { return '?'; }, $criteria['ids']))
+                . implode(',', array_map(function ($v) {
+                    return '?';
+                }, $criteria['ids']))
                 . ')';
             $values = array_merge($values, $criteria['ids']);
         }
@@ -533,19 +535,19 @@ class Jonah_Driver_Sql extends Jonah_Driver
      */
     protected function _getStory($story_id, $read = false)
     {
-        $sql = 'SELECT stories.story_id as id, ' .
-           'stories.channel_id, ' .
-           'stories.story_author AS author, ' .
-           'stories.story_title AS title, ' .
-           'stories.story_desc AS description, ' .
-           'stories.story_body_type AS body_type, ' .
-           'stories.story_body AS body, ' .
-           'stories.story_url AS url, ' .
-           'stories.story_permalink AS permalink, ' .
-           'stories.story_published AS published, ' .
-           'stories.story_updated AS updated, ' .
-           'stories.story_read AS readcount ' .
-           'FROM jonah_stories AS stories WHERE stories.story_id=?';
+        $sql = 'SELECT stories.story_id as id, '
+           . 'stories.channel_id, '
+           . 'stories.story_author AS author, '
+           . 'stories.story_title AS title, '
+           . 'stories.story_desc AS description, '
+           . 'stories.story_body_type AS body_type, '
+           . 'stories.story_body AS body, '
+           . 'stories.story_url AS url, '
+           . 'stories.story_permalink AS permalink, '
+           . 'stories.story_published AS published, '
+           . 'stories.story_updated AS updated, '
+           . 'stories.story_read AS readcount '
+           . 'FROM jonah_stories AS stories WHERE stories.story_id=?';
 
         try {
             $result = $this->_db->selectOne($sql, [(int) $story_id]);
@@ -602,9 +604,9 @@ class Jonah_Driver_Sql extends Jonah_Driver
      */
     public function getLatestStoryId($channel_id)
     {
-        $sql = 'SELECT story_id FROM jonah_stories' .
-               ' WHERE channel_id = ? AND story_published <= ?' .
-               ' ORDER BY story_updated DESC';
+        $sql = 'SELECT story_id FROM jonah_stories'
+               . ' WHERE channel_id = ? AND story_published <= ?'
+               . ' ORDER BY story_updated DESC';
         try {
             $result = $this->_db->selectValue($sql, [(int) $channel_id, time()]);
         } catch (Horde_Db_Exception $e) {
@@ -622,8 +624,8 @@ class Jonah_Driver_Sql extends Jonah_Driver
      */
     public function deleteStory($channel_id, $story_id)
     {
-        $sql = 'DELETE FROM jonah_stories' .
-               ' WHERE channel_id = ? AND story_id = ?';
+        $sql = 'DELETE FROM jonah_stories'
+               . ' WHERE channel_id = ? AND story_id = ?';
         $values = [(int) $channel_id, (int) $story_id];
 
         try {

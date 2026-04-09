@@ -3,7 +3,7 @@
 /**
  * Provide API to embed news in other Horde applications.
  *
- * Copyright 2002-2007 Roel Gloudemans <roel@gloudemans.info>
+ * Copyright 2002-2026 Roel Gloudemans <roel@gloudemans.info>
  *
  * See the enclosed file LICENSE for license information (BSD). If you
  * did not receive this file, see http://cvs.horde.org/co.php/jonah/LICENSE.
@@ -58,8 +58,8 @@ class Jonah_Block_Story extends Horde_Core_Block
      */
     protected function _title()
     {
-        if (empty($this->_params['source']) ||
-            empty($this->_params['story'])) {
+        if (empty($this->_params['source'])
+            || empty($this->_params['story'])) {
             return $this->getName();
         }
 

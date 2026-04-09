@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file stores the templates used to generate different views of
  * news channels.
@@ -10,27 +11,27 @@
  * use var/config/jonah/templates-servername.php.
  */
 
-$templates['standard'] = array(
+$templates['standard'] = [
     'name' => _("Standard"),
     'view_template' => 'standard',
-);
+];
 
-$templates['media'] = array(
+$templates['media'] = [
     'name' => _("Media"),
     'view_template' => 'media',
-);
+];
 
-$templates['internal'] = array(
+$templates['internal'] = [
     'name' => _("Internal"),
     'view_template' => 'internal',
-);
+];
 
-$templates['compact'] = array(
+$templates['compact'] = [
     'name' => _("Compact"),
     'view_template' => 'compact',
-);
+];
 
-$templates['ultracompact'] = array(
+$templates['ultracompact'] = [
     'name' => _("Ultracompact"),
     'view_template' => 'ultracompact',
-);
+];

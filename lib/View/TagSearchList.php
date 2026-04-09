@@ -4,7 +4,7 @@
  * Turba_View_TagSearchList:: A view to handle displaying a list of stories
  * matching a requested tag filter.
  *
- * Copyright 2003-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2003-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (BSD). If you
  * did not receive this file, see http://cvs.horde.org/co.php/jonah/LICENSE.
@@ -93,8 +93,8 @@ class Jonah_View_TagSearchList extends Jonah_View_Base
             }
 
             /* Comment counter. */
-            if ($conf['comments']['allow'] &&
-                $registry->hasMethod('forums/numMessages')) {
+            if ($conf['comments']['allow']
+                && $registry->hasMethod('forums/numMessages')) {
                 try {
                     $comments = $registry->call('forums/numMessages', [$stories[$key]['id'], 'jonah']);
                 } catch (Exception $e) {

@@ -1,6 +1,7 @@
 <?php
+
 /**
- * Copyright 2003-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2003-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (BSD). If you
  * did not receive this file, see http://cvs.horde.org/co.php/jonah/LICENSE.
@@ -9,15 +10,15 @@
  * @package Jonah
  */
 require_once __DIR__ . '/../lib/Application.php';
-Horde_Registry::appInit('jonah', array(
+Horde_Registry::appInit('jonah', [
     'authentication' => 'none',
-    'session_control' => 'readonly'
-));
+    'session_control' => 'readonly',
+]);
 
-$params = array('registry' => &$registry,
-                'notification' => &$notification,
-                'story_id' => Horde_Util::getFormData('id'),
-                'browser' => &$browser,
-                'channel_id' => Horde_Util::getFormData('channel_id'));
+$params = ['registry' => &$registry,
+    'notification' => &$notification,
+    'story_id' => Horde_Util::getFormData('id'),
+    'browser' => &$browser,
+    'channel_id' => Horde_Util::getFormData('channel_id')];
 $view = new Jonah_View_StoryPdf($params);
 $view->run();

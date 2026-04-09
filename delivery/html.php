@@ -1,8 +1,9 @@
 <?php
+
 /**
  * Script to handle requests for html delivery of stories.
  *
- * Copyright 2004-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2004-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (BSD). If you did not
  * did not receive this file, see http://cvs.horde.org/co.php/jonah/LICENSE.
@@ -11,10 +12,10 @@
  */
 
 require_once __DIR__ . '/../lib/Application.php';
-$jonah = Horde_Registry::appInit('jonah', array(
+$jonah = Horde_Registry::appInit('jonah', [
     'authentication' => 'none',
-    'session_control' => 'readonly'
-));
+    'session_control' => 'readonly',
+]);
 
 /* Get the id and format of the channel to display. */
 $criteria = Horde_Util::nonInputVar('criteria');
@@ -28,9 +29,9 @@ if (empty($criteria['format'])) {
     $criteria['format'] = 'standard';
 }
 
-$params = array('registry' => &$registry,
-                'notification' => &$notification,
-                'conf' => &$conf,
-                'criteria' => &$criteria);
+$params = ['registry' => &$registry,
+    'notification' => &$notification,
+    'conf' => &$conf,
+    'criteria' => &$criteria];
 $view = new Jonah_View_DeliveryHtml($params);
 $view->run();

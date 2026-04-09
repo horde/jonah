@@ -3,7 +3,7 @@
 /**
  * Provides a list of deliverable internal channels.
  *
- * Copyright 2004-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2004-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (BSD). If you
  * did not receive this file, see http://cvs.horde.org/co.php/jonah/LICENSE.
@@ -37,19 +37,19 @@ class Jonah_Block_Delivery extends Horde_Core_Block
             /* Link for HTML delivery. */
             $url = Horde::url('delivery/html.php')->add('channel_id', $channel['channel_id']);
             $label = sprintf(_("\"%s\" stories in HTML"), $channel['channel_name']);
-            $html .= '<tr><td width="140">' .
-                Horde_Themes_Image::tag('story_marker.png') . ' ' .
-                $url->link(['title' => $label]) .
-                htmlspecialchars($channel['channel_name']) . '</a></td>';
+            $html .= '<tr><td width="140">'
+                . Horde_Themes_Image::tag('story_marker.png') . ' '
+                . $url->link(['title' => $label])
+                . htmlspecialchars($channel['channel_name']) . '</a></td>';
 
             $html .= '<td>' . ($channel['channel_updated'] ? date('M d, Y H:i', (int) $channel['channel_updated']) : '-') . '</td>';
 
             /* Link for feed delivery. */
             $url = Horde::url('delivery/rss.php', true, -1)->add('channel_id', $channel['channel_id']);
             $label = sprintf(_("RSS Feed of \"%s\""), $channel['channel_name']);
-            $html .= '<td align="right" class="nowrap">' .
-                     $url->link(['title' => $label]) .
-                     Horde_Themes_Image::tag('feed.png') . '</a> ';
+            $html .= '<td align="right" class="nowrap">'
+                     . $url->link(['title' => $label])
+                     . Horde_Themes_Image::tag('feed.png') . '</a> ';
         }
 
         if ($html) {

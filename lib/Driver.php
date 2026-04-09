@@ -4,7 +4,7 @@
  * Jonah_Driver:: is responsible for storing, searching, sorting and filtering
  * locally generated and managed articles.  Aggregation is left to Hippo.
  *
- * Copyright 2002-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2002-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (BSD). If you did not
  * did not receive this file, see http://cvs.horde.org/co.php/jonah/LICENSE.
@@ -79,8 +79,8 @@ class Jonah_Driver
         if (!isset($channel[$channel_id])) {
             $channel[$channel_id] = $this->_getChannel($channel_id);
             if (empty($channel[$channel_id]['channel_link'])) {
-                $channel[$channel_id]['channel_official'] =
-                    Horde::url('delivery/html.php', true, -1)->add('channel_id', $channel_id)->setRaw(false);
+                $channel[$channel_id]['channel_official']
+                    = Horde::url('delivery/html.php', true, -1)->add('channel_id', $channel_id)->setRaw(false);
             } else {
                 $channel[$channel_id]['channel_official'] = str_replace(['%25c', '%c'], ['%c', $channel_id], $channel[$channel_id]['channel_link']);
             }
@@ -131,7 +131,9 @@ class Jonah_Driver
         }
 
         if (!isset($criteria['channel']) && empty($criteria['channel_id'])) {
-            $criteria['channel_id'] = array_map(function ($ar) { return $ar['channel_id']; }, $this->getChannels());
+            $criteria['channel_id'] = array_map(function ($ar) {
+                return $ar['channel_id'];
+            }, $this->getChannels());
         }
 
         // Validate that we have proper Horde_Date objects
@@ -215,8 +217,8 @@ class Jonah_Driver
     {
         if (!empty($story['url']) && empty($story['body'])) {
             $url = $story['url'];
-        } elseif ((empty($story['url']) || !empty($story['body'])) &&
-            !empty($channel['channel_story_url'])) {
+        } elseif ((empty($story['url']) || !empty($story['body']))
+            && !empty($channel['channel_story_url'])) {
             $url = $channel['channel_story_url'];
         } else {
             $url = Horde::url('stories/view.php', true, -1)->add(['channel_id' => '%c', 'id' => '%s'])->setRaw(false);
@@ -277,7 +279,12 @@ class Jonah_Driver
     {
         $channel = $this->getChannel($channel_id);
 
-        $templates = Horde::loadConfiguration('templates.php', 'templates', 'jonah');
+        /**
+         * ARCHITECTURE VIOLATION: Using deprecated Horde::loadConfiguration()
+         * @deprecated Use $registry->loadConfigFile() instead
+         * @see Horde_Deprecated::loadConfiguration()
+         */
+$templates = Horde::loadConfiguration('templates.php', 'templates', 'jonah');
         $escape = !isset($templates[$tpl]['escape']) || !empty($templates[$tpl]['escape']);
         $view = new Horde_View(['templatePath' => JONAH_TEMPLATES . '/channels']);
 
