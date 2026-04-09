@@ -1,6 +1,7 @@
 <?php
+
 /**
- * Copyright 2003-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2003-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (BSD). If you
  * did not receive this file, see http://cvs.horde.org/co.php/jonah/LICENSE.
@@ -12,15 +13,15 @@
  */
 
 require_once __DIR__ . '/../lib/Application.php';
-Horde_Registry::appInit('jonah', array(
-    'permission' => array('jonah:news', Horde_Perms::EDIT)
-));
+Horde_Registry::appInit('jonah', [
+    'permission' => ['jonah:news', Horde_Perms::EDIT],
+]);
 
-$params = array(
+$params = [
     'notification' => $notification,
     'prefs' => $prefs,
-    'registry' => $registry
-);
+    'registry' => $registry,
+];
 
 $view = new Jonah_View_ChannelList($params);
 $view->run();

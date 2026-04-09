@@ -1,7 +1,8 @@
 <?php
+
 /**
  *
- * Copyright 2003-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2003-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (BSD). If you did
  * did not receive this file, see http://cvs.horde.org/co.php/jonah/LICENSE.
@@ -9,14 +10,14 @@
  * @author Ben Klang <ben@alkaloid.net>
  */
 require_once __DIR__ . '/../lib/Application.php';
-$jonah = Horde_Registry::appInit('jonah', array(
+$jonah = Horde_Registry::appInit('jonah', [
     'authentication' => 'none',
-    'session_control' => 'readonly'
-));
+    'session_control' => 'readonly',
+]);
 $parts = explode('/', Horde_Util::getPathInfo());
 $lastpart = null;
 $deliveryType = null;
-$criteria = array();
+$criteria = [];
 foreach ($parts as $part) {
     if (empty($part)) {
         // Double slash in the URL path.  Ignore this empty part.
@@ -29,43 +30,43 @@ foreach ($parts as $part) {
         $part = substr($part, 0, strrpos($part, '.'));
     }
 
-    switch($part) {
-    case 'html':
-    case 'rss':
-        $deliveryType = $part;
-        break;
+    switch ($part) {
+        case 'html':
+        case 'rss':
+            $deliveryType = $part;
+            break;
 
-    case 'type':
-        // Feed type is specially mangled
-        $lastpart = 'feed_type';
-        break;
+        case 'type':
+            // Feed type is specially mangled
+            $lastpart = 'feed_type';
+            break;
 
-    case 'format':
-        // Format is specially mangled
-        $lastpart = 'channel_format';
-        break;
+        case 'format':
+            // Format is specially mangled
+            $lastpart = 'channel_format';
+            break;
 
-    case 'author':
-    case 'channel_format':
-    case 'tag':
-    case 'tag_id':
-    case 'story':
-    case 'story_id':
-    case 'channel':
-    case 'channel_id':
-        $lastpart = $part;
-        break;
+        case 'author':
+        case 'channel_format':
+        case 'tag':
+        case 'tag_id':
+        case 'story':
+        case 'story_id':
+        case 'channel':
+        case 'channel_id':
+            $lastpart = $part;
+            break;
 
-    default:
-        if (!empty($lastpart)) {
-            $criteria[$lastpart] = $part;
-            $lastpart = null;
-        } else {
-            // An unknown directive
-            Horde::log("Malformed request URL: " . Horde_Util::getPathInfo(), 'WARN');
-            exit;
-        }
-        break;
+        default:
+            if (!empty($lastpart)) {
+                $criteria[$lastpart] = $part;
+                $lastpart = null;
+            } else {
+                // An unknown directive
+                Horde::log("Malformed request URL: " . Horde_Util::getPathInfo(), 'WARN');
+                exit;
+            }
+            break;
     }
 }
 

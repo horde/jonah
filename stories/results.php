@@ -1,8 +1,9 @@
 <?php
+
 /**
  * Display list of articles that match a tag query.
  *
- * Copyright 2003-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2003-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (BSD). If you
  * did not receive this file, see http://cvs.horde.org/co.php/jonah/LICENSE.
@@ -22,13 +23,13 @@ if (empty($tag)) {
 }
 
 // @todo - use an actual Horde_View
-$params = array(
+$params = [
     'registry' => $registry,
     'notification' => $notification,
     'prefs' => $prefs,
     'conf' => $conf,
     'tag' => $tag,
-    'channel_id' => Horde_Util::getFormData('channel_id')
-);
+    'channel_id' => Horde_Util::getFormData('channel_id'),
+];
 $view = new Jonah_View_TagSearchList($params);
 $view->run();

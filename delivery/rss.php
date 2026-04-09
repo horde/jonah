@@ -1,6 +1,7 @@
 <?php
+
 /**
- * Copyright 2003-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2003-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (BSD). If you did
  * did not receive this file, see http://cvs.horde.org/co.php/jonah/LICENSE.
@@ -8,27 +9,27 @@
  * @author Chuck Hagenbuch <chuck@horde.org>
  */
 require_once __DIR__ . '/../lib/Application.php';
-$jonah = Horde_Registry::appInit('jonah', array(
+$jonah = Horde_Registry::appInit('jonah', [
     'authentication' => 'none',
-    'session_control' => 'readonly'
-));
+    'session_control' => 'readonly',
+]);
 
 $driver = $GLOBALS['injector']->getInstance('Jonah_Driver');
 
 // See if the criteria has already been loaded by the index page
 $criteria = Horde_Util::nonInputVar('criteria');
 if (!$criteria) {
-    $criteria = array(
+    $criteria = [
         'channel_id' => Horde_Util::getFormData('channel_id'),
         'feed_type' => basename(Horde_Util::getFormData('type')),
         'limit' => 10,
-    );
+    ];
     if ($tag_id = Horde_Util::getFormData('tag_id')) {
         $criteria['tags'] = array_reduce(
             $injector->getInstance('Jonah_Tagger')
                 ->getTags(explode(':', $tag_id)),
             'array_merge',
-            array()
+            []
         );
     }
     if ($tag = Horde_Util::getFormData('tag')) {
@@ -65,7 +66,7 @@ try {
     $stories = $driver->getStories($criteria);
 } catch (Exception $e) {
     Horde::log($e, 'ERR');
-    $stories = array();
+    $stories = [];
 }
 
 // Build the template
@@ -80,8 +81,8 @@ if (!empty($criteria['tag_id'])) {
 $view->channel_desc = htmlspecialchars($channel['channel_desc']);
 $view->channel_updated = htmlspecialchars(date('r', $channel['channel_updated']));
 $view->channel_official = htmlspecialchars($channel['channel_official']);
-$view->channel_rss = htmlspecialchars(Horde::url('delivery/rss.php', true, -1)->add(array('type' => 'rss', 'channel_id' => $channel['channel_id'])));
-$view->channel_rss2 = htmlspecialchars(Horde::url('delivery/rss.php', true, -1)->add(array('type' => 'rss2', 'channel_id' => $channel['channel_id'])));
+$view->channel_rss = htmlspecialchars(Horde::url('delivery/rss.php', true, -1)->add(['type' => 'rss', 'channel_id' => $channel['channel_id']]));
+$view->channel_rss2 = htmlspecialchars(Horde::url('delivery/rss.php', true, -1)->add(['type' => 'rss2', 'channel_id' => $channel['channel_id']]));
 foreach ($stories as &$story) {
     $story['title'] = htmlspecialchars($story['title']);
     $story['description'] = htmlspecialchars($story['description']);
@@ -95,7 +96,7 @@ foreach ($stories as &$story) {
         $story['author'] = htmlspecialchars($story['author']);
     }
     if (!empty($story['body_type']) && $story['body_type'] == 'text') {
-        $story['body'] = $GLOBALS['injector']->getInstance('Horde_Core_Factory_TextFilter')->filter($story['body'], 'text2html', array('parselevel' => Horde_Text_Filter_Text2html::MICRO));
+        $story['body'] = $GLOBALS['injector']->getInstance('Horde_Core_Factory_TextFilter')->filter($story['body'], 'text2html', ['parselevel' => Horde_Text_Filter_Text2html::MICRO]);
     }
 }
 $view->stories = $stories;

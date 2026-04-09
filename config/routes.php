@@ -1,21 +1,22 @@
 <?php
+
 /**
  * Setup default routes
  */
-$m->connect('Admin', '/admin/:section/:page', array(
-     'controller' => 'admin',
-     'section' => '',
-     'page' => '',
-));
+$m->connect('Admin', '/admin/:section/:page', [
+    'controller' => 'admin',
+    'section' => '',
+    'page' => '',
+]);
 
 // Valid filter names are "author", "tag" and "date"
 // @TODO represent those with route requirements
-$m->connect('Default', '/feeds/:feed/:filter/:value', array(
+$m->connect('Default', '/feeds/:feed/:filter/:value', [
     'controller' => 'feed',
     'feed' => '',
     'filter' => '',
     'value' => '',
-));
+]);
 
 // api endpoint for getting post counts?
 //$m->connect('/feeds/:feed/-/posts/count', array(

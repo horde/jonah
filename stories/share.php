@@ -1,6 +1,7 @@
 <?php
+
 /**
- * Copyright 1999-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 1999-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (BSD). If you
  * did not receive this file, see http://cvs.horde.org/co.php/jonah/LICENSE.
@@ -24,10 +25,10 @@ function _mail($story_part, $from, $recipients, $subject, $note)
     global $conf;
 
     /* Create the MIME message. */
-    $mail = new Horde_Mime_Mail(array('Subject' => $subject,
-                                      'To' => $recipients,
-                                      'From' => $from,
-                                      'User-Agent' => 'Jonah ' . $GLOBALS['registry']->getVersion()));
+    $mail = new Horde_Mime_Mail(['Subject' => $subject,
+        'To' => $recipients,
+        'From' => $from,
+        'User-Agent' => 'Jonah ' . $GLOBALS['registry']->getVersion()]);
 
     /* If a note has been provided, add it to the message as a text part. */
     if (strlen($note) > 0) {
@@ -48,10 +49,10 @@ function _mail($story_part, $from, $recipients, $subject, $note)
 }
 
 require_once __DIR__ . '/../lib/Application.php';
-Horde_Registry::appInit('jonah', array(
+Horde_Registry::appInit('jonah', [
     'authentication' => 'none',
-    'session_control' => 'readonly'
-));
+    'session_control' => 'readonly',
+]);
 
 /* Set up the form variables. */
 $vars = Horde_Variables::getDefaultVariables();
@@ -60,7 +61,7 @@ $story_id = $vars->get('id');
 
 if (!$conf['sharing']['allow']) {
     Horde::url('stories/view.php', true)
-        ->add(array('story_id' => $story_id, 'channel_id' => $channel_id))
+        ->add(['story_id' => $story_id, 'channel_id' => $channel_id])
         ->redirect();
     exit;
 }
@@ -85,21 +86,21 @@ if ($GLOBALS['registry']->getAuth()) {
 }
 $form->addVariable(_("To"), 'recipients', 'email', true, false, _("Separate multiple email addresses with commas."), true);
 $form->addVariable(_("Subject"), 'subject', 'text', true);
-$form->addVariable(_("Include"), 'include', 'enum', true, false, null, array(array(_("A link to the story"), _("The complete text of the story"))));
-$form->addVariable(_("Message"), 'message', 'longtext', false, false, null, array(4, 40));
+$form->addVariable(_("Include"), 'include', 'enum', true, false, null, [[_("A link to the story"), _("The complete text of the story")]]);
+$form->addVariable(_("Message"), 'message', 'longtext', false, false, null, [4, 40]);
 
 if ($form->validate($vars)) {
     $info = $form->getInfo($vars);
 
     $channel = $GLOBALS['injector']->getInstance('Jonah_Driver')->getChannel($channel_id);
     if (empty($channel['channel_story_url'])) {
-        $story_url = Horde::url('stories/view.php', true)->add(array('channel_id' => '%c', 'id' => '%s'));
+        $story_url = Horde::url('stories/view.php', true)->add(['channel_id' => '%c', 'id' => '%s']);
     } else {
         $story_url = $channel['channel_story_url'];
     }
 
-    $story_url = str_replace(array('%25c', '%25s'), array('%c', '%s'), $story_url);
-    $story_url = str_replace(array('%c', '%s', '&amp;'), array($channel_id, $story['id'], '&'), $story_url);
+    $story_url = str_replace(['%25c', '%25s'], ['%c', '%s'], $story_url);
+    $story_url = str_replace(['%c', '%s', '&amp;'], [$channel_id, $story['id'], '&'], $story_url);
 
     if ($info['include'] == 0) {
         require_once 'Horde/MIME/Part.php';
@@ -112,8 +113,13 @@ if ($form->validate($vars)) {
         $message_part = Jonah::getStoryAsMessage($story);
     }
 
-    $result = _mail($message_part, $info['from'], $info['recipients'],
-                    $info['subject'], $info['message']);
+    $result = _mail(
+        $message_part,
+        $info['from'],
+        $info['recipients'],
+        $info['subject'],
+        $info['message']
+    );
 
     if (is_a($result, 'PEAR_Error')) {
         $notification->push(sprintf(_("Unable to send story: %s"), $result->getMessage()), 'horde.error');
@@ -126,9 +132,9 @@ if ($form->validate($vars)) {
 
 $page_output->topbar = $page_output->sidebar = false;
 
-$page_output->header(array(
-    'title' => $title
-));
-$notification->notify(array('listeners' => 'status'));
+$page_output->header([
+    'title' => $title,
+]);
+$notification->notify(['listeners' => 'status']);
 $form->renderActive(null, $vars, Horde::url('stories/share.php'), 'post');
 $page_output->footer();

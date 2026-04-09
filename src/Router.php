@@ -1,5 +1,5 @@
 <?php
+
 namespace Horde\Jonah;
-class Router
-{
-}
+
+class Router {}

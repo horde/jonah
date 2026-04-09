@@ -1,12 +1,13 @@
 #!/usr/bin/env php
 <?php
+
 /**
  * See the enclosed file LICENSE for license information (BSD). If you
  * did not receive this file, see http://cvs.horde.org/co.php/jonah/LICENSE.
  */
 
 require_once __DIR__ . '/../lib/Application.php';
-Horde_Registry::appInit('jonah', array('cli' => true));
+Horde_Registry::appInit('jonah', ['cli' => true]);
 
 if (empty($argv[1]) || !file_exists($argv[1])) {
     exit("Need a valid filename.\n");

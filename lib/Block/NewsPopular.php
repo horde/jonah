@@ -4,7 +4,7 @@
  * Provide an API to embed the most popular news stories in other Horde
  * applications.
  *
- * Copyright 2002-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2002-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (BSD). If you
  * did not receive this file, see http://cvs.horde.org/co.php/jonah/LICENSE.
@@ -27,7 +27,12 @@ class Jonah_Block_NewsPopular extends Horde_Core_Block
      */
     protected function _params()
     {
-        $templates = Horde::loadConfiguration('templates.php', 'templates', 'jonah');
+        /**
+         * ARCHITECTURE VIOLATION: Using deprecated Horde::loadConfiguration()
+         * @deprecated Use $registry->loadConfigFile() instead
+         * @see Horde_Deprecated::loadConfiguration()
+         */
+$templates = Horde::loadConfiguration('templates.php', 'templates', 'jonah');
         $params['source'] = [
             'name' => _("Feed"),
             'type' => 'enum',

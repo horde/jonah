@@ -3,7 +3,7 @@
 /**
  * Jonah Base Class.
  *
- * Copyright 2002-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2002-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (BSD). If you did not
  * did not receive this file, see http://cvs.horde.org/co.php/jonah/LICENSE.
@@ -87,8 +87,8 @@ class Jonah
         switch ($filter) {
             case 'channels':
                 foreach ($in as $key => $val) {
-                    if ($perms->hasPermission('jonah:news', $registry->getAuth(), $permission) ||
-                        $perms->hasPermission('jonah:news:' . $val['channel_id'], $registry->getAuth(), $permission)) {
+                    if ($perms->hasPermission('jonah:news', $registry->getAuth(), $permission)
+                        || $perms->hasPermission('jonah:news:' . $val['channel_id'], $registry->getAuth(), $permission)) {
                         $out[$key] = $in[$key];
                     }
                 }
@@ -119,8 +119,8 @@ class Jonah
 
         /* Other than checking if text is enabled, it is inserted by default if
          * no other body type has been enabled in the config. */
-        if (in_array('text', $GLOBALS['conf']['news']['story_types']) ||
-            empty($types)) {
+        if (in_array('text', $GLOBALS['conf']['news']['story_types'])
+            || empty($types)) {
             $types['text'] = _("Text");
         }
 

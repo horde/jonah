@@ -3,7 +3,7 @@
 /**
  * Jonah_FeedParser.
  *
- * Copyright 2000-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2000-2026 Horde LLC (http://www.horde.org/)
  *
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -241,8 +241,8 @@ class Jonah_FeedParser
                     // For now, make the alternate link, which is most likely to
                     // point to the HTML copy of the article, the default one - or,
                     // if there isn't yet a link and the rel is empty, use it.
-                    if ((empty($target['link']) && empty($attribs['rel'])) ||
-                        (isset($attribs['rel']) && $attribs['rel'] == 'alternate')) {
+                    if ((empty($target['link']) && empty($attribs['rel']))
+                        || (isset($attribs['rel']) && $attribs['rel'] == 'alternate')) {
                         $target['link'] = $attribs['href'];
                     }
 
