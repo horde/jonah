@@ -45,21 +45,20 @@ if (!empty($stories)) {
     die(print_r($stories, true));
 }
 
-$template = new Horde_Template();
-$template->setOption('gettext', 'true');
-$template->set('url', Horde::selfUrl());
-$template->set('session', Horde_Util::formInput());
-$template->set('channel_id', $criteria['channel_id']);
-$template->set('channel_name', $channel['channel_name']);
-$template->set('format', $criteria['channel_format']);
-$template->set('options', $options);
-$template->set('stories', $news->renderChannel($criteria['channel_id'], $criteria['channel_format']));
+$view = new Horde_View(['templatePath' => JONAH_TEMPLATES . '/delivery']);
+$view->url = Horde::selfUrl();
+$view->session = Horde_Util::formInput();
+$view->channel_id = $criteria['channel_id'];
+$view->channel_name = $channel['channel_name'];
+$view->format = $criteria['channel_format'];
+$view->options = $options;
+$view->stories = $news->renderChannel($criteria['channel_id'], $criteria['channel_format']);
 
 // Buffer the notifications and send to the template
 Horde::startBuffer();
 $GLOBALS['notification']->notify(['listeners' => 'status']);
-$template->set('notify', Horde::endBuffer());
+$view->notify = Horde::endBuffer();
 
 $page_output->header();
-echo $template->fetch(JONAH_TEMPLATES . '/delivery/html.html');
+echo $view->render('html');
 $page_output->footer();
