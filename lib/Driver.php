@@ -288,7 +288,7 @@ class Jonah_Driver
          * @deprecated Use $registry->loadConfigFile() instead
          * @see Horde_Deprecated::loadConfiguration()
          */
-$templates = Horde::loadConfiguration('templates.php', 'templates', 'jonah');
+        $templates = Horde::loadConfiguration('templates.php', 'templates', 'jonah');
         $escape = !isset($templates[$tpl]['escape']) || !empty($templates[$tpl]['escape']);
         $view = new Horde_View(['templatePath' => JONAH_TEMPLATES . '/channels']);
 

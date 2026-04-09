@@ -35,6 +35,12 @@ $url = $request->getPath();
 $args = $request->getGetParams();
 $result = $m->match('/' . $url);
 
+if (!$result) {
+    $GLOBALS['notification']->push(_("Page not found."), 'horde.error');
+    Horde::url('channels/index.php', true)->redirect();
+    exit;
+}
+
 $criteria = [];
 // @TODO: This should be handled by controller objects, but for now just use
 // a switch conditional until we move to Horde_Controller
@@ -165,7 +171,13 @@ switch ($result['controller']) {
         // Preserve remaining args
         // @TODO: Don't think we need to preserve the query string once we get here.
         $criteria = array_merge($defaults, $args, $criteria);
-        $class = 'Jonah_View_Delivery' . $criteria['format'];
+        $class = 'Jonah_View_Delivery' . ucfirst($criteria['format']);
+
+        if (!class_exists($class)) {
+            $GLOBALS['notification']->push(sprintf(_("Unknown delivery format: %s"), $criteria['format']), 'horde.error');
+            Horde::url('channels/index.php', true)->redirect();
+            exit;
+        }
 
         //@TODO: FIXME - format (html/rss/pdf) is dealt with by the view object we
         // instantiate but html _currently_ needs a format. Think we'll just have to

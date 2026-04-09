@@ -27,7 +27,7 @@ class Jonah_View_DeliveryHtml extends Jonah_View_Base
          * @deprecated Use $registry->loadConfigFile() instead
          * @see Horde_Deprecated::loadConfiguration()
          */
-$templates = Horde::loadConfiguration('templates.php', 'templates', 'jonah');
+        $templates = Horde::loadConfiguration('templates.php', 'templates', 'jonah');
 
         /* Get requested channel. */
         try {
