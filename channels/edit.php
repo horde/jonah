@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Legacy entry point — delegates to the PSR-15 Channel\EditController.
+ *
  * Copyright 2003-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (BSD). If you
@@ -15,9 +17,20 @@
 require_once __DIR__ . '/../lib/Application.php';
 Horde_Registry::appInit('jonah');
 
-$params = ['vars' => Horde_Variables::getDefaultVariables(),
-    'registry' => &$registry,
-    'notification' => &$notification];
+use Horde\Http\RequestFactory;
+use Horde\Http\StreamFactory;
+use Horde\Http\UriFactory;
+use Horde\Http\Server\RequestBuilder;
+use Horde\Http\Server\ResponseWriterWeb;
+use Horde\Jonah\Controller\Channel\EditController;
 
-$view = new Jonah_View_ChannelEdit($params);
-$view->run();
+$request = (new RequestBuilder(
+    new RequestFactory(),
+    new StreamFactory(),
+    new UriFactory(),
+))->withGlobalVariables()->build();
+
+$controller = $GLOBALS['injector']->getInstance(EditController::class);
+$response = $controller->handle($request);
+
+(new ResponseWriterWeb())->writeResponse($response);
