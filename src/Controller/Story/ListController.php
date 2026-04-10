@@ -1,0 +1,166 @@
+<?php
+
+declare(strict_types=1);
+
+/**
+ * Copyright 2003-2026 Horde LLC (http://www.horde.org/)
+ *
+ * See the enclosed file LICENSE for license information (BSD). If you
+ * did not receive this file, see http://cvs.horde.org/co.php/jonah/LICENSE.
+ */
+
+namespace Horde\Jonah\Controller\Story;
+
+use Exception;
+use Horde;
+use Horde\Jonah\Service\PermissionChecker;
+use Horde\Jonah\Traits\ResponseTrait;
+use Horde_Date;
+use Horde_Exception_AuthenticationFailure;
+use Horde_Notification_Handler;
+use Horde_PageOutput;
+use Horde_Perms;
+use Horde_Prefs;
+use Horde_Registry;
+use Horde_Themes_Image;
+use Horde_View;
+use Jonah_Driver;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
+use Psr\Log\LoggerInterface;
+use Horde_Url;
+use Horde_Util;
+
+/**
+ * PSR-15 controller for listing stories in a channel.
+ *
+ * Replaces stories/index.php + Jonah_View_StoryList.
+ *
+ * @category Horde
+ * @license  http://www.horde.org/licenses/bsd BSD
+ * @package  Jonah
+ */
+class ListController implements RequestHandlerInterface
+{
+    use ResponseTrait;
+
+    public function __construct(
+        private readonly Jonah_Driver $driver,
+        private readonly PermissionChecker $permissions,
+        private readonly Horde_Notification_Handler $notification,
+        private readonly Horde_PageOutput $pageOutput,
+        private readonly Horde_Registry $registry,
+        private readonly Horde_Prefs $prefs,
+        private readonly LoggerInterface $logger,
+    ) {}
+
+    public function handle(ServerRequestInterface $request): ResponseInterface
+    {
+        $queryParams = $request->getQueryParams();
+        $channel_id = $queryParams['channel_id'] ?? null;
+
+        if (empty($channel_id)) {
+            $this->notification->push(_("No channel requested."), 'horde.error');
+            return $this->redirect((string) Horde::url('channels/index.php', true));
+        }
+
+        try {
+            $channel = $this->driver->getChannel($channel_id);
+        } catch (Exception $e) {
+            $this->notification->push(
+                sprintf(_("Invalid channel requested. %s"), $e->getMessage()),
+                'horde.error',
+            );
+            return $this->redirect((string) Horde::url('channels/index.php', true));
+        }
+
+        if (!$this->permissions->check('channels', Horde_Perms::EDIT, [$channel_id])) {
+            $this->notification->push(
+                _("You are not authorised for this action."),
+                'horde.warning',
+            );
+            throw new Horde_Exception_AuthenticationFailure();
+        }
+
+        /* Check if a URL has been passed. */
+        if ($url = Horde::verifySignedUrl(Horde_Util::getFormData('url'))) {
+            return $this->redirect((string) new Horde_Url($url));
+        }
+
+        try {
+            $stories = $this->driver->getStories(['channel_id' => $channel_id]);
+        } catch (Exception $e) {
+            $this->notification->push(
+                sprintf(_("Invalid channel requested. %s"), $e->getMessage()),
+                'horde.error',
+            );
+            return $this->redirect((string) Horde::url('channels/index.php', true));
+        }
+
+        if (empty($stories)) {
+            $this->notification->push(_("No available stories."), 'horde.warning');
+        }
+
+        $conf = $GLOBALS['conf'];
+
+        foreach ($stories as $key => $story) {
+            if (!empty($stories[$key]['published'])) {
+                $dateFormat = $this->prefs->getValue('date_format') . ', '
+                    . ($this->prefs->getValue('twentyFour') ? '%H:%M' : '%I:%M%p');
+                $stories[$key]['published_date'] = (new Horde_Date($stories[$key]['published']))->strftime($dateFormat);
+            } else {
+                $stories[$key]['published_date'] = '';
+            }
+
+            $stories[$key]['pdf_link'] = '';
+            $stories[$key]['edit_link'] = '';
+            $stories[$key]['delete_link'] = '';
+            $stories[$key]['view_link'] = Horde::link(
+                $this->driver->getStoryLink($channel, $story),
+                $story['description'],
+            ) . htmlspecialchars($story['title']) . '</a>';
+
+            $url = Horde::url('stories/pdf.php')->add(['id' => $story['id'], 'channel_id' => $channel_id]);
+            $stories[$key]['pdf_link'] = $url->link(['title' => _("PDF version")])
+                . Horde_Themes_Image::tag('mime/pdf.png') . '</a>';
+
+            $url = Horde::url('stories/edit.php')->add(['id' => $story['id'], 'channel_id' => $channel_id]);
+            $stories[$key]['edit_link'] = $url->link(['title' => _("Edit story")])
+                . Horde_Themes_Image::tag('edit.png') . '</a>';
+
+            if ($this->permissions->check('channels', Horde_Perms::DELETE, [$channel_id])) {
+                $url = Horde::url('stories/delete.php')->add(['id' => $story['id'], 'channel_id' => $channel_id]);
+                $stories[$key]['delete_link'] = $url->link(['title' => _("Delete story")])
+                    . Horde_Themes_Image::tag('delete.png') . '</a>';
+            }
+
+            if (!empty($conf['comments']['allow'])
+                && $this->registry->hasMethod('forums/numMessages')) {
+                try {
+                    $stories[$key]['comments'] = $this->registry->call(
+                        'forums/numMessages',
+                        [$stories[$key]['id'], 'jonah'],
+                    );
+                } catch (Exception $e) {
+                    $this->logger->error('Error fetching comment count: {error}', [
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            }
+        }
+
+        $title = $channel['channel_name'];
+        $view = new Horde_View(['templatePath' => JONAH_TEMPLATES . '/stories']);
+        $view->stories = $stories;
+        $view->read = true;
+        $view->comments = !empty($conf['comments']['allow'])
+            && $this->registry->hasMethod('forums/numMessages');
+
+        $html = $this->renderChrome($title, function () use ($view) {
+            echo $view->render('index');
+        });
+
+        return $this->htmlResponse($html);
+    }
+}
