@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Legacy entry point — delegates to the PSR-15 Channel\ListController.
+ *
  * Copyright 2003-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (BSD). If you
@@ -17,11 +19,20 @@ Horde_Registry::appInit('jonah', [
     'permission' => ['jonah:news', Horde_Perms::EDIT],
 ]);
 
-$params = [
-    'notification' => $notification,
-    'prefs' => $prefs,
-    'registry' => $registry,
-];
+use Horde\Http\RequestFactory;
+use Horde\Http\StreamFactory;
+use Horde\Http\UriFactory;
+use Horde\Http\Server\RequestBuilder;
+use Horde\Http\Server\ResponseWriterWeb;
+use Horde\Jonah\Controller\Channel\ListController;
 
-$view = new Jonah_View_ChannelList($params);
-$view->run();
+$request = (new RequestBuilder(
+    new RequestFactory(),
+    new StreamFactory(),
+    new UriFactory(),
+))->withGlobalVariables()->build();
+
+$controller = $GLOBALS['injector']->getInstance(ListController::class);
+$response = $controller->handle($request);
+
+(new ResponseWriterWeb())->writeResponse($response);

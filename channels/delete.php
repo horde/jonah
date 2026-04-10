@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Legacy entry point — delegates to the PSR-15 Channel\DeleteController.
+ *
  * Copyright 2003-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (BSD). If you
@@ -11,13 +13,24 @@
  * @author Michael J. Rubinsky <mrubinsk@horde.org>
  * @package Jonah
  */
+
 require_once __DIR__ . '/../lib/Application.php';
 Horde_Registry::appInit('jonah');
 
-/* Set up the form variables and the form. */
-$params = ['vars' => Horde_Variables::getDefaultVariables(),
-    'registry' => &$registry,
-    'notification' => &$notification];
+use Horde\Http\RequestFactory;
+use Horde\Http\StreamFactory;
+use Horde\Http\UriFactory;
+use Horde\Http\Server\RequestBuilder;
+use Horde\Http\Server\ResponseWriterWeb;
+use Horde\Jonah\Controller\Channel\DeleteController;
 
-$view = new Jonah_View_ChannelDelete($params);
-$view->run();
+$request = (new RequestBuilder(
+    new RequestFactory(),
+    new StreamFactory(),
+    new UriFactory(),
+))->withGlobalVariables()->build();
+
+$controller = $GLOBALS['injector']->getInstance(DeleteController::class);
+$response = $controller->handle($request);
+
+(new ResponseWriterWeb())->writeResponse($response);
