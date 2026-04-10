@@ -1,7 +1,15 @@
 <?php
 
+use Horde\Jonah\Service\FeedFetcher;
+use Horde\Jonah\Service\PermissionChecker;
+use Horde\Jonah\Service\StoryConfig;
+use Horde\Jonah\StoryOrder;
+
 /**
  * Jonah Base Class.
+ *
+ * @deprecated Use the individual service classes in Horde\Jonah\Service\ and
+ *             the StoryOrder enum instead.
  *
  * Copyright 2002-2026 Horde LLC (http://www.horde.org/)
  *
@@ -16,134 +24,79 @@
 class Jonah
 {
     /**
+     * @deprecated Use StoryOrder::Published->value
      */
     public const ORDER_PUBLISHED = 0;
+
+    /**
+     * @deprecated Use StoryOrder::Read->value
+     */
     public const ORDER_READ = 1;
+
+    /**
+     * @deprecated Use StoryOrder::Comments->value
+     */
     public const ORDER_COMMENTS = 2;
 
     /**
      * Obtain the list of stories from the passed in URI.
      *
-     * @deprecated Will be removed when external channels are removed.
+     * @deprecated Use Horde\Jonah\Service\FeedFetcher::fetch() instead.
      *
      * @param string $url  The url to get the list of the channel's stories.
+     *
+     * @return array{body: string, charset?: string}
      */
     public static function readURL($url)
     {
-        global $conf;
+        global $injector;
 
-        $http = $GLOBALS['injector']
-          ->getInstance('Horde_Core_Factory_HttpClient')
-          ->create();
-
-        try {
-            $response = $http->get($url);
-        } catch (Horde_Http_Exception $e) {
-            throw new Jonah_Exception(sprintf(_("Could not open %s: %s"), $url, $e->getMessage()));
-        }
-        if ($response->code <> '200') {
-            throw new Jonah_Exception(sprintf(_("Could not open %s: %s"), $url, $response->code));
-        }
-        $result = ['body' => $response->getBody()];
-        $content_type = $response->getHeader('Content-Type');
-        if (preg_match('/.*;\s?charset="?([^"]*)/', $content_type, $match)) {
-            $result['charset'] = $match[1];
-        } elseif (preg_match('/<\?xml[^>]+encoding=["\']?([^"\'\s?]+)[^?].*?>/i', $result['body'], $match)) {
-            $result['charset'] = $match[1];
-        }
-
-        return $result;
+        return $injector->getInstance(FeedFetcher::class)->fetch($url);
     }
 
     /**
-     *
+     * @deprecated Use Horde\Jonah\Service\PermissionChecker::check() instead.
      *
      * @param string $filter       The type of channel
      * @param integer $permission  Horde_Perms:: constant
-     * @param mixed $in            ??
+     * @param mixed $in            Items to filter
      *
-     * @return mixed  An array of results or a single boolean?
+     * @return mixed  An array of results or a single boolean
      */
     public static function checkPermissions($filter, $permission = Horde_Perms::READ, $in = null)
     {
-        global $registry, $injector;
+        global $injector;
 
-        if ($registry->isAdmin(['permission' => 'jonah:admin', 'permlevel' =>  $permission])) {
-            if (empty($in)) {
-                // Calls with no $in parameter are checking whether this user
-                // has permission.  Since this user is an admin, they always
-                // have permission.  If the $in parameter is an empty array,
-                // the method is expected to return an array too.
-                return is_array($in) ? [] : true;
-            } else {
-                return $in;
-            }
-        }
-
-        $perms = $injector->getInstance('Horde_Perms');
-
-        $out = [];
-
-        switch ($filter) {
-            case 'channels':
-                foreach ($in as $key => $val) {
-                    if ($perms->hasPermission('jonah:news', $registry->getAuth(), $permission)
-                        || $perms->hasPermission('jonah:news:' . $val['channel_id'], $registry->getAuth(), $permission)) {
-                        $out[$key] = $in[$key];
-                    }
-                }
-                break;
-
-            default:
-                return $perms->hasPermission($filter, $registry->getAuth(), Horde_Perms::EDIT);
-        }
-
-        return $out;
+        return $injector->getInstance(PermissionChecker::class)
+            ->check($filter, $permission, $in);
     }
 
     /**
      * Returns an array of configured body types from Jonah's $conf array.
      *
+     * @deprecated Use Horde\Jonah\Service\StoryConfig::getBodyTypes() instead.
+     *
      * @return array  An array of body types.
      */
     public static function getBodyTypes()
     {
-        static $types = [];
-        if (!empty($types)) {
-            return $types;
-        }
+        global $injector;
 
-        if (in_array('richtext', $GLOBALS['conf']['news']['story_types'])) {
-            $types['richtext'] = _("Rich Text");
-        }
-
-        /* Other than checking if text is enabled, it is inserted by default if
-         * no other body type has been enabled in the config. */
-        if (in_array('text', $GLOBALS['conf']['news']['story_types'])
-            || empty($types)) {
-            $types['text'] = _("Text");
-        }
-
-        return $types;
+        return $injector->getInstance(StoryConfig::class)->getBodyTypes();
     }
 
     /**
-     * Tries to figure out a default body type. Used when none has been
-     * specified and a types is needed to fall back on to.
+     * Tries to figure out a default body type.
      *
-     * @return string  A default type.
+     * @deprecated Use Horde\Jonah\Service\StoryConfig::getDefaultBodyType() instead.
+     *
+     * @return string|null  A default type.
      */
     public static function getDefaultBodyType()
     {
-        $types = Jonah::getBodyTypes();
-        if (isset($types['text'])) {
-            return 'text';
-        } elseif (isset($types['richtext'])) {
-            return 'richtext';
-        }
-        /* The two most common body types have not been found, so just return
-         * the first one that is in the array. */
-        return array_key_first($types);
+        global $injector;
+
+        return $injector->getInstance(StoryConfig::class)->getDefaultBodyType();
     }
 
 }
