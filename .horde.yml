@@ -43,3 +43,8 @@ autoload:
   psr-4:
     Horde\Jonah\: /src
 vendor: horde
+keywords:
+  - rss
+  - atom
+  - feed
+  - aggregator
