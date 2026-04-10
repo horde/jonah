@@ -265,114 +265,39 @@ class Jonah_Driver
     /**
      * Returns the stories of a channel rendered with the specified template.
      *
+     * @deprecated Use Horde\Jonah\Service\ChannelRenderer::render() instead.
+     *
      * @param integer $channel_id  The news channel to get stories from.
      * @param string  $tpl         The name of the template to use.
-     * @param integer $max         The maximum number of stories to get. If
-     *                             null, all stories will be returned.
+     * @param integer $max         The maximum number of stories to get.
      * @param integer $from        The number of the story to start with.
-     * @param integer $order       How to sort the results for internal channels
-     *                             Possible values are the Jonah::ORDER_*
-     *                             constants.
-     *
-     * @TODO: This doesn't belong in a storage driver class. Move it to a
-     * view or possible a static method in Jonah::?
+     * @param integer $order       Jonah::ORDER_* constant.
      *
      * @return string  The rendered story listing.
      */
     public function renderChannel($channel_id, $tpl, $max = 10, $from = 0, $order = Jonah::ORDER_PUBLISHED)
     {
-        $channel = $this->getChannel($channel_id);
+        $renderer = $GLOBALS['injector']
+            ->getInstance(Horde\Jonah\Service\ChannelRenderer::class);
 
         /**
          * ARCHITECTURE VIOLATION: Using deprecated Horde::loadConfiguration()
          * @deprecated Use $registry->loadConfigFile() instead
-         * @see Horde_Deprecated::loadConfiguration()
          */
         $templates = Horde::loadConfiguration('templates.php', 'templates', 'jonah');
-        $escape = !isset($templates[$tpl]['escape']) || !empty($templates[$tpl]['escape']);
-        $view = new Horde_View(['templatePath' => JONAH_TEMPLATES . '/channels']);
 
-        if ($escape) {
-            $channel['channel_name'] = htmlspecialchars($channel['channel_name']);
-            $channel['channel_desc'] = htmlspecialchars($channel['channel_desc']);
-        }
-        $view->channel = $channel;
-
-        /* Get one story more than requested to see if there are more stories. */
-        if ($max !== null) {
-            $stories = $this->getStories(
-                ['channel_id' => $channel_id,
-                    'published' => true,
-                    'startnumber' => $from,
-                    'limit' => $max],
-                $order
-            );
-        } else {
-            $stories = $this->getStories(
-                ['channel_id' => $channel_id,
-                    'published' => true],
-                $order
-            );
-            $max = count($stories);
-        }
-
-        if (!$stories) {
-            $view->error = _("No stories are currently available.");
-            $view->stories = false;
-            $view->image = false;
-            $view->form = false;
-        } else {
-            /* Escape. */
-            if ($escape) {
-                array_walk($stories, [$this, '_escapeStories']);
-            }
-
-            /* Process story summaries. */
-            array_walk($stories, [$this, '_escapeStoryDescriptions']);
-
-            $view->error = false;
-            $view->story_marker = Horde_Themes_Image::tag('story_marker.png');
-            $view->image = false;
-            $view->form = false;
-            if ($from) {
-                $view->previous = max(0, $from - $max);
-            } else {
-                $view->previous = false;
-            }
-            if ($from && !empty($channel['channel_page_link'])) {
-                $view->previous_link = str_replace(
-                    ['%25c', '%25n', '%c', '%n'],
-                    ['%c', '%n', $channel['channel_id'], max(0, $from - $max)],
-                    $channel['channel_page_link']
-                );
-            } else {
-                $view->previous_link = false;
-            }
-            $more = count($stories) > $max;
-            if ($more) {
-                $view->next = $from + $max;
-                array_pop($stories);
-            } else {
-                $view->next = false;
-            }
-            if ($more && !empty($channel['channel_page_link'])) {
-                $view->next_link = str_replace(
-                    ['%25c', '%25n', '%c', '%n'],
-                    ['%c', '%n', $channel['channel_id'], $from + $max],
-                    $channel['channel_page_link']
-                );
-            } else {
-                $view->next_link = false;
-            }
-
-            $view->stories = $stories;
-        }
-
-        return $view->render($templates[$tpl]['view_template']);
+        return $renderer->render(
+            (int) $channel_id,
+            $tpl,
+            $templates,
+            $max,
+            (int) $from,
+            Horde\Jonah\StoryOrder::from($order),
+        );
     }
 
     /**
-     * @TODO: Move to a view class or static Jonah:: method?
+     * @deprecated Moved to Horde\Jonah\Service\ChannelRenderer.
      */
     protected function _escapeStories(&$value, $key)
     {
@@ -387,7 +312,7 @@ class Jonah_Driver
     }
 
     /**
-     * @TODO: Move to a view class or static Jonah:: method?
+     * @deprecated Moved to Horde\Jonah\Service\ChannelRenderer.
      */
     protected function _escapeStoryDescriptions(&$value, $key)
     {
@@ -397,56 +322,17 @@ class Jonah_Driver
     /**
      * Returns the provided story as a MIME part.
      *
+     * @deprecated Use Horde\Jonah\Service\StoryMailer::buildStoryPart() instead.
+     *
      * @param array $story  A data array representing a story.
      *
-     * @return MIME_Part  The MIME message part containing the story parts.
-     * @TODO: Refactor to use new Horde MIME library
+     * @return Horde_Mime_Part  The MIME message part containing the story parts.
      */
-    protected function getStoryAsMessage($story)
+    public function getStoryAsMessage($story)
     {
-        require_once 'Horde/MIME/Part.php';
-
-        /* Add the story to the message based on the story's body type. */
-        switch ($story['body_type']) {
-            case 'richtext':
-                /* Get a plain text version of a richtext story. */
-                $body_html = $story['body'];
-                $body_text = $GLOBALS['injector']->getInstance('Horde_Core_Factory_TextFilter')->filter($body_html, 'html2text');
-
-                /* Add description. */
-                $body_html = '<p>' . $GLOBALS['injector']->getInstance('Horde_Core_Factory_TextFilter')->filter($story['description'], 'text2html', ['parselevel' => Horde_Text_Filter_Text2html::MICRO, 'callback' => null]) . "</p>\n" . $body_html;
-                $body_text = Horde_String::wrap('  ' . $story['description'], 70) . "\n\n" . $body_text;
-
-                /* Add the text version of the story to the base message. */
-                $message_text = new MIME_Part('text/plain');
-                $message_text->setCharset('UTF-8');
-                $message_text->setContents($message_text->replaceEOL($body_text));
-                $message_text->setDescription(_("Plaintext Version of Story"));
-
-                /* Add an HTML version of the story to the base message. */
-                $message_html = new MIME_Part(
-                    'text/html',
-                    Horde_String::wrap($body_html),
-                    'UTF-8',
-                    'inline'
-                );
-                $message_html->setDescription(_("HTML Version of Story"));
-
-                /* Add the two parts as multipart/alternative. */
-                $basepart = new MIME_Part('multipart/alternative');
-                $basepart->addPart($message_text);
-                $basepart->addPart($message_html);
-
-                return $basepart;
-
-            case 'text':
-                /* This is just a plain text story. */
-                $message_text = new MIME_Part('text/plain');
-                $message_text->setContents($message_text->replaceEOL($story['description'] . "\n\n" . $story['body']));
-                $message_text->setCharset('UTF-8');
-
-                return $message_text;
-        }
+        return $GLOBALS['injector']
+            ->getInstance(Horde\Jonah\Service\StoryMailer::class)
+            ->buildStoryPart($story);
     }
 
     /**

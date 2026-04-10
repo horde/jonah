@@ -33,6 +33,77 @@ class Jonah_Application extends Horde_Registry_Application
     protected function _bootstrap()
     {
         $GLOBALS['injector']->bindFactory('Jonah_Driver', 'Jonah_Factory_Driver', 'create');
+
+        $injector = $GLOBALS['injector'];
+
+        /* PSR-3 logger — bind NullLogger if no concrete logger is registered */
+        if (!$injector->has(Psr\Log\LoggerInterface::class)) {
+            $injector->bindClosure(
+                Psr\Log\LoggerInterface::class,
+                function () {
+                    return new Psr\Log\NullLogger();
+                },
+            );
+        }
+
+        /* PSR-4 services */
+        $injector->bindClosure(
+            Horde\Jonah\Service\PermissionChecker::class,
+            function ($injector) {
+                return new Horde\Jonah\Service\PermissionChecker(
+                    $injector->getInstance('Horde_Perms'),
+                    $injector->getInstance('Horde_Registry'),
+                );
+            },
+        );
+
+        $injector->bindClosure(
+            Horde\Jonah\Service\StoryConfig::class,
+            function () {
+                return new Horde\Jonah\Service\StoryConfig(
+                    $GLOBALS['conf']['news']['story_types'] ?? [],
+                );
+            },
+        );
+
+        $injector->bindClosure(
+            Horde\Jonah\Service\FeedFetcher::class,
+            function ($injector) {
+                $responseFactory = new Horde\Http\ResponseFactory();
+                $streamFactory = new Horde\Http\StreamFactory();
+                $client = new Horde\Http\Client\Curl(
+                    $responseFactory,
+                    $streamFactory,
+                    new Horde\Http\Client\Options(),
+                );
+
+                return new Horde\Jonah\Service\FeedFetcher(
+                    $client,
+                    new Horde\Http\RequestFactory(),
+                    $injector->getInstance(Psr\Log\LoggerInterface::class),
+                );
+            },
+        );
+
+        $injector->bindClosure(
+            Horde\Jonah\Service\StoryMailer::class,
+            function ($injector) {
+                return new Horde\Jonah\Service\StoryMailer(
+                    $injector->getInstance(Psr\Log\LoggerInterface::class),
+                );
+            },
+        );
+
+        $injector->bindClosure(
+            Horde\Jonah\Service\ChannelRenderer::class,
+            function ($injector) {
+                return new Horde\Jonah\Service\ChannelRenderer(
+                    $injector->getInstance('Jonah_Driver'),
+                    $injector->getInstance(Psr\Log\LoggerInterface::class),
+                    JONAH_TEMPLATES . '/channels',
+                );
+            },
+        );
     }
 
     /**
