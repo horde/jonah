@@ -1,4 +1,22 @@
 ---
+1.0.0-beta1:
+  api: 1.0.0-beta1
+  state:
+    release: beta
+    api: beta
+  date: 2026-04-10
+  license:
+    identifier: BSD-2-Clause
+    uri: https://spdx.org/licenses/BSD-2-Clause.html
+  notes: |-
+    refactor: Nothing we do here throws PEAR_Error so remove handling
+    fix: Explicit exits and returns in dead ends, explicit initial data structures
+    fix: various null safety / typing issues in classes
+    style: php-cs-fixer
+    Merge pull request #1 from horde/feat/replace-horde-template
+    feat: Replace Horde_Template with Horde_View
+    fix: More defensive code when trying to drop tables
+    docs: Clarify where to put local overrides
 1.0.0-alpha6:
   api: 1.0.0-alpha6
   state:
