@@ -1,37 +1,34 @@
 <?php
 
 /**
- * Script to handle requests for html delivery of stories.
+ * Legacy entry point for HTML feed delivery — delegates to HtmlController.
  *
  * Copyright 2004-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (BSD). If you did not
  * did not receive this file, see http://cvs.horde.org/co.php/jonah/LICENSE.
- *
- * @author Jan Schneider <jan@horde.org>
  */
 
 require_once __DIR__ . '/../lib/Application.php';
-$jonah = Horde_Registry::appInit('jonah', [
+Horde_Registry::appInit('jonah', [
     'authentication' => 'none',
     'session_control' => 'readonly',
 ]);
 
-/* Get the id and format of the channel to display. */
-$criteria = Horde_Util::nonInputVar('criteria');
-if (!$criteria) {
-    $criteria['feed'] = Horde_Util::getFormData('channel_id');
-    $criteria['format'] = Horde_Util::getFormData('format');
-}
-if (empty($criteria['format'])) {
-    // Select the default channel format
-    // TODO: FIXME
-    $criteria['format'] = 'standard';
-}
+use Horde\Http\RequestFactory;
+use Horde\Http\StreamFactory;
+use Horde\Http\UriFactory;
+use Horde\Http\Server\RequestBuilder;
+use Horde\Http\Server\ResponseWriterWeb;
+use Horde\Jonah\Controller\Feed\HtmlController;
 
-$params = ['registry' => &$registry,
-    'notification' => &$notification,
-    'conf' => &$conf,
-    'criteria' => &$criteria];
-$view = new Jonah_View_DeliveryHtml($params);
-$view->run();
+$request = (new RequestBuilder(
+    new RequestFactory(),
+    new StreamFactory(),
+    new UriFactory(),
+))->withGlobalVariables()->build();
+
+$controller = $GLOBALS['injector']->getInstance(HtmlController::class);
+$response = $controller->handle($request);
+
+(new ResponseWriterWeb())->writeResponse($response);
