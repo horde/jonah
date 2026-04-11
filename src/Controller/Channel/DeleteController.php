@@ -18,6 +18,7 @@ namespace Horde\Jonah\Controller\Channel;
 
 use Horde;
 use Horde\Jonah\Service\PermissionChecker;
+use Horde\Jonah\Service\UrlGenerator;
 use Horde\Jonah\Traits\ResponseTrait;
 use Horde_Exception_AuthenticationFailure;
 use Horde_Form;
@@ -51,6 +52,7 @@ class DeleteController implements RequestHandlerInterface
         private readonly Horde_Notification_Handler $notification,
         private readonly Horde_PageOutput $pageOutput,
         private readonly LoggerInterface $logger,
+        private readonly UrlGenerator $urlGenerator,
     ) {}
 
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -70,7 +72,7 @@ class DeleteController implements RequestHandlerInterface
                 _("Invalid channel specified for deletion."),
                 'horde.message',
             );
-            return $this->redirect((string) Horde::url('channels'));
+            return $this->redirect($this->urlGenerator->urlFor('ChannelList'));
         }
 
         /* If not yet submitted, populate form vars from fetched channel. */
@@ -107,7 +109,7 @@ class DeleteController implements RequestHandlerInterface
                         _("The channel has been deleted."),
                         'horde.success',
                     );
-                    return $this->redirect((string) Horde::url('channels'));
+                    return $this->redirect($this->urlGenerator->urlFor('ChannelList'));
                 } catch (Exception $e) {
                     $this->notification->push(
                         sprintf(
@@ -123,7 +125,7 @@ class DeleteController implements RequestHandlerInterface
                 _("Channel has not been deleted."),
                 'horde.message',
             );
-            return $this->redirect((string) Horde::url('channels'));
+            return $this->redirect($this->urlGenerator->urlFor('ChannelList'));
         }
 
         $html = $this->renderChrome($title, function () use ($form, $vars) {

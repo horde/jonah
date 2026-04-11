@@ -16,7 +16,9 @@ namespace Horde\Jonah\Controller;
 
 use Exception;
 use Horde;
+use Horde\Core\Config\LegacyMergedConfig;
 use Horde\Jonah\Service\PermissionChecker;
+use Horde\Jonah\Service\UrlGenerator;
 use Horde\Jonah\Traits\ResponseTrait;
 use Horde_Date;
 use Horde_Exception_AuthenticationFailure;
@@ -26,8 +28,8 @@ use Horde_Perms;
 use Horde_Prefs;
 use Horde_Registry;
 use Horde_Themes_Image;
+use Horde_Url;
 use Horde_View;
-use Jonah;
 use Jonah_Driver;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -55,6 +57,8 @@ class TagSearchController implements RequestHandlerInterface
         private readonly Horde_Registry $registry,
         private readonly Horde_Prefs $prefs,
         private readonly LoggerInterface $logger,
+        private readonly LegacyMergedConfig $config,
+        private readonly UrlGenerator $urlGenerator,
     ) {}
 
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -65,7 +69,7 @@ class TagSearchController implements RequestHandlerInterface
 
         if (empty($tag)) {
             $this->notification->push(_("No tag requested."), 'horde.error');
-            return $this->redirect((string) Horde::url('channels/index.php', true));
+            return $this->redirect($this->urlGenerator->absoluteUrlFor('ChannelList'));
         }
 
         /* Get channel(s) to search */
@@ -79,7 +83,7 @@ class TagSearchController implements RequestHandlerInterface
                     sprintf(_("Invalid channel requested. %s"), $e->getMessage()),
                     'horde.error',
                 );
-                return $this->redirect((string) Horde::url('channels/index.php', true));
+                return $this->redirect($this->urlGenerator->absoluteUrlFor('ChannelList'));
             }
         }
 
@@ -105,7 +109,7 @@ class TagSearchController implements RequestHandlerInterface
                     sprintf(_("Invalid channel requested. %s"), $e->getMessage()),
                     'horde.error',
                 );
-                return $this->redirect((string) Horde::url('channels/index.php', true));
+                return $this->redirect($this->urlGenerator->absoluteUrlFor('ChannelList'));
             }
 
             $stories = array_merge($stories, $cstories);
@@ -114,8 +118,6 @@ class TagSearchController implements RequestHandlerInterface
         if (empty($stories)) {
             $this->notification->push(_("No available stories."), 'horde.warning');
         }
-
-        $conf = $GLOBALS['conf'];
 
         foreach ($stories as $key => $story) {
             $storyChannelId = $story['channel_id'];
@@ -134,40 +136,35 @@ class TagSearchController implements RequestHandlerInterface
             $stories[$key]['pdf_link'] = '';
             $stories[$key]['edit_link'] = '';
             $stories[$key]['delete_link'] = '';
-            $stories[$key]['view_link'] = Horde::url($story['link'])
-                ->link(['title' => $story['description']])
-                . htmlspecialchars($story['title']) . '</a>';
+            $stories[$key]['view_link'] = Horde::link(
+                new Horde_Url($story['link']),
+                $story['description'],
+            ) . htmlspecialchars($story['title']) . '</a>';
 
             /* PDF link */
-            $url = Horde::url('stories/pdf.php')->add([
-                'id' => $story['id'],
-                'channel_id' => $storyChannelId,
-            ]);
-            $stories[$key]['pdf_link'] = $url->link(['title' => _("PDF version")])
-                . Horde_Themes_Image::tag('mime/pdf.png') . '</a>';
+            $stories[$key]['pdf_link'] = Horde::link(
+                $this->urlGenerator->urlFor('StoryPdf', ['id' => $story['id'], 'channel_id' => $storyChannelId]),
+                _("PDF version"),
+            ) . Horde_Themes_Image::tag('mime/pdf.png') . '</a>';
 
             /* Edit link */
             if ($this->permissions->check('channels', Horde_Perms::EDIT, [$storyChannelId])) {
-                $url = Horde::url('stories/edit.php')->add([
-                    'id' => $story['id'],
-                    'channel_id' => $storyChannelId,
-                ]);
-                $stories[$key]['edit_link'] = $url->link(['title' => _("Edit story")])
-                    . Horde_Themes_Image::tag('edit.png') . '</a>';
+                $stories[$key]['edit_link'] = Horde::link(
+                    $this->urlGenerator->urlFor('StoryEdit', ['id' => $story['id'], 'channel_id' => $storyChannelId]),
+                    _("Edit story"),
+                ) . Horde_Themes_Image::tag('edit.png') . '</a>';
             }
 
             /* Delete link */
             if ($this->permissions->check('channels', Horde_Perms::DELETE, [$storyChannelId])) {
-                $url = Horde::url('stories/delete.php')->add([
-                    'id' => $story['id'],
-                    'channel_id' => $storyChannelId,
-                ]);
-                $stories[$key]['delete_link'] = $url->link(['title' => _("Delete story")])
-                    . Horde_Themes_Image::tag('delete.png') . '</a>';
+                $stories[$key]['delete_link'] = Horde::link(
+                    $this->urlGenerator->urlFor('StoryDelete', ['id' => $story['id'], 'channel_id' => $storyChannelId]),
+                    _("Delete story"),
+                ) . Horde_Themes_Image::tag('delete.png') . '</a>';
             }
 
             /* Comment count */
-            if (!empty($conf['comments']['allow'])
+            if ($this->config->get('comments.allow')
                 && $this->registry->hasMethod('forums/numMessages')) {
                 $comments = 0;
                 try {
@@ -186,7 +183,7 @@ class TagSearchController implements RequestHandlerInterface
         $view = new Horde_View(['templatePath' => JONAH_TEMPLATES . '/stories']);
         $view->stories = $stories;
         $view->read = true;
-        $view->comments = !empty($conf['comments']['allow'])
+        $view->comments = $this->config->get('comments.allow')
             && $this->registry->hasMethod('forums/numMessages');
 
         $html = $this->renderChrome($title, function () use ($view) {

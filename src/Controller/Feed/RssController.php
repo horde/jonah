@@ -15,16 +15,17 @@ declare(strict_types=1);
 namespace Horde\Jonah\Controller\Feed;
 
 use Exception;
-use Horde;
 use Horde\Http\Response;
 use Horde\Http\StreamFactory;
+use Horde\Jonah\Service\UrlGenerator;
 use Horde_Browser;
+use Horde_Core_Factory_Identity;
+use Horde_Core_Factory_TextFilter;
 use Horde_Notification_Handler;
 use Horde_PageOutput;
 use Horde_Registry;
 use Horde_Text_Filter_Text2html;
 use Horde_Themes;
-use Horde_Util;
 use Horde_View;
 use Jonah_Driver;
 use Jonah_Tagger;
@@ -52,6 +53,9 @@ class RssController implements RequestHandlerInterface
         private readonly Horde_Registry $registry,
         private readonly Horde_Browser $browser,
         private readonly LoggerInterface $logger,
+        private readonly Horde_Core_Factory_Identity $identityFactory,
+        private readonly Horde_Core_Factory_TextFilter $textFilter,
+        private readonly UrlGenerator $urlGenerator,
     ) {}
 
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -59,7 +63,7 @@ class RssController implements RequestHandlerInterface
         $queryParams = $request->getQueryParams();
 
         /* Accept criteria from the REST dispatcher (delivery/index.php) */
-        $criteria = Horde_Util::nonInputVar('criteria');
+        $criteria = $request->getAttribute('criteria');
         if (!$criteria) {
             $criteria = [
                 'channel_id' => $queryParams['channel_id'] ?? null,
@@ -123,12 +127,16 @@ class RssController implements RequestHandlerInterface
         $view->channel_updated = htmlspecialchars(date('r', (int) $channel['channel_updated']));
         $view->channel_official = htmlspecialchars($channel['channel_official']);
         $view->channel_rss = htmlspecialchars(
-            Horde::url('delivery/rss.php', true, -1)
-                ->add(['type' => 'rss', 'channel_id' => $channel['channel_id']]),
+            $this->urlGenerator->absoluteUrlFor('FeedRss', [
+                'channel_id' => $channel['channel_id'],
+                'type' => 'rss',
+            ]),
         );
         $view->channel_rss2 = htmlspecialchars(
-            Horde::url('delivery/rss.php', true, -1)
-                ->add(['type' => 'rss2', 'channel_id' => $channel['channel_id']]),
+            $this->urlGenerator->absoluteUrlFor('FeedRss', [
+                'channel_id' => $channel['channel_id'],
+                'type' => 'rss2',
+            ]),
         );
 
         foreach ($stories as &$story) {
@@ -138,16 +146,12 @@ class RssController implements RequestHandlerInterface
             $story['storylink'] = htmlspecialchars($this->driver->getStoryLink($channel, $story));
             $story['published'] = htmlspecialchars(date('r', (int) $story['published']));
 
-            $identity = $GLOBALS['injector']
-                ->getInstance('Horde_Core_Factory_Identity')
-                ->create($story['author']);
+            $identity = $this->identityFactory->create($story['author']);
             $name = $identity->getValue('fullname');
             $story['author'] = htmlspecialchars($name ?: $story['author']);
 
             if (!empty($story['body_type']) && $story['body_type'] === 'text') {
-                $story['body'] = $GLOBALS['injector']
-                    ->getInstance('Horde_Core_Factory_TextFilter')
-                    ->filter(
+                $story['body'] = $this->textFilter->filter(
                         $story['body'],
                         'text2html',
                         ['parselevel' => Horde_Text_Filter_Text2html::MICRO],

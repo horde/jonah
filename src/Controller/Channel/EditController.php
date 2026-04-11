@@ -18,6 +18,7 @@ namespace Horde\Jonah\Controller\Channel;
 
 use Horde;
 use Horde\Jonah\Service\PermissionChecker;
+use Horde\Jonah\Service\UrlGenerator;
 use Horde\Jonah\Traits\ResponseTrait;
 use Horde_Exception_AuthenticationFailure;
 use Horde_Form_Renderer;
@@ -50,6 +51,7 @@ class EditController implements RequestHandlerInterface
         private readonly PermissionChecker $permissions,
         private readonly Horde_Notification_Handler $notification,
         private readonly Horde_PageOutput $pageOutput,
+        private readonly UrlGenerator $urlGenerator,
     ) {}
 
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -69,7 +71,7 @@ class EditController implements RequestHandlerInterface
                     sprintf(_("Invalid channel requested. %s"), $e->getMessage()),
                     'horde.error',
                 );
-                return $this->redirect((string) Horde::url('channels/index.php', true));
+                return $this->redirect($this->urlGenerator->absoluteUrlFor('ChannelList'));
             }
         }
 
@@ -94,7 +96,7 @@ class EditController implements RequestHandlerInterface
                         sprintf(_("The feed \"%s\" has been saved."), $info['channel_name']),
                         'horde.success',
                     );
-                    return $this->redirect((string) Horde::url('channels'));
+                    return $this->redirect($this->urlGenerator->urlFor('ChannelList'));
                 } catch (Exception $e) {
                     $this->notification->push(
                         sprintf(_("There was an error saving the feed: %s"), $e->getMessage()),
@@ -108,7 +110,7 @@ class EditController implements RequestHandlerInterface
             $form->renderActive(
                 new Horde_Form_Renderer(),
                 $vars,
-                Horde::url('channels/edit.php'),
+                $this->urlGenerator->urlFor('ChannelCreate'),
                 'post',
             );
         });

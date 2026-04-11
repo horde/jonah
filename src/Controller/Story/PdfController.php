@@ -17,6 +17,7 @@ namespace Horde\Jonah\Controller\Story;
 use Exception;
 use Horde\Jonah\Traits\ResponseTrait;
 use Horde_Browser;
+use Horde_Core_Factory_TextFilter;
 use Horde_Notification_Handler;
 use Horde_PageOutput;
 use Horde_Pdf_Writer;
@@ -46,6 +47,7 @@ class PdfController implements RequestHandlerInterface
         private readonly Horde_Notification_Handler $notification,
         private readonly Horde_PageOutput $pageOutput,
         private readonly Horde_Browser $browser,
+        private readonly Horde_Core_Factory_TextFilter $textFilter,
     ) {}
 
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -74,9 +76,7 @@ class PdfController implements RequestHandlerInterface
 
         /* Convert richtext HTML body to plain text for PDF */
         if (!empty($story['body_type']) && $story['body_type'] === 'richtext') {
-            $story['body'] = $GLOBALS['injector']
-                ->getInstance('Horde_Core_Factory_TextFilter')
-                ->filter($story['body'], 'html2text');
+            $story['body'] = $this->textFilter->filter($story['body'], 'html2text');
         }
 
         $pdf = new Horde_Pdf_Writer(['format' => 'Letter', 'unit' => 'pt']);

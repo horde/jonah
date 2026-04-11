@@ -16,8 +16,8 @@ declare(strict_types=1);
 namespace Horde\Jonah\Controller\Story;
 
 use Exception;
-use Horde;
 use Horde\Jonah\Service\PermissionChecker;
+use Horde\Jonah\Service\UrlGenerator;
 use Horde\Jonah\Traits\ResponseTrait;
 use Horde_Exception_AuthenticationFailure;
 use Horde_Form;
@@ -48,6 +48,7 @@ class DeleteController implements RequestHandlerInterface
         private readonly PermissionChecker $permissions,
         private readonly Horde_Notification_Handler $notification,
         private readonly Horde_PageOutput $pageOutput,
+        private readonly UrlGenerator $urlGenerator,
     ) {}
 
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -65,7 +66,7 @@ class DeleteController implements RequestHandlerInterface
                 sprintf(_("Story editing failed: %s"), $e->getMessage()),
                 'horde.error',
             );
-            return $this->redirect((string) Horde::url('channels/index.php', true));
+            return $this->redirect($this->urlGenerator->absoluteUrlFor('ChannelList'));
         }
 
         if (!$this->permissions->check('channels', Horde_Perms::DELETE, [$channel_id])) {
@@ -83,7 +84,7 @@ class DeleteController implements RequestHandlerInterface
                 _("No valid story requested for deletion."),
                 'horde.message',
             );
-            return $this->redirect((string) Horde::url('channels/index.php', true));
+            return $this->redirect($this->urlGenerator->absoluteUrlFor('ChannelList'));
         }
 
         if (empty($form_submit)) {
@@ -113,9 +114,10 @@ class DeleteController implements RequestHandlerInterface
                         'horde.success',
                     );
                     return $this->redirect(
-                        (string) Horde::url('stories/index.php', true)
-                            ->add('channel_id', $channel_id)
-                            ->setRaw(true),
+                        $this->urlGenerator->absoluteUrlFor(
+                            'StoryList',
+                            ['channel_id' => $channel_id],
+                        ),
                     );
                 } catch (Exception $e) {
                     $this->notification->push(
@@ -133,14 +135,20 @@ class DeleteController implements RequestHandlerInterface
                 'horde.message',
             );
             return $this->redirect(
-                (string) Horde::url('stories/index.php', true)
-                    ->add('channel_id', $channel_id)
-                    ->setRaw(true),
+                $this->urlGenerator->absoluteUrlFor(
+                    'StoryList',
+                    ['channel_id' => $channel_id],
+                ),
             );
         }
 
         $html = $this->renderChrome($title, function () use ($form, $vars) {
-            $form->renderActive(null, $vars, Horde::url('stories/delete.php'), 'post');
+            $form->renderActive(
+                null,
+                $vars,
+                $this->urlGenerator->urlFor('StoryDelete', ['channel_id' => $channel_id, 'id' => $story_id]),
+                'post',
+            );
         });
 
         return $this->htmlResponse($html);
