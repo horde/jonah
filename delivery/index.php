@@ -1,6 +1,11 @@
 <?php
 
 /**
+ * REST-style URL dispatcher for feed delivery.
+ *
+ * Parses path-based URLs and delegates to Feed\HtmlController or
+ * Feed\RssController. Retains the original routing logic so that
+ * URLs like /delivery/rss/channel_id/5 continue to work.
  *
  * Copyright 2003-2026 Horde LLC (http://www.horde.org/)
  *
@@ -9,22 +14,32 @@
  *
  * @author Ben Klang <ben@alkaloid.net>
  */
+
 require_once __DIR__ . '/../lib/Application.php';
-$jonah = Horde_Registry::appInit('jonah', [
+Horde_Registry::appInit('jonah', [
     'authentication' => 'none',
     'session_control' => 'readonly',
 ]);
+
+use Horde\Http\RequestFactory;
+use Horde\Http\StreamFactory;
+use Horde\Http\UriFactory;
+use Horde\Http\Server\RequestBuilder;
+use Horde\Http\Server\ResponseWriterWeb;
+use Horde\Jonah\Controller\Feed\HtmlController;
+use Horde\Jonah\Controller\Feed\RssController;
+
+/* Parse REST-style path into criteria */
 $parts = explode('/', Horde_Util::getPathInfo());
 $lastpart = null;
 $deliveryType = null;
 $criteria = [];
+
 foreach ($parts as $part) {
     if (empty($part)) {
-        // Double slash in the URL path.  Ignore this empty part.
         continue;
     }
 
-    // Check for REST-style content type
     if (strpos($part, '.') !== false) {
         $deliveryType = substr($part, strrpos($part, '.') + 1);
         $part = substr($part, 0, strrpos($part, '.'));
@@ -37,12 +52,10 @@ foreach ($parts as $part) {
             break;
 
         case 'type':
-            // Feed type is specially mangled
             $lastpart = 'feed_type';
             break;
 
         case 'format':
-            // Format is specially mangled
             $lastpart = 'channel_format';
             break;
 
@@ -62,8 +75,8 @@ foreach ($parts as $part) {
                 $criteria[$lastpart] = $part;
                 $lastpart = null;
             } else {
-                // An unknown directive
-                Horde::log("Malformed request URL: " . Horde_Util::getPathInfo(), 'WARN');
+                $GLOBALS['injector']->getInstance(Psr\Log\LoggerInterface::class)
+                    ->warning('Malformed request URL: {url}', ['url' => Horde_Util::getPathInfo()]);
                 exit;
             }
             break;
@@ -74,4 +87,21 @@ if (empty($deliveryType)) {
     $deliveryType = 'html';
 }
 
-include __DIR__ . '/' . basename($deliveryType) . '.php';
+/* Store criteria so controllers can pick them up via nonInputVar */
+Horde_Util::nonInputVar('criteria', $criteria);
+
+$request = (new RequestBuilder(
+    new RequestFactory(),
+    new StreamFactory(),
+    new UriFactory(),
+))->withGlobalVariables()->build();
+
+if ($deliveryType === 'rss') {
+    $controller = $GLOBALS['injector']->getInstance(RssController::class);
+} else {
+    $controller = $GLOBALS['injector']->getInstance(HtmlController::class);
+}
+
+$response = $controller->handle($request);
+
+(new ResponseWriterWeb())->writeResponse($response);
