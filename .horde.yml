@@ -37,6 +37,7 @@ dependencies:
       horde/db: ^3
       horde/core: ^3
       horde/horde: ^6
+      horde/routes: ^3
 autoload:
   classmap:
     - lib/
