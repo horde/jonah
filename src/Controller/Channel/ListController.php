@@ -16,15 +16,13 @@ declare(strict_types=1);
 
 namespace Horde\Jonah\Controller\Channel;
 
-use Horde;
 use Horde\Jonah\Service\PermissionChecker;
 use Horde\Jonah\Service\UrlGenerator;
 use Horde\Jonah\Traits\ResponseTrait;
+use Horde\Jonah\View\ViewFactory;
 use Horde_Notification_Handler;
 use Horde_PageOutput;
 use Horde_Perms;
-use Horde_Themes_Image;
-use Horde_View;
 use Jonah_Driver;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -50,6 +48,7 @@ class ListController implements RequestHandlerInterface
         private readonly Horde_Notification_Handler $notification,
         private readonly Horde_PageOutput $pageOutput,
         private readonly UrlGenerator $urlGenerator,
+        private readonly ViewFactory $viewFactory,
     ) {}
 
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -69,36 +68,17 @@ class ListController implements RequestHandlerInterface
 
             foreach ($channels as $key => $channel) {
                 $cid = $channel['channel_id'];
-
-                $channels[$key]['edit_link'] = Horde::link(
-                    $this->urlGenerator->urlFor('ChannelEdit', ['channel_id' => $cid]),
-                    _("Edit channel"),
-                ) . Horde_Themes_Image::tag('edit.png') . '</a>';
-
-                $channels[$key]['delete_link'] = Horde::link(
-                    $this->urlGenerator->urlFor('ChannelDelete', ['channel_id' => $cid]),
-                    _("Delete channel"),
-                ) . Horde_Themes_Image::tag('delete.png') . '</a>';
-
                 $channels[$key]['stories_url'] = $this->urlGenerator->urlFor(
                     'StoryList',
                     ['channel_id' => $cid],
                 );
-
-                $channels[$key]['addstory_link'] = '';
-                $channels[$key]['refresh_link'] = '';
-
-                $channels[$key]['addstory_link'] = Horde::link(
-                    $this->urlGenerator->urlFor('StoryCreate', ['channel_id' => $cid]),
-                    _("Add story"),
-                ) . Horde_Themes_Image::tag('new.png') . '</a>';
+                $channels[$key]['can_edit'] = true;
+                $channels[$key]['can_delete'] = true;
             }
         }
 
-        $view = new Horde_View(['templatePath' => JONAH_TEMPLATES . '/view']);
-        $view->addHelper('Tag');
+        $view = $this->viewFactory->createChannelListView();
         $view->channels = $channels;
-        $view->search_img = Horde_Themes_Image::tag('search.png');
 
         $this->pageOutput->addScriptFile('tables.js', 'horde');
         $this->pageOutput->addScriptFile('quickfinder.js', 'horde');

@@ -100,7 +100,32 @@ class Jonah_Application extends Horde_Registry_Application
                 return new Horde\Jonah\Service\ChannelRenderer(
                     $injector->getInstance('Jonah_Driver'),
                     $injector->getInstance(Psr\Log\LoggerInterface::class),
-                    JONAH_TEMPLATES . '/channels',
+                    $injector->getInstance(Horde\Jonah\Service\FilesystemPathHelper::class),
+                );
+            },
+        );
+
+        $injector->bindClosure(
+            Horde\Jonah\Service\FilesystemPathHelper::class,
+            function ($injector) {
+                $registry = $injector->getInstance('Horde_Registry');
+
+                return new Horde\Jonah\Service\FilesystemPathHelper(
+                    JONAH_BASE,
+                    $registry->get('jsuri', 'horde'),
+                    $registry->get('jsfs', 'horde'),
+                    $registry->get('themesuri', 'horde'),
+                    $registry->get('themesuri', 'jonah'),
+                );
+            },
+        );
+
+        $injector->bindClosure(
+            Horde\Jonah\Service\UrlSigner::class,
+            function () {
+                return new Horde\Jonah\Service\UrlSigner(
+                    $GLOBALS['conf']['secret_key'] ?? '',
+                    (int) ($GLOBALS['conf']['urls']['hmac_lifetime'] ?? 30),
                 );
             },
         );
@@ -119,10 +144,16 @@ class Jonah_Application extends Horde_Registry_Application
                 return new Horde\Jonah\Service\UrlGenerator(
                     $mapper,
                     $webroot,
-                    $registry->get('jsuri', 'horde'),
-                    $registry->get('jsfs', 'horde'),
-                    $registry->get('themesuri', 'horde'),
-                    $registry->get('themesuri', 'jonah'),
+                );
+            },
+        );
+
+        $injector->bindClosure(
+            Horde\Jonah\View\ViewFactory::class,
+            function ($injector) {
+                return new Horde\Jonah\View\ViewFactory(
+                    $injector->getInstance(Horde\Jonah\Service\UrlGenerator::class),
+                    $injector->getInstance(Horde\Jonah\Service\FilesystemPathHelper::class),
                 );
             },
         );

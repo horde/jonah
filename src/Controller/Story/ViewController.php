@@ -16,11 +16,11 @@ declare(strict_types=1);
 namespace Horde\Jonah\Controller\Story;
 
 use Exception;
-use Horde;
 use Horde\Core\Config\LegacyMergedConfig;
 use Horde\Jonah\Service\FilesystemPathHelper;
 use Horde\Jonah\Service\UrlGenerator;
 use Horde\Jonah\Traits\ResponseTrait;
+use Horde\Jonah\View\ViewFactory;
 use Horde_Browser;
 use Horde_Core_Factory_TextFilter;
 use Horde_Core_Ui_TagCloud;
@@ -28,7 +28,6 @@ use Horde_Notification_Handler;
 use Horde_PageOutput;
 use Horde_Registry;
 use Horde_Text_Filter_Text2html;
-use Horde_View;
 use Jonah_Driver;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -59,6 +58,7 @@ class ViewController implements RequestHandlerInterface
         private readonly Horde_Core_Factory_TextFilter $textFilter,
         private readonly UrlGenerator $urlGenerator,
         private readonly FilesystemPathHelper $paths,
+        private readonly ViewFactory $viewFactory,
     ) {}
 
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -158,14 +158,14 @@ class ViewController implements RequestHandlerInterface
         /* Filter story content */
         if (!empty($story['body_type']) && $story['body_type'] === 'text') {
             $story['body'] = $this->textFilter->filter(
-                    $story['body'],
-                    'text2html',
-                    ['parselevel' => Horde_Text_Filter_Text2html::MICRO],
-                );
+                $story['body'],
+                'text2html',
+                ['parselevel' => Horde_Text_Filter_Text2html::MICRO],
+            );
         }
 
         if (!empty($story['url'])) {
-            $story['body'] .= Horde::link(Horde::externalUrl($story['url']))
+            $story['body'] .= '<p><a href="' . htmlspecialchars($story['url']) . '">'
                 . htmlspecialchars($story['url']) . '</a></p>';
         }
 
@@ -173,23 +173,16 @@ class ViewController implements RequestHandlerInterface
             $story['published_date'] = false;
         }
 
-        $view = new Horde_View(['templatePath' => [
-            JONAH_TEMPLATES . '/stories',
-            JONAH_TEMPLATES . '/stories/partial',
-            JONAH_TEMPLATES . '/stories/layout',
-        ]]);
-        $view->addHelper('Tag');
-        $view->addHelper('Text');
+        $view = $this->viewFactory->createStoryView();
         $view->tagcloud = $cloud->buildHTML();
         $view->story = $story;
 
         /* Sharing link */
         if ($this->config->get('sharing.allow')) {
-            $shareUrl = $this->urlGenerator->urlFor('StoryShare', [
+            $view->shareUrl = $this->urlGenerator->urlFor('StoryShare', [
                 'id' => $story['id'],
                 'channel_id' => $channel_id,
             ]);
-            $view->sharelink = Horde::link($shareUrl) . _("Share this story") . '</a>';
         }
 
         /* Comments */
