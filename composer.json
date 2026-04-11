@@ -23,9 +23,9 @@
         "php": "^8",
         "horde/db": "^3 || dev-FRAMEWORK_6_0",
         "horde/core": "^3 || dev-FRAMEWORK_6_0",
-        "horde/horde": "^6 || dev-FRAMEWORK_6_0"
+        "horde/horde": "^6 || dev-FRAMEWORK_6_0",
+        "horde/routes": "^3 || dev-FRAMEWORK_6_0"
     },
-    "require-dev": {},
     "suggest": {},
     "autoload": {
         "classmap": [
@@ -49,5 +49,6 @@
         "branch-alias": {
             "dev-FRAMEWORK_6_0": "1.x-dev"
         }
-    }
+    },
+    "minimum-stability": "alpha"
 }
