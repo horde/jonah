@@ -88,14 +88,14 @@ if (empty($deliveryType)) {
     $deliveryType = 'html';
 }
 
-/* Store criteria so controllers can pick them up via nonInputVar */
-Horde_Util::nonInputVar('criteria', $criteria);
-
+/* Pass criteria to controller via PSR-7 request attribute */
 $request = (new RequestBuilder(
     new RequestFactory(),
     new StreamFactory(),
     new UriFactory(),
 ))->withGlobalVariables()->build();
+
+$request = $request->withAttribute('criteria', $criteria);
 
 if ($deliveryType === 'rss') {
     $controller = $GLOBALS['injector']->getInstance(RssController::class);
