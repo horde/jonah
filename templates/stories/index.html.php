@@ -1,11 +1,13 @@
 <?php
 /**
- * Template for stories index page - lists available stories
+ * Template for stories index page - lists available stories.
  *
- *   ->stories
- *   ->read
- *   ->comments
- *   ->stories
+ * Expects:
+ *   ->stories (array with view_url, channel_id, can_edit, can_delete flags)
+ *   ->read    (bool)
+ *   ->comments (bool)
+ *
+ * Helpers available: jonahUrl(), jonahLink(), jonahIconLink(), jonahImage()
  */
 ?>
 <?php if (!empty($this->stories)): ?>
@@ -24,12 +26,16 @@
  <?php foreach ($this->stories as $story): ?>
    <tr>
     <td>
-     <?php echo $story['pdf_link'] ?>
-     <?php echo $story['edit_link'] ?>
-     <?php echo $story['delete_link'] ?>
+     <?php echo $this->jonahIconLink($this->jonahUrl('StoryPdf', ['id' => $story['id'], 'channel_id' => $story['channel_id']]), 'mime/pdf.png', _("PDF version")) ?>
+     <?php if ($story['can_edit']): ?>
+      <?php echo $this->jonahIconLink($this->jonahUrl('StoryEdit', ['id' => $story['id'], 'channel_id' => $story['channel_id']]), 'edit.png', _("Edit story")) ?>
+     <?php endif ?>
+     <?php if ($story['can_delete']): ?>
+      <?php echo $this->jonahIconLink($this->jonahUrl('StoryDelete', ['id' => $story['id'], 'channel_id' => $story['channel_id']]), 'delete.png', _("Delete story")) ?>
+     <?php endif ?>
     </td>
     <td>
-     <?php echo $story['view_link'] ?>
+     <?php echo $this->jonahLink($story['view_url'], htmlspecialchars($story['title']), $story['description'] ?? '') ?>
     </td>
     <td>
      <?php echo $story['published_date'] ?>
