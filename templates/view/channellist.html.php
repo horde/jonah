@@ -1,15 +1,14 @@
 <?php
 /**
- * index view for rendering channel list. Expects:
- *  ->search_img
- *  ->channels
+ * Channel list view. Expects:
+ *  ->channels (array with can_edit, can_delete flags, stories_url)
  *
- *
+ * Helpers available: jonahUrl(), jonahIconLink(), jonahImage()
  */
 ?>
 <div class="header">
  <?php echo _("Manage Feeds") ?>
- <a id="quicksearchL" href="#" title="<?php echo _("Search")?>" onclick="$('quicksearchL').hide(); $('quicksearch').show(); $('quicksearchT').focus(); return false;"><?php echo $this->search_img?></a>
+ <a id="quicksearchL" href="#" title="<?php echo _("Search")?>" onclick="$('quicksearchL').hide(); $('quicksearch').show(); $('quicksearchT').focus(); return false;"><?php echo $this->jonahImage('search.png', _("Search"))?></a>
  <div id="quicksearch" style="display:none;">
   <input type="text" name="quicksearchT" id="quicksearchT" for="feeds-body" empty="feeds-empty" />
   <small>
@@ -32,7 +31,13 @@
      <?php foreach ($this->channels as $channel):?>
      <tr>
       <td class="nowrap">
-       <?php echo $channel['edit_link'] . $channel['refresh_link'] . $channel['addstory_link'] . $channel['delete_link'];?>
+       <?php if ($channel['can_edit']): ?>
+        <?php echo $this->jonahIconLink($this->jonahUrl('ChannelEdit', ['channel_id' => $channel['channel_id']]), 'edit.png', _("Edit channel")) ?>
+       <?php endif ?>
+       <?php echo $this->jonahIconLink($this->jonahUrl('StoryCreate', ['channel_id' => $channel['channel_id']]), 'new.png', _("Add story")) ?>
+       <?php if ($channel['can_delete']): ?>
+        <?php echo $this->jonahIconLink($this->jonahUrl('ChannelDelete', ['channel_id' => $channel['channel_id']]), 'delete.png', _("Delete channel")) ?>
+       <?php endif ?>
       </td>
       <td>
        <a href="<?php echo $channel['stories_url']?>"><?php echo $channel['channel_name']?></a>

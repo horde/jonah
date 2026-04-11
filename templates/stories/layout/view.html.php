@@ -2,10 +2,12 @@
 /**
  * Main layout for viewing story entries
  * Expects:
- *   ->tagcloud
- *   ->story
- *   ->sharelink
- *   ->comments
+ *   ->tagcloud   (string, pre-rendered HTML)
+ *   ->story      (array)
+ *   ->shareUrl   (?string, URL or null)
+ *   ->comments   (?array with 'threads' and 'comments' keys)
+ *
+ * Helpers available: jonahUrl(), jonahLink(), jonahIconLink(), jonahImage()
  */
 ?>
 <?php if (!empty($this->tagcloud)): ?>
@@ -15,7 +17,7 @@
 <div>
 <?php endif;?>
   <?php echo $this->renderPartial('story', ['local' => ['story' => $this->story]]); ?>
-  <?php echo $this->contentTag('div', (!empty($this->sharelink) ? $this->sharelink : ''), ['class' => 'storyLinks']);?>
+  <?php echo $this->contentTag('div', (!empty($this->shareUrl) ? $this->jonahLink($this->shareUrl, _("Share this story")) : ''), ['class' => 'storyLinks']);?>
 </div>
 <?php
     if (!empty($this->comments)) {
