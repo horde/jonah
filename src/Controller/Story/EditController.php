@@ -7,6 +7,10 @@ declare(strict_types=1);
  *
  * See the enclosed file LICENSE for license information (BSD). If you
  * did not receive this file, see http://cvs.horde.org/co.php/jonah/LICENSE.
+ *
+ * @author Chuck Hagenbuch <chuck@horde.org>
+ * @author Marko Djukic <marko@oblo.com>
+ * @author Ralf Lang <ralf.lang@ralf-lang.de>
  */
 
 namespace Horde\Jonah\Controller\Story;
