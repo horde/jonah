@@ -7,6 +7,9 @@
  *
  * See the enclosed file LICENSE for license information (BSD). If you did not
  * did not receive this file, see http://cvs.horde.org/co.php/jonah/LICENSE.
+ *
+ * @author Jan Schneider <jan@horde.org>
+ * @author Ralf Lang <ralf.lang@ralf-lang.de>
  */
 
 require_once __DIR__ . '/../lib/Application.php';
