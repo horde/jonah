@@ -33,10 +33,6 @@ class UrlGenerator
     public function __construct(
         private readonly Mapper $mapper,
         private readonly string $webroot,
-        private readonly string $hordeJsUri = '',
-        private readonly string $hordeJsFs = '',
-        private readonly string $hordeThemesUri = '',
-        private readonly string $jonahThemesUri = '',
     ) {
         $this->mapper->environ['SCRIPT_NAME'] = rtrim($webroot, '/');
         $this->utils = new Utils($this->mapper);
@@ -70,37 +66,5 @@ class UrlGenerator
         $params['qualified'] = true;
 
         return $this->utils->urlFor($routeName, $params);
-    }
-
-    /**
-     * Horde JS asset URI (e.g. for syntax highlighter scripts).
-     */
-    public function getHordeJsUri(): string
-    {
-        return $this->hordeJsUri;
-    }
-
-    /**
-     * Horde JS filesystem path (e.g. for stylesheets).
-     */
-    public function getHordeJsFs(): string
-    {
-        return $this->hordeJsFs;
-    }
-
-    /**
-     * Horde themes URI.
-     */
-    public function getHordeThemesUri(): string
-    {
-        return $this->hordeThemesUri;
-    }
-
-    /**
-     * Jonah themes URI.
-     */
-    public function getJonahThemesUri(): string
-    {
-        return $this->jonahThemesUri;
     }
 }
