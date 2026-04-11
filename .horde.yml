@@ -41,7 +41,7 @@ autoload:
   classmap:
     - lib/
   psr-4:
-    Horde\Jonah\: /src
+    Horde\Jonah\: src/
 vendor: horde
 keywords:
   - rss
