@@ -10,6 +10,7 @@
  * did not receive this file, see http://cvs.horde.org/co.php/jonah/LICENSE.
  *
  * @author Ben Klang <ben@alkaloid.net>
+ * @author Ralf Lang <ralf.lang@ralf-lang.de>
  */
 
 require_once __DIR__ . '/lib/Application.php';
