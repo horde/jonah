@@ -44,6 +44,9 @@ class Jonah_Factory_Driver extends Horde_Core_Factory_Injector
         $class = 'Jonah_Driver_' . $driver;
         if (class_exists($class)) {
             $object = new $class($params);
+            if ($injector->has(Psr\Log\LoggerInterface::class)) {
+                $object->setLogger($injector->getInstance(Psr\Log\LoggerInterface::class));
+            }
             $this->_instances[$sig] = $object;
         } else {
             throw new Jonah_Exception(sprintf(_("No such backend \"%s\" found"), $driver));

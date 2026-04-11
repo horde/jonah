@@ -2,7 +2,7 @@
 
 /**
  * Jonah_Driver:: is responsible for storing, searching, sorting and filtering
- * locally generated and managed articles.  Aggregation is left to Hippo.
+ * locally generated and managed articles.
  *
  * Copyright 2002-2026 Horde LLC (http://www.horde.org/)
  *
@@ -26,6 +26,11 @@ class Jonah_Driver
     protected $_params = [];
 
     /**
+     * @var Psr\Log\LoggerInterface
+     */
+    protected $_logger;
+
+    /**
      * Constructs a new Driver storage object.
      *
      * @param array $params  A hash containing connection parameters.
@@ -33,6 +38,17 @@ class Jonah_Driver
     public function __construct($params = [])
     {
         $this->_params = $params;
+        $this->_logger = new Psr\Log\NullLogger();
+    }
+
+    /**
+     * Set the logger instance.
+     *
+     * @param Psr\Log\LoggerInterface $logger
+     */
+    public function setLogger(Psr\Log\LoggerInterface $logger): void
+    {
+        $this->_logger = $logger;
     }
 
     /**
@@ -243,26 +259,6 @@ class Jonah_Driver
     }
 
     /**
-     */
-    public function getIntervalLabel($seconds = null)
-    {
-        $interval = [1 => _("none"),
-            1800 => _("30 mins"),
-            3600 => _("1 hour"),
-            7200 => _("2 hours"),
-            14400 => _("4 hours"),
-            28800 => _("8 hours"),
-            43200 => _("12 hours"),
-            86400 => _("24 hours")];
-
-        if ($seconds === null) {
-            return $interval;
-        } else {
-            return $interval[$seconds] ?? '';
-        }
-    }
-
-    /**
      * Returns the stories of a channel rendered with the specified template.
      *
      * @deprecated Use Horde\Jonah\Service\ChannelRenderer::render() instead.
@@ -294,45 +290,6 @@ class Jonah_Driver
             (int) $from,
             Horde\Jonah\StoryOrder::from($order),
         );
-    }
-
-    /**
-     * @deprecated Moved to Horde\Jonah\Service\ChannelRenderer.
-     */
-    protected function _escapeStories(&$value, $key)
-    {
-        $value['title'] = htmlspecialchars($value['title'] ?? '');
-        $value['description'] = htmlspecialchars($value['description'] ?? '');
-        if (isset($value['link'])) {
-            $value['link'] = htmlspecialchars($value['link']);
-        }
-        if (empty($value['body_type']) || $value['body_type'] != 'richtext') {
-            $value['body'] = htmlspecialchars($value['body'] ?? '');
-        }
-    }
-
-    /**
-     * @deprecated Moved to Horde\Jonah\Service\ChannelRenderer.
-     */
-    protected function _escapeStoryDescriptions(&$value, $key)
-    {
-        $value['description'] = nl2br($value['description']);
-    }
-
-    /**
-     * Returns the provided story as a MIME part.
-     *
-     * @deprecated Use Horde\Jonah\Service\StoryMailer::buildStoryPart() instead.
-     *
-     * @param array $story  A data array representing a story.
-     *
-     * @return Horde_Mime_Part  The MIME message part containing the story parts.
-     */
-    public function getStoryAsMessage($story)
-    {
-        return $GLOBALS['injector']
-            ->getInstance(Horde\Jonah\Service\StoryMailer::class)
-            ->buildStoryPart($story);
     }
 
     /**

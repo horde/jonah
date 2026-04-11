@@ -103,7 +103,7 @@ class Jonah_Driver_Sql extends Jonah_Driver
         try {
             $this->_db->update($sql, $values);
         } catch (Horde_Db_Exception $e) {
-            Horde::log($e->getMessage(), 'ERR');
+            $this->_logger->error($e->getMessage());
             throw new Jonah_Exception($e);
         }
 
@@ -124,7 +124,7 @@ class Jonah_Driver_Sql extends Jonah_Driver
         try {
             $rows = $this->_db->selectAll($sql);
         } catch (Horde_Db_Exception $e) {
-            Horde::log($e->getMessage(), 'ERR');
+            $this->_logger->error($e->getMessage());
             throw new Jonah_Exception($e);
         }
         foreach ($rows as &$row) {
@@ -151,7 +151,7 @@ class Jonah_Driver_Sql extends Jonah_Driver
         try {
             $result = $this->_db->selectOne($sql, [(int) $channel_id]);
         } catch (Horde_Db_Exception $e) {
-            Horde::log($e->getMessage(), 'ERR');
+            $this->_logger->error($e->getMessage());
             throw new Jonah_Exception($e);
         }
         if (empty($result)) {
@@ -176,7 +176,7 @@ class Jonah_Driver_Sql extends Jonah_Driver
         try {
             return $this->_db->update($sql, $params);
         } catch (Horde_Db_Exception $e) {
-            Horde::log($e->getMessage(), 'ERR');
+            $this->_logger->error($e->getMessage());
             throw new Jonah_Exception($e);
         }
     }
@@ -195,7 +195,7 @@ class Jonah_Driver_Sql extends Jonah_Driver
         try {
             return $this->_db->update($sql, [(int) $story_id]);
         } catch (Horde_Db_Exception $e) {
-            Horde::log($e->getMessage(), 'ERR');
+            $this->_logger->error($e->getMessage());
             throw new Jonah_Exception($e);
         }
     }
@@ -214,7 +214,7 @@ class Jonah_Driver_Sql extends Jonah_Driver
         try {
             return $this->_db->delete($sql, [$channel_id]);
         } catch (Horde_Db_Exception $e) {
-            Horde::log($e->getMessage(), 'ERR');
+            $this->_logger->error($e->getMessage());
             throw new Jonah_Exception($e);
         }
     }
@@ -251,7 +251,7 @@ class Jonah_Driver_Sql extends Jonah_Driver
                 $id = $this->_db->insert($sql, $values);
                 $info['id'] = (int) $id;
             } catch (Horde_Db_Exception $e) {
-                Horde::log($e->getMessage(), 'ERR');
+                $this->_logger->error($e->getMessage());
                 throw new Jonah_Exception($e);
             }
             $this->_addPermalink($info);
@@ -266,7 +266,7 @@ class Jonah_Driver_Sql extends Jonah_Driver
             try {
                 $this->_db->update($sql, $values);
             } catch (Horde_Db_Exception $e) {
-                Horde::log($e->getMessage(), 'ERR');
+                $this->_logger->error($e->getMessage());
                 throw new Jonah_Exception($e);
             }
         }
@@ -553,7 +553,7 @@ class Jonah_Driver_Sql extends Jonah_Driver
         try {
             $result = $this->_db->selectOne($sql, [(int) $story_id]);
         } catch (Horde_Db_Exception $e) {
-            Horde::log($e->getMessage(), 'ERR');
+            $this->_logger->error($e->getMessage());
             throw new Jonah_Exception($e);
         }
         if (empty($result)) {
@@ -611,7 +611,7 @@ class Jonah_Driver_Sql extends Jonah_Driver
         try {
             $result = $this->_db->selectValue($sql, [(int) $channel_id, time()]);
         } catch (Horde_Db_Exception $e) {
-            Horde::log($e->getMessage(), 'ERR');
+            $this->_logger->error($e->getMessage());
             throw new Jonah_Exception($e);
         }
         if (empty($result)) {
@@ -632,7 +632,7 @@ class Jonah_Driver_Sql extends Jonah_Driver
         try {
             $this->_db->delete($sql, $values);
         } catch (Horde_Db_Exception $e) {
-            Horde::log($e->getMessage(), 'ERR');
+            $this->_logger->error($e->getMessage());
             throw new Jonah_Exception($e);
         }
     }
