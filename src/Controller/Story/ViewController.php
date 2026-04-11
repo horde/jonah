@@ -17,8 +17,11 @@ namespace Horde\Jonah\Controller\Story;
 
 use Exception;
 use Horde;
+use Horde\Core\Config\LegacyMergedConfig;
+use Horde\Jonah\Service\UrlGenerator;
 use Horde\Jonah\Traits\ResponseTrait;
 use Horde_Browser;
+use Horde_Core_Factory_TextFilter;
 use Horde_Core_Ui_TagCloud;
 use Horde_Notification_Handler;
 use Horde_PageOutput;
@@ -51,6 +54,9 @@ class ViewController implements RequestHandlerInterface
         private readonly Horde_Registry $registry,
         private readonly Horde_Browser $browser,
         private readonly LoggerInterface $logger,
+        private readonly LegacyMergedConfig $config,
+        private readonly Horde_Core_Factory_TextFilter $textFilter,
+        private readonly UrlGenerator $urlGenerator,
     ) {}
 
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -86,7 +92,7 @@ class ViewController implements RequestHandlerInterface
         /* Syntax highlighter setup */
         $this->pageOutput->addScriptFile('syntaxhighlighter/scripts/shCore.js', 'horde');
         $this->pageOutput->addScriptFile('syntaxhighlighter/scripts/shAutoloader.js', 'horde');
-        $path = $this->registry->get('jsuri', 'horde') . '/syntaxhighlighter/scripts/';
+        $path = $this->urlGenerator->getHordeJsUri() . '/syntaxhighlighter/scripts/';
         $brushes = <<<EOT
                       SyntaxHighlighter.autoloader(
                       'applescript            {$path}shBrushAppleScript.js',
@@ -121,8 +127,8 @@ class ViewController implements RequestHandlerInterface
             'SyntaxHighlighter.all()',
         ], true);
 
-        $sh_js_fs = $this->registry->get('jsfs', 'horde') . '/syntaxhighlighter/styles/';
-        $sh_js_uri = Horde::url($this->registry->get('jsuri', 'horde'), false, -1)
+        $sh_js_fs = $this->urlGenerator->getHordeJsFs() . '/syntaxhighlighter/styles/';
+        $sh_js_uri = $this->urlGenerator->getHordeJsUri()
             . '/syntaxhighlighter/styles/';
         $this->pageOutput->addStylesheet(
             $sh_js_fs . 'shCoreEclipse.css',
@@ -139,7 +145,7 @@ class ViewController implements RequestHandlerInterface
         foreach ($allTags as $tag_id => $taginfo) {
             $cloud->addElement(
                 $taginfo['tag_name'],
-                Horde::url('stories/results.php')->add([
+                $this->urlGenerator->urlFor('TagSearch', [
                     'tag' => trim($taginfo['tag_name']),
                     'channel_id' => $channel_id,
                 ]),
@@ -149,9 +155,7 @@ class ViewController implements RequestHandlerInterface
 
         /* Filter story content */
         if (!empty($story['body_type']) && $story['body_type'] === 'text') {
-            $story['body'] = $GLOBALS['injector']
-                ->getInstance('Horde_Core_Factory_TextFilter')
-                ->filter(
+            $story['body'] = $this->textFilter->filter(
                     $story['body'],
                     'text2html',
                     ['parselevel' => Horde_Text_Filter_Text2html::MICRO],
@@ -177,19 +181,17 @@ class ViewController implements RequestHandlerInterface
         $view->tagcloud = $cloud->buildHTML();
         $view->story = $story;
 
-        $conf = $GLOBALS['conf'];
-
         /* Sharing link */
-        if (!empty($conf['sharing']['allow'])) {
-            $url = Horde::url('stories/share.php')->add([
+        if ($this->config->get('sharing.allow')) {
+            $shareUrl = $this->urlGenerator->urlFor('StoryShare', [
                 'id' => $story['id'],
                 'channel_id' => $channel_id,
             ]);
-            $view->sharelink = $url->link() . _("Share this story") . '</a>';
+            $view->sharelink = Horde::link($shareUrl) . _("Share this story") . '</a>';
         }
 
         /* Comments */
-        if (!empty($conf['comments']['allow'])) {
+        if ($this->config->get('comments.allow')) {
             if (!$this->registry->hasMethod('forums/doComments')) {
                 $this->logger->error(
                     'User comments are enabled but the forums API is not available.',

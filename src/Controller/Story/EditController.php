@@ -18,6 +18,7 @@ namespace Horde\Jonah\Controller\Story;
 use Exception;
 use Horde;
 use Horde\Jonah\Service\PermissionChecker;
+use Horde\Jonah\Service\UrlGenerator;
 use Horde\Jonah\Traits\ResponseTrait;
 use Horde_Exception_AuthenticationFailure;
 use Horde_Notification_Handler;
@@ -50,6 +51,7 @@ class EditController implements RequestHandlerInterface
         private readonly Horde_Notification_Handler $notification,
         private readonly Horde_PageOutput $pageOutput,
         private readonly Horde_Registry $registry,
+        private readonly UrlGenerator $urlGenerator,
     ) {}
 
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -65,7 +67,7 @@ class EditController implements RequestHandlerInterface
                 sprintf(_("Story editing failed: %s"), $e->getMessage()),
                 'horde.error',
             );
-            return $this->redirect((string) Horde::url('channels/index.php', true));
+            return $this->redirect($this->urlGenerator->absoluteUrlFor('ChannelList'));
         }
 
         if (!$this->permissions->check('channels', Horde_Perms::EDIT, [$channel_id])) {
@@ -88,7 +90,7 @@ class EditController implements RequestHandlerInterface
                     'horde.error',
                 );
                 return $this->redirect(
-                    (string) Horde::url('stories/index.php')->add('channel_id', $channel_id),
+                    $this->urlGenerator->urlFor('StoryList', ['channel_id' => $channel_id]),
                 );
             }
         }
@@ -104,7 +106,7 @@ class EditController implements RequestHandlerInterface
                     'horde.success',
                 );
                 return $this->redirect(
-                    (string) Horde::url('stories/index.php')->add('channel_id', $channel_id),
+                    $this->urlGenerator->urlFor('StoryList', ['channel_id' => $channel_id]),
                 );
             } catch (Exception $e) {
                 $this->notification->push(
@@ -118,7 +120,7 @@ class EditController implements RequestHandlerInterface
             $form->renderActive(
                 $form->getRenderer(),
                 $vars,
-                Horde::url('stories/edit.php'),
+                $this->urlGenerator->urlFor('StoryCreate', ['channel_id' => $channel_id]),
                 'post',
             );
         });
