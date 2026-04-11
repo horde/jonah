@@ -18,6 +18,7 @@ namespace Horde\Jonah\Controller\Story;
 use Exception;
 use Horde;
 use Horde\Core\Config\LegacyMergedConfig;
+use Horde\Jonah\Service\FilesystemPathHelper;
 use Horde\Jonah\Service\UrlGenerator;
 use Horde\Jonah\Traits\ResponseTrait;
 use Horde_Browser;
@@ -57,6 +58,7 @@ class ViewController implements RequestHandlerInterface
         private readonly LegacyMergedConfig $config,
         private readonly Horde_Core_Factory_TextFilter $textFilter,
         private readonly UrlGenerator $urlGenerator,
+        private readonly FilesystemPathHelper $paths,
     ) {}
 
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -92,7 +94,7 @@ class ViewController implements RequestHandlerInterface
         /* Syntax highlighter setup */
         $this->pageOutput->addScriptFile('syntaxhighlighter/scripts/shCore.js', 'horde');
         $this->pageOutput->addScriptFile('syntaxhighlighter/scripts/shAutoloader.js', 'horde');
-        $path = $this->urlGenerator->getHordeJsUri() . '/syntaxhighlighter/scripts/';
+        $path = $this->paths->getHordeJsUri() . '/syntaxhighlighter/scripts/';
         $brushes = <<<EOT
                       SyntaxHighlighter.autoloader(
                       'applescript            {$path}shBrushAppleScript.js',
@@ -127,8 +129,8 @@ class ViewController implements RequestHandlerInterface
             'SyntaxHighlighter.all()',
         ], true);
 
-        $sh_js_fs = $this->urlGenerator->getHordeJsFs() . '/syntaxhighlighter/styles/';
-        $sh_js_uri = $this->urlGenerator->getHordeJsUri()
+        $sh_js_fs = $this->paths->getHordeJsFs() . '/syntaxhighlighter/styles/';
+        $sh_js_uri = $this->paths->getHordeJsUri()
             . '/syntaxhighlighter/styles/';
         $this->pageOutput->addStylesheet(
             $sh_js_fs . 'shCoreEclipse.css',
