@@ -14,9 +14,12 @@ declare(strict_types=1);
 namespace Horde\Jonah\Controller\Story;
 
 use Exception;
-use Horde;
+use Horde\Core\Config\LegacyMergedConfig;
 use Horde\Jonah\Service\StoryMailer;
+use Horde\Jonah\Service\UrlGenerator;
 use Horde\Jonah\Traits\ResponseTrait;
+use Horde_Core_Factory_Identity;
+use Horde_Core_Factory_Mail;
 use Horde_Form;
 use Horde_Mime_Part;
 use Horde_Notification_Handler;
@@ -47,6 +50,10 @@ class ShareController implements RequestHandlerInterface
         private readonly Horde_Notification_Handler $notification,
         private readonly Horde_PageOutput $pageOutput,
         private readonly Horde_Registry $registry,
+        private readonly LegacyMergedConfig $config,
+        private readonly Horde_Core_Factory_Identity $identityFactory,
+        private readonly Horde_Core_Factory_Mail $mailFactory,
+        private readonly UrlGenerator $urlGenerator,
     ) {}
 
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -55,12 +62,12 @@ class ShareController implements RequestHandlerInterface
         $channel_id = $vars->get('channel_id');
         $story_id = $vars->get('id');
 
-        $conf = $GLOBALS['conf'];
-
-        if (empty($conf['sharing']['allow'])) {
+        if (!$this->config->get('sharing.allow')) {
             return $this->redirect(
-                (string) Horde::url('stories/view.php', true)
-                    ->add(['story_id' => $story_id, 'channel_id' => $channel_id]),
+                $this->urlGenerator->absoluteUrlFor('StoryView', [
+                    'channel_id' => $channel_id,
+                    'id' => $story_id,
+                ]),
             );
         }
 
@@ -85,10 +92,7 @@ class ShareController implements RequestHandlerInterface
         $v = $form->addVariable(_("From"), 'from', 'email', true, false);
         if ($this->registry->getAuth()) {
             $v->setDefault(
-                $GLOBALS['injector']
-                    ->getInstance('Horde_Core_Factory_Identity')
-                    ->create()
-                    ->getValue('from_addr'),
+                $this->identityFactory->create()->getValue('from_addr'),
             );
         }
         $form->addVariable(
@@ -157,7 +161,7 @@ class ShareController implements RequestHandlerInterface
                             $info['subject'],
                             $info['message'],
                             'Jonah ' . $this->registry->getVersion(),
-                            Horde::getMailerConfig(),
+                            $this->mailFactory->getConfig(),
                         );
                         $this->notification->push(
                             _("The story was sent successfully."),
@@ -176,8 +180,13 @@ class ShareController implements RequestHandlerInterface
 
         $this->pageOutput->topbar = $this->pageOutput->sidebar = false;
 
-        $html = $this->renderChrome($title, function () use ($form, $vars) {
-            $form->renderActive(null, $vars, Horde::url('stories/share.php'), 'post');
+        $html = $this->renderChrome($title, function () use ($form, $vars, $channel_id, $story_id) {
+            $form->renderActive(
+                null,
+                $vars,
+                $this->urlGenerator->urlFor('StoryShare', ['channel_id' => $channel_id, 'id' => $story_id]),
+                'post',
+            );
         });
 
         return $this->htmlResponse($html);
@@ -186,12 +195,13 @@ class ShareController implements RequestHandlerInterface
     private function buildStoryUrl(array $channel, string $channel_id, array $story): string
     {
         if (empty($channel['channel_story_url'])) {
-            $story_url = (string) Horde::url('stories/view.php', true)
-                ->add(['channel_id' => '%c', 'id' => '%s']);
-        } else {
-            $story_url = $channel['channel_story_url'];
+            return $this->urlGenerator->absoluteUrlFor('StoryView', [
+                'channel_id' => $channel_id,
+                'id' => $story['id'],
+            ]);
         }
 
+        $story_url = $channel['channel_story_url'];
         $story_url = str_replace(['%25c', '%25s'], ['%c', '%s'], $story_url);
 
         return str_replace(

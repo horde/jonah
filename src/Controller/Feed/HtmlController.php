@@ -20,6 +20,7 @@ use Horde\Jonah\Service\ChannelRenderer;
 use Horde\Jonah\Traits\ResponseTrait;
 use Horde_Notification_Handler;
 use Horde_PageOutput;
+use Horde_Registry;
 use Horde_Util;
 use Horde_View;
 use Jonah_Driver;
@@ -45,6 +46,7 @@ class HtmlController implements RequestHandlerInterface
         private readonly ChannelRenderer $renderer,
         private readonly Horde_Notification_Handler $notification,
         private readonly Horde_PageOutput $pageOutput,
+        private readonly Horde_Registry $registry,
     ) {}
 
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -52,7 +54,7 @@ class HtmlController implements RequestHandlerInterface
         $queryParams = $request->getQueryParams();
 
         /* Accept criteria from the REST dispatcher (delivery/index.php) */
-        $criteria = Horde_Util::nonInputVar('criteria');
+        $criteria = $request->getAttribute('criteria');
         if (!$criteria) {
             $criteria = [
                 'feed' => $queryParams['channel_id'] ?? null,
@@ -61,10 +63,10 @@ class HtmlController implements RequestHandlerInterface
         }
 
         /**
-         * ARCHITECTURE VIOLATION: Using deprecated Horde::loadConfiguration()
-         * @deprecated Use $registry->loadConfigFile() instead
+         * Load the template definitions from config/templates.php.
          */
-        $templates = Horde::loadConfiguration('templates.php', 'templates', 'jonah');
+        $result = $this->registry->loadConfigFile('templates.php', 'templates', 'jonah');
+        $templates = $result->config['templates'];
 
         if (empty($criteria['channel_format'])) {
             $criteria['channel_format'] = key($templates);

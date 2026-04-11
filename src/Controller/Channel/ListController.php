@@ -18,6 +18,7 @@ namespace Horde\Jonah\Controller\Channel;
 
 use Horde;
 use Horde\Jonah\Service\PermissionChecker;
+use Horde\Jonah\Service\UrlGenerator;
 use Horde\Jonah\Traits\ResponseTrait;
 use Horde_Notification_Handler;
 use Horde_PageOutput;
@@ -48,6 +49,7 @@ class ListController implements RequestHandlerInterface
         private readonly PermissionChecker $permissions,
         private readonly Horde_Notification_Handler $notification,
         private readonly Horde_PageOutput $pageOutput,
+        private readonly UrlGenerator $urlGenerator,
     ) {}
 
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -68,23 +70,28 @@ class ListController implements RequestHandlerInterface
             foreach ($channels as $key => $channel) {
                 $cid = $channel['channel_id'];
 
-                $url = Horde::url('channels/edit.php')->add('channel_id', $cid);
-                $channels[$key]['edit_link'] = $url->link(['title' => _("Edit channel")])
-                    . Horde_Themes_Image::tag('edit.png') . '</a>';
+                $channels[$key]['edit_link'] = Horde::link(
+                    $this->urlGenerator->urlFor('ChannelEdit', ['channel_id' => $cid]),
+                    _("Edit channel"),
+                ) . Horde_Themes_Image::tag('edit.png') . '</a>';
 
-                $url = Horde::url('channels/delete.php')->add('channel_id', $cid);
-                $channels[$key]['delete_link'] = $url->link(['title' => _("Delete channel")])
-                    . Horde_Themes_Image::tag('delete.png') . '</a>';
+                $channels[$key]['delete_link'] = Horde::link(
+                    $this->urlGenerator->urlFor('ChannelDelete', ['channel_id' => $cid]),
+                    _("Delete channel"),
+                ) . Horde_Themes_Image::tag('delete.png') . '</a>';
 
-                $channels[$key]['stories_url'] = Horde::url('stories/index.php')
-                    ->add('channel_id', $cid);
+                $channels[$key]['stories_url'] = $this->urlGenerator->urlFor(
+                    'StoryList',
+                    ['channel_id' => $cid],
+                );
 
                 $channels[$key]['addstory_link'] = '';
                 $channels[$key]['refresh_link'] = '';
 
-                $url = Horde::url('stories/edit.php')->add('channel_id', $cid);
-                $channels[$key]['addstory_link'] = $url->link(['title' => _("Add story")])
-                    . Horde_Themes_Image::tag('new.png') . '</a>';
+                $channels[$key]['addstory_link'] = Horde::link(
+                    $this->urlGenerator->urlFor('StoryCreate', ['channel_id' => $cid]),
+                    _("Add story"),
+                ) . Horde_Themes_Image::tag('new.png') . '</a>';
             }
         }
 

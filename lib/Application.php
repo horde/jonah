@@ -104,6 +104,28 @@ class Jonah_Application extends Horde_Registry_Application
                 );
             },
         );
+
+        $injector->bindClosure(
+            Horde\Jonah\Service\UrlGenerator::class,
+            function ($injector) {
+                $mapper = new Horde\Routes\Mapper();
+                require JONAH_BASE . '/config/routes.php';
+                if (file_exists(JONAH_BASE . '/config/routes.local.php')) {
+                    include JONAH_BASE . '/config/routes.local.php';
+                }
+                $registry = $injector->getInstance('Horde_Registry');
+                $webroot = $registry->get('webroot', 'jonah');
+
+                return new Horde\Jonah\Service\UrlGenerator(
+                    $mapper,
+                    $webroot,
+                    $registry->get('jsuri', 'horde'),
+                    $registry->get('jsfs', 'horde'),
+                    $registry->get('themesuri', 'horde'),
+                    $registry->get('themesuri', 'jonah'),
+                );
+            },
+        );
     }
 
     /**

@@ -18,7 +18,9 @@ namespace Horde\Jonah\Controller\Story;
 
 use Exception;
 use Horde;
+use Horde\Core\Config\LegacyMergedConfig;
 use Horde\Jonah\Service\PermissionChecker;
+use Horde\Jonah\Service\UrlGenerator;
 use Horde\Jonah\Traits\ResponseTrait;
 use Horde_Date;
 use Horde_Exception_AuthenticationFailure;
@@ -58,6 +60,8 @@ class ListController implements RequestHandlerInterface
         private readonly Horde_Registry $registry,
         private readonly Horde_Prefs $prefs,
         private readonly LoggerInterface $logger,
+        private readonly LegacyMergedConfig $config,
+        private readonly UrlGenerator $urlGenerator,
     ) {}
 
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -67,7 +71,7 @@ class ListController implements RequestHandlerInterface
 
         if (empty($channel_id)) {
             $this->notification->push(_("No channel requested."), 'horde.error');
-            return $this->redirect((string) Horde::url('channels/index.php', true));
+            return $this->redirect($this->urlGenerator->absoluteUrlFor('ChannelList'));
         }
 
         try {
@@ -77,7 +81,7 @@ class ListController implements RequestHandlerInterface
                 sprintf(_("Invalid channel requested. %s"), $e->getMessage()),
                 'horde.error',
             );
-            return $this->redirect((string) Horde::url('channels/index.php', true));
+            return $this->redirect($this->urlGenerator->absoluteUrlFor('ChannelList'));
         }
 
         if (!$this->permissions->check('channels', Horde_Perms::EDIT, [$channel_id])) {
@@ -100,14 +104,12 @@ class ListController implements RequestHandlerInterface
                 sprintf(_("Invalid channel requested. %s"), $e->getMessage()),
                 'horde.error',
             );
-            return $this->redirect((string) Horde::url('channels/index.php', true));
+            return $this->redirect($this->urlGenerator->absoluteUrlFor('ChannelList'));
         }
 
         if (empty($stories)) {
             $this->notification->push(_("No available stories."), 'horde.warning');
         }
-
-        $conf = $GLOBALS['conf'];
 
         foreach ($stories as $key => $story) {
             if (!empty($stories[$key]['published'])) {
@@ -126,21 +128,24 @@ class ListController implements RequestHandlerInterface
                 $story['description'],
             ) . htmlspecialchars($story['title']) . '</a>';
 
-            $url = Horde::url('stories/pdf.php')->add(['id' => $story['id'], 'channel_id' => $channel_id]);
-            $stories[$key]['pdf_link'] = $url->link(['title' => _("PDF version")])
-                . Horde_Themes_Image::tag('mime/pdf.png') . '</a>';
+            $stories[$key]['pdf_link'] = Horde::link(
+                $this->urlGenerator->urlFor('StoryPdf', ['id' => $story['id'], 'channel_id' => $channel_id]),
+                _("PDF version"),
+            ) . Horde_Themes_Image::tag('mime/pdf.png') . '</a>';
 
-            $url = Horde::url('stories/edit.php')->add(['id' => $story['id'], 'channel_id' => $channel_id]);
-            $stories[$key]['edit_link'] = $url->link(['title' => _("Edit story")])
-                . Horde_Themes_Image::tag('edit.png') . '</a>';
+            $stories[$key]['edit_link'] = Horde::link(
+                $this->urlGenerator->urlFor('StoryEdit', ['id' => $story['id'], 'channel_id' => $channel_id]),
+                _("Edit story"),
+            ) . Horde_Themes_Image::tag('edit.png') . '</a>';
 
             if ($this->permissions->check('channels', Horde_Perms::DELETE, [$channel_id])) {
-                $url = Horde::url('stories/delete.php')->add(['id' => $story['id'], 'channel_id' => $channel_id]);
-                $stories[$key]['delete_link'] = $url->link(['title' => _("Delete story")])
-                    . Horde_Themes_Image::tag('delete.png') . '</a>';
+                $stories[$key]['delete_link'] = Horde::link(
+                    $this->urlGenerator->urlFor('StoryDelete', ['id' => $story['id'], 'channel_id' => $channel_id]),
+                    _("Delete story"),
+                ) . Horde_Themes_Image::tag('delete.png') . '</a>';
             }
 
-            if (!empty($conf['comments']['allow'])
+            if ($this->config->get('comments.allow')
                 && $this->registry->hasMethod('forums/numMessages')) {
                 try {
                     $stories[$key]['comments'] = $this->registry->call(
@@ -159,7 +164,7 @@ class ListController implements RequestHandlerInterface
         $view = new Horde_View(['templatePath' => JONAH_TEMPLATES . '/stories']);
         $view->stories = $stories;
         $view->read = true;
-        $view->comments = !empty($conf['comments']['allow'])
+        $view->comments = $this->config->get('comments.allow')
             && $this->registry->hasMethod('forums/numMessages');
 
         $html = $this->renderChrome($title, function () use ($view) {
