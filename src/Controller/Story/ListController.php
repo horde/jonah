@@ -37,7 +37,6 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Log\LoggerInterface;
 use Horde_Url;
-use Horde_Util;
 
 /**
  * PSR-15 controller for listing stories in a channel.
@@ -93,7 +92,9 @@ class ListController implements RequestHandlerInterface
         }
 
         /* Check if a URL has been passed. */
-        if ($url = Horde::verifySignedUrl(Horde_Util::getFormData('url'))) {
+        $parsedBody = (array) ($request->getParsedBody() ?? []);
+        $signedUrl = $parsedBody['url'] ?? $queryParams['url'] ?? null;
+        if ($signedUrl && ($url = Horde::verifySignedUrl($signedUrl))) {
             return $this->redirect((string) new Horde_Url($url));
         }
 
