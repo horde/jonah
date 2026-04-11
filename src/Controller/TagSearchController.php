@@ -15,11 +15,11 @@ declare(strict_types=1);
 namespace Horde\Jonah\Controller;
 
 use Exception;
-use Horde;
 use Horde\Core\Config\LegacyMergedConfig;
 use Horde\Jonah\Service\PermissionChecker;
 use Horde\Jonah\Service\UrlGenerator;
 use Horde\Jonah\Traits\ResponseTrait;
+use Horde\Jonah\View\ViewFactory;
 use Horde_Date;
 use Horde_Exception_AuthenticationFailure;
 use Horde_Notification_Handler;
@@ -27,9 +27,6 @@ use Horde_PageOutput;
 use Horde_Perms;
 use Horde_Prefs;
 use Horde_Registry;
-use Horde_Themes_Image;
-use Horde_Url;
-use Horde_View;
 use Jonah_Driver;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -59,6 +56,7 @@ class TagSearchController implements RequestHandlerInterface
         private readonly LoggerInterface $logger,
         private readonly LegacyMergedConfig $config,
         private readonly UrlGenerator $urlGenerator,
+        private readonly ViewFactory $viewFactory,
     ) {}
 
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -132,36 +130,9 @@ class TagSearchController implements RequestHandlerInterface
                 $stories[$key]['published_date'] = '';
             }
 
-            /* Default links */
-            $stories[$key]['pdf_link'] = '';
-            $stories[$key]['edit_link'] = '';
-            $stories[$key]['delete_link'] = '';
-            $stories[$key]['view_link'] = Horde::link(
-                new Horde_Url($story['link']),
-                $story['description'],
-            ) . htmlspecialchars($story['title']) . '</a>';
-
-            /* PDF link */
-            $stories[$key]['pdf_link'] = Horde::link(
-                $this->urlGenerator->urlFor('StoryPdf', ['id' => $story['id'], 'channel_id' => $storyChannelId]),
-                _("PDF version"),
-            ) . Horde_Themes_Image::tag('mime/pdf.png') . '</a>';
-
-            /* Edit link */
-            if ($this->permissions->check('channels', Horde_Perms::EDIT, [$storyChannelId])) {
-                $stories[$key]['edit_link'] = Horde::link(
-                    $this->urlGenerator->urlFor('StoryEdit', ['id' => $story['id'], 'channel_id' => $storyChannelId]),
-                    _("Edit story"),
-                ) . Horde_Themes_Image::tag('edit.png') . '</a>';
-            }
-
-            /* Delete link */
-            if ($this->permissions->check('channels', Horde_Perms::DELETE, [$storyChannelId])) {
-                $stories[$key]['delete_link'] = Horde::link(
-                    $this->urlGenerator->urlFor('StoryDelete', ['id' => $story['id'], 'channel_id' => $storyChannelId]),
-                    _("Delete story"),
-                ) . Horde_Themes_Image::tag('delete.png') . '</a>';
-            }
+            $stories[$key]['view_url'] = $story['link'] ?? '';
+            $stories[$key]['can_edit'] = $this->permissions->check('channels', Horde_Perms::EDIT, [$storyChannelId]);
+            $stories[$key]['can_delete'] = $this->permissions->check('channels', Horde_Perms::DELETE, [$storyChannelId]);
 
             /* Comment count */
             if ($this->config->get('comments.allow')
@@ -180,7 +151,7 @@ class TagSearchController implements RequestHandlerInterface
         }
 
         $title = _("Tag Search Results");
-        $view = new Horde_View(['templatePath' => JONAH_TEMPLATES . '/stories']);
+        $view = $this->viewFactory->createStoryListView();
         $view->stories = $stories;
         $view->read = true;
         $view->comments = $this->config->get('comments.allow')

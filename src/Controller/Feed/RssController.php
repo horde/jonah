@@ -18,6 +18,7 @@ use Exception;
 use Horde\Http\Response;
 use Horde\Http\StreamFactory;
 use Horde\Jonah\Service\UrlGenerator;
+use Horde\Jonah\View\ViewFactory;
 use Horde_Browser;
 use Horde_Core_Factory_Identity;
 use Horde_Core_Factory_TextFilter;
@@ -26,7 +27,6 @@ use Horde_PageOutput;
 use Horde_Registry;
 use Horde_Text_Filter_Text2html;
 use Horde_Themes;
-use Horde_View;
 use Jonah_Driver;
 use Jonah_Tagger;
 use Psr\Http\Message\ResponseInterface;
@@ -56,6 +56,7 @@ class RssController implements RequestHandlerInterface
         private readonly Horde_Core_Factory_Identity $identityFactory,
         private readonly Horde_Core_Factory_TextFilter $textFilter,
         private readonly UrlGenerator $urlGenerator,
+        private readonly ViewFactory $viewFactory,
     ) {}
 
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -109,7 +110,7 @@ class RssController implements RequestHandlerInterface
         }
 
         /* Build the RSS view */
-        $view = new Horde_View(['templatePath' => JONAH_TEMPLATES . '/delivery']);
+        $view = $this->viewFactory->createFeedRssView();
         $view->jonah = 'Jonah ' . $this->registry->getVersion() . ' (http://www.horde.org/jonah/)';
         $view->xsl = Horde_Themes::getFeedXsl();
 
@@ -152,10 +153,10 @@ class RssController implements RequestHandlerInterface
 
             if (!empty($story['body_type']) && $story['body_type'] === 'text') {
                 $story['body'] = $this->textFilter->filter(
-                        $story['body'],
-                        'text2html',
-                        ['parselevel' => Horde_Text_Filter_Text2html::MICRO],
-                    );
+                    $story['body'],
+                    'text2html',
+                    ['parselevel' => Horde_Text_Filter_Text2html::MICRO],
+                );
             }
         }
         $view->stories = $stories;

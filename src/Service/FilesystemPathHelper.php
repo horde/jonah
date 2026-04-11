@@ -58,7 +58,7 @@ class FilesystemPathHelper
     public function getTemplatePaths(string ...$subdirectories): array
     {
         return array_map(
-            fn (string $sub): string => $this->getTemplatePath($sub),
+            fn(string $sub): string => $this->getTemplatePath($sub),
             $subdirectories,
         );
     }

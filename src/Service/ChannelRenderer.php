@@ -32,7 +32,7 @@ class ChannelRenderer
     public function __construct(
         private readonly Jonah_Driver $driver,
         private readonly LoggerInterface $logger,
-        private readonly string $templatePath,
+        private readonly FilesystemPathHelper $paths,
     ) {}
 
     /**
@@ -60,7 +60,7 @@ class ChannelRenderer
         $escape = !isset($templates[$tpl]['escape'])
             || !empty($templates[$tpl]['escape']);
 
-        $view = new Horde_View(['templatePath' => $this->templatePath]);
+        $view = new Horde_View(['templatePath' => $this->paths->getTemplatePath('channels')]);
 
         if ($escape) {
             $channel['channel_name'] = htmlspecialchars($channel['channel_name']);

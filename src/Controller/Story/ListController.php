@@ -17,11 +17,12 @@ declare(strict_types=1);
 namespace Horde\Jonah\Controller\Story;
 
 use Exception;
-use Horde;
 use Horde\Core\Config\LegacyMergedConfig;
 use Horde\Jonah\Service\PermissionChecker;
 use Horde\Jonah\Service\UrlGenerator;
+use Horde\Jonah\Service\UrlSigner;
 use Horde\Jonah\Traits\ResponseTrait;
+use Horde\Jonah\View\ViewFactory;
 use Horde_Date;
 use Horde_Exception_AuthenticationFailure;
 use Horde_Notification_Handler;
@@ -29,14 +30,12 @@ use Horde_PageOutput;
 use Horde_Perms;
 use Horde_Prefs;
 use Horde_Registry;
-use Horde_Themes_Image;
-use Horde_View;
+use Horde_Url;
 use Jonah_Driver;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Log\LoggerInterface;
-use Horde_Url;
 
 /**
  * PSR-15 controller for listing stories in a channel.
@@ -61,6 +60,8 @@ class ListController implements RequestHandlerInterface
         private readonly LoggerInterface $logger,
         private readonly LegacyMergedConfig $config,
         private readonly UrlGenerator $urlGenerator,
+        private readonly UrlSigner $urlSigner,
+        private readonly ViewFactory $viewFactory,
     ) {}
 
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -94,7 +95,7 @@ class ListController implements RequestHandlerInterface
         /* Check if a URL has been passed. */
         $parsedBody = (array) ($request->getParsedBody() ?? []);
         $signedUrl = $parsedBody['url'] ?? $queryParams['url'] ?? null;
-        if ($signedUrl && ($url = Horde::verifySignedUrl($signedUrl))) {
+        if ($signedUrl && ($url = $this->urlSigner->verify($signedUrl))) {
             return $this->redirect((string) new Horde_Url($url));
         }
 
@@ -121,30 +122,10 @@ class ListController implements RequestHandlerInterface
                 $stories[$key]['published_date'] = '';
             }
 
-            $stories[$key]['pdf_link'] = '';
-            $stories[$key]['edit_link'] = '';
-            $stories[$key]['delete_link'] = '';
-            $stories[$key]['view_link'] = Horde::link(
-                $this->driver->getStoryLink($channel, $story),
-                $story['description'],
-            ) . htmlspecialchars($story['title']) . '</a>';
-
-            $stories[$key]['pdf_link'] = Horde::link(
-                $this->urlGenerator->urlFor('StoryPdf', ['id' => $story['id'], 'channel_id' => $channel_id]),
-                _("PDF version"),
-            ) . Horde_Themes_Image::tag('mime/pdf.png') . '</a>';
-
-            $stories[$key]['edit_link'] = Horde::link(
-                $this->urlGenerator->urlFor('StoryEdit', ['id' => $story['id'], 'channel_id' => $channel_id]),
-                _("Edit story"),
-            ) . Horde_Themes_Image::tag('edit.png') . '</a>';
-
-            if ($this->permissions->check('channels', Horde_Perms::DELETE, [$channel_id])) {
-                $stories[$key]['delete_link'] = Horde::link(
-                    $this->urlGenerator->urlFor('StoryDelete', ['id' => $story['id'], 'channel_id' => $channel_id]),
-                    _("Delete story"),
-                ) . Horde_Themes_Image::tag('delete.png') . '</a>';
-            }
+            $stories[$key]['view_url'] = (string) $this->driver->getStoryLink($channel, $story);
+            $stories[$key]['channel_id'] = $channel_id;
+            $stories[$key]['can_edit'] = true;
+            $stories[$key]['can_delete'] = $this->permissions->check('channels', Horde_Perms::DELETE, [$channel_id]);
 
             if ($this->config->get('comments.allow')
                 && $this->registry->hasMethod('forums/numMessages')) {
@@ -162,7 +143,7 @@ class ListController implements RequestHandlerInterface
         }
 
         $title = $channel['channel_name'];
-        $view = new Horde_View(['templatePath' => JONAH_TEMPLATES . '/stories']);
+        $view = $this->viewFactory->createStoryListView();
         $view->stories = $stories;
         $view->read = true;
         $view->comments = $this->config->get('comments.allow')

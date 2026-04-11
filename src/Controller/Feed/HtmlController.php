@@ -15,14 +15,13 @@ declare(strict_types=1);
 namespace Horde\Jonah\Controller\Feed;
 
 use Exception;
-use Horde;
 use Horde\Jonah\Service\ChannelRenderer;
 use Horde\Jonah\Traits\ResponseTrait;
+use Horde\Jonah\View\ViewFactory;
 use Horde_Notification_Handler;
 use Horde_PageOutput;
 use Horde_Registry;
 use Horde_Util;
-use Horde_View;
 use Jonah_Driver;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -47,6 +46,7 @@ class HtmlController implements RequestHandlerInterface
         private readonly Horde_Notification_Handler $notification,
         private readonly Horde_PageOutput $pageOutput,
         private readonly Horde_Registry $registry,
+        private readonly ViewFactory $viewFactory,
     ) {}
 
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -87,8 +87,8 @@ class HtmlController implements RequestHandlerInterface
             $this->notification->push(_("No valid feed name or ID requested."), 'horde.error');
         }
 
-        $view = new Horde_View(['templatePath' => JONAH_TEMPLATES . '/delivery']);
-        $view->url = Horde::selfUrl();
+        $view = $this->viewFactory->createFeedHtmlView();
+        $view->url = (string) $request->getUri();
         $view->session = Horde_Util::formInput();
         $view->channel_id = $criteria['channel_id'] ?? '';
         $view->format = $criteria['channel_format'];

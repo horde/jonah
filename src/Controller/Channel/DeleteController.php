@@ -16,7 +16,6 @@ declare(strict_types=1);
 
 namespace Horde\Jonah\Controller\Channel;
 
-use Horde;
 use Horde\Jonah\Service\PermissionChecker;
 use Horde\Jonah\Service\UrlGenerator;
 use Horde\Jonah\Traits\ResponseTrait;
@@ -128,8 +127,10 @@ class DeleteController implements RequestHandlerInterface
             return $this->redirect($this->urlGenerator->urlFor('ChannelList'));
         }
 
-        $html = $this->renderChrome($title, function () use ($form, $vars) {
-            $form->renderActive(null, $vars, Horde::selfUrl(), 'post');
+        $formAction = (string) $request->getUri();
+
+        $html = $this->renderChrome($title, function () use ($form, $vars, $formAction) {
+            $form->renderActive(null, $vars, $formAction, 'post');
         });
 
         return $this->htmlResponse($html);
