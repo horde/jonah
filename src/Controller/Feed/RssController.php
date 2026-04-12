@@ -19,6 +19,7 @@ use Horde\Http\Response;
 use Horde\Http\StreamFactory;
 use Horde\Jonah\Service\UrlGenerator;
 use Horde\Jonah\View\ViewFactory;
+use Horde\Url\Url;
 use Horde_Browser;
 use Horde_Core_Factory_Identity;
 use Horde_Core_Factory_TextFilter;
@@ -126,7 +127,7 @@ class RssController implements RequestHandlerInterface
 
         $view->channel_desc = htmlspecialchars($channel['channel_desc'] ?? '');
         $view->channel_updated = htmlspecialchars(date('r', (int) $channel['channel_updated']));
-        $view->channel_official = htmlspecialchars($channel['channel_official']);
+        $view->channel_official = htmlspecialchars((string) new Url($channel['channel_official']));
         $view->channel_rss = htmlspecialchars(
             $this->urlGenerator->absoluteUrlFor('FeedRss', [
                 'channel_id' => $channel['channel_id'],
@@ -144,7 +145,7 @@ class RssController implements RequestHandlerInterface
             $story['title'] = htmlspecialchars($story['title']);
             $story['description'] = htmlspecialchars($story['description']);
             $story['permalink'] = htmlspecialchars($story['permalink'] ?? '');
-            $story['storylink'] = htmlspecialchars($this->driver->getStoryLink($channel, $story));
+            $story['storylink'] = htmlspecialchars((string) new Url($this->driver->getStoryLink($channel, $story)));
             $story['published'] = htmlspecialchars(date('r', (int) $story['published']));
 
             $identity = $this->identityFactory->create($story['author']);
