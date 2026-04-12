@@ -16,7 +16,13 @@
             "role": "lead"
         }
     ],
-    "time": "2026-04-10",
+    "keywords": [
+        "rss",
+        "atom",
+        "feed",
+        "aggregator"
+    ],
+    "time": "2026-04-12",
     "repositories": [],
     "require": {
         "horde/horde-installer-plugin": "dev-FRAMEWORK_6_0 || ^3 || ^2",
@@ -26,6 +32,7 @@
         "horde/horde": "^6 || dev-FRAMEWORK_6_0",
         "horde/routes": "^3 || dev-FRAMEWORK_6_0"
     },
+    "require-dev": {},
     "suggest": {},
     "autoload": {
         "classmap": [
@@ -49,6 +56,5 @@
         "branch-alias": {
             "dev-FRAMEWORK_6_0": "1.x-dev"
         }
-    },
-    "minimum-stability": "alpha"
+    }
 }
