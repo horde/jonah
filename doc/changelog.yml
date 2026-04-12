@@ -1,4 +1,36 @@
 ---
+1.0.0-beta2:
+  api: 1.0.0-beta2
+  state:
+    release: beta
+    api: beta
+  date: 2026-04-12
+  license:
+    identifier: BSD-2-Clause
+    uri: https://spdx.org/licenses/BSD-2-Clause.html
+  notes: |-
+    chore: Add missing dependency on horde/routes
+    test: Extend unit and integration tests for jonah
+    refactor: update and document templates
+    refactor: Use new infrastructure in controllers
+    feat: FilesystemPathHelper facade abstracts registry and constants
+    refactor: PSR-7 migration for delivery and dispatcher
+    refactor: ListController replaces getFormData with PSR-7 native method
+    refactor: Controllers use injection rather than globals and a UrlGenerator class rather than static Horde::url
+    chore: Don't lose original authors while migrating to controllers
+    refactor: stories.php now delegates to TagSearchController
+    feat: TagSearchController replaces Jonah_View_TagSearchList
+    fix: autoloader
+    chore: Delete test script for delete FeedParser class
+    refactor: feed.php endpoint is now just a wrapper around HtmlController
+    feat: Turn dispatcher and delivery endpoints into wrappers around controllers
+    refactor: Use PSR-3 logger instead of Horde::log
+    feat: Add Feed Controller
+    feat: Create new PSR story controllers
+    refactor: Turn legacy channel entrypoints into thin wrappers around Controllers
+    feat: Implement Channel List, Edit, Delete endpoints as controllers
+    feat: Add routes to router definition file.
+    refactor: Phase 1 - Build OO Service infrastructure and delegate from existing static calls
 1.0.0-beta1:
   api: 1.0.0-beta1
   state:
