@@ -58,4 +58,32 @@ class Jonah_Test extends Horde_Test
      */
     public function appTests() {}
 
+    /**
+     * Available sub-test types.
+     *
+     * @return array  Map of type key => display name.
+     */
+    public function appTestTypes()
+    {
+        return [
+            'routes' => 'Routes',
+        ];
+    }
+
+    /**
+     * Run a specific test type.
+     *
+     * @param string $type  The test type key.
+     *
+     * @return string  HTML output.
+     */
+    public function appTestType($type)
+    {
+        if ($type === 'routes') {
+            return $this->_routesTest();
+        }
+
+        return '';
+    }
+
 }
