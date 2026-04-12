@@ -1,5 +1,7 @@
 <?php
 
+use Horde\Util\Util;
+
 /**
  * Copyright 2003-2026 Horde LLC (http://www.horde.org/)
  *
@@ -15,7 +17,7 @@ require_once __DIR__ . '/../lib/Application.php';
 Horde_Registry::appInit('jonah');
 
 /* Redirect to the news index if no channel_id is specified. */
-$channel_id = Horde_Util::getFormData('channel_id');
+$channel_id = Util::getFormData('channel_id');
 if (empty($channel_id)) {
     $notification->push(_("No channel requested."), 'horde.error');
     header('Location: ' . Horde::url('channels/index.php', true));

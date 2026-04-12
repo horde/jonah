@@ -29,9 +29,10 @@ use Horde\Http\Server\RequestBuilder;
 use Horde\Http\Server\ResponseWriterWeb;
 use Horde\Jonah\Controller\Feed\HtmlController;
 use Horde\Jonah\Controller\Feed\RssController;
+use Horde\Util\Util;
 
 /* Parse REST-style path into criteria */
-$parts = explode('/', Horde_Util::getPathInfo());
+$parts = explode('/', Util::getPathInfo());
 $lastpart = null;
 $deliveryType = null;
 $criteria = [];
@@ -77,7 +78,7 @@ foreach ($parts as $part) {
                 $lastpart = null;
             } else {
                 $GLOBALS['injector']->getInstance(Psr\Log\LoggerInterface::class)
-                    ->warning('Malformed request URL: {url}', ['url' => Horde_Util::getPathInfo()]);
+                    ->warning('Malformed request URL: {url}', ['url' => Util::getPathInfo()]);
                 exit;
             }
             break;

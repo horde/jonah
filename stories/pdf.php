@@ -1,5 +1,7 @@
 <?php
 
+use Horde\Util\Util;
+
 /**
  * Copyright 2003-2026 Horde LLC (http://www.horde.org/)
  *
@@ -17,8 +19,8 @@ Horde_Registry::appInit('jonah', [
 
 $params = ['registry' => &$registry,
     'notification' => &$notification,
-    'story_id' => Horde_Util::getFormData('id'),
+    'story_id' => Util::getFormData('id'),
     'browser' => &$browser,
-    'channel_id' => Horde_Util::getFormData('channel_id')];
+    'channel_id' => Util::getFormData('channel_id')];
 $view = new Jonah_View_StoryPdf($params);
 $view->run();

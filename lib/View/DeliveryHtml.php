@@ -1,5 +1,7 @@
 <?php
 
+use Horde\Util\Util;
+
 /**
  * Script to handle requests for html delivery of stories.
  *
@@ -48,7 +50,7 @@ class Jonah_View_DeliveryHtml extends Jonah_View_Base
 
         $view = new Horde_View(['templatePath' => JONAH_TEMPLATES . '/delivery']);
         $view->url = Horde::selfUrl();
-        $view->session = Horde_Util::formInput();
+        $view->session = Util::formInput();
         $view->channel_id = $criteria['feed'];
         $view->channel_name = $channel['channel_name'];
         $view->format = $criteria['format'];
