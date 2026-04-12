@@ -1,7 +1,8 @@
 <?php
 /**
  * Channel list view. Expects:
- *  ->channels (array with can_edit, can_delete flags, stories_url)
+ *  ->channels (array with can_edit, can_delete flags, stories_url,
+ *              feed_html_url, feed_html_fallback, feed_rss_url, feed_rss_fallback)
  *
  * Helpers available: jonahUrl(), jonahIconLink(), jonahImage()
  */
@@ -23,6 +24,7 @@
      <tr>
       <th width="1%">&nbsp;</th>
       <th class="sortdown"><?php echo _("Name")?></th>
+      <th><?php echo _("Delivery URLs")?></th>
       <th><?php echo _("Last Update")?></th>
      </tr>
     </thead>
@@ -41,6 +43,13 @@
       </td>
       <td>
        <a href="<?php echo $channel['stories_url']?>"><?php echo $channel['channel_name']?></a>
+      </td>
+      <td>
+       <a href="<?php echo htmlspecialchars($channel['feed_html_url'])?>"><?php echo _("HTML")?></a>
+       (<a href="<?php echo htmlspecialchars($channel['feed_html_fallback'])?>"><?php echo _("fallback")?></a>)
+       &middot;
+       <a href="<?php echo htmlspecialchars($channel['feed_rss_url'])?>"><?php echo _("RSS")?></a>
+       (<a href="<?php echo htmlspecialchars($channel['feed_rss_fallback'])?>"><?php echo _("fallback")?></a>)
       </td>
       <td class="linedRow"><?php echo $channel['channel_updated']?></td>
      </tr>
