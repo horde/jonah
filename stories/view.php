@@ -1,5 +1,7 @@
 <?php
 
+use Horde\Util\Util;
+
 /**
  * Copyright 2003-2026 Horde LLC (http://www.horde.org/)
  *
@@ -13,8 +15,8 @@
 require_once __DIR__ . '/../lib/Application.php';
 Horde_Registry::appInit('jonah', ['authentication' => 'none']);
 
-$channel_id = Horde_Util::getFormData('channel_id');
-$story_id = Horde_Util::getFormData('id');
+$channel_id = Util::getFormData('channel_id');
+$story_id = Util::getFormData('id');
 if (!$story_id) {
     try {
         $story_id = $injector->getInstance('Jonah_Driver')->getLatestStoryId($channel_id);

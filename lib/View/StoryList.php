@@ -1,5 +1,7 @@
 <?php
 
+use Horde\Util\Util;
+
 /**
  * Turba_View_StoryList:: A view to handle displaying a list of stories in a
  * channel.
@@ -41,7 +43,7 @@ class Jonah_View_StoryList extends Jonah_View_Base
         }
 
         /* Check if a URL has been passed. */
-        if ($url = Horde::verifySignedUrl(Horde_Util::getFormData('url'))) {
+        if ($url = Horde::verifySignedUrl(Util::getFormData('url'))) {
             $url = new Horde_Url($url);
         } else {
             $url = null;
