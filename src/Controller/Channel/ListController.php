@@ -72,6 +72,16 @@ class ListController implements RequestHandlerInterface
                     'StoryList',
                     ['channel_id' => $cid],
                 );
+                $channels[$key]['feed_html_url'] = $this->urlGenerator->absoluteUrlFor(
+                    'FeedHtml',
+                    ['feed' => $cid],
+                );
+                $channels[$key]['feed_html_fallback'] = 'delivery/html.php?channel_id=' . $cid;
+                $channels[$key]['feed_rss_url'] = $this->urlGenerator->absoluteUrlFor(
+                    'FeedRss',
+                    ['channel_id' => $cid],
+                );
+                $channels[$key]['feed_rss_fallback'] = 'delivery/rss.php?channel_id=' . $cid;
                 $channels[$key]['can_edit'] = true;
                 $channels[$key]['can_delete'] = true;
             }
