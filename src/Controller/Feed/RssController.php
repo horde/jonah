@@ -168,7 +168,7 @@ class RssController implements RequestHandlerInterface
             $tpl .= '_full';
         }
 
-        $xml = $view->render($tpl . '.xml');
+        $xml = $view->render($tpl . '.xml.html.php');
 
         /* Build PSR-7 XML response */
         $streamFactory = new StreamFactory();
