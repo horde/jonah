@@ -26,6 +26,7 @@ use Jonah_Driver;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Horde\Util\Util;
 
 /**
  * PSR-15 controller for HTML feed delivery.
@@ -89,7 +90,7 @@ class HtmlController implements RequestHandlerInterface
 
         $view = $this->viewFactory->createFeedHtmlView();
         $view->url = (string) $request->getUri();
-        $view->session = Horde_Util::formInput();
+        $view->session = Util::formInput();
         $view->channel_id = $criteria['channel_id'] ?? '';
         $view->format = $criteria['channel_format'];
         $view->options = $options;

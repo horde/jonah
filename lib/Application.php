@@ -1,5 +1,7 @@
 <?php
 
+use Horde\Util\Util;
+
 /**
  * Jonah application API.
  *
@@ -149,11 +151,21 @@ class Jonah_Application extends Horde_Registry_Application
         );
 
         $injector->bindClosure(
+            Horde\Core\Assets\ResponsiveAssets::class,
+            function ($injector) {
+                return new Horde\Core\Assets\ResponsiveAssets(
+                    $injector->getInstance('Horde_Registry'),
+                );
+            },
+        );
+
+        $injector->bindClosure(
             Horde\Jonah\View\ViewFactory::class,
             function ($injector) {
                 return new Horde\Jonah\View\ViewFactory(
                     $injector->getInstance(Horde\Jonah\Service\UrlGenerator::class),
                     $injector->getInstance(Horde\Jonah\Service\FilesystemPathHelper::class),
+                    $injector->getInstance(Horde\Core\Assets\ResponsiveAssets::class),
                 );
             },
         );
@@ -163,10 +175,10 @@ class Jonah_Application extends Horde_Registry_Application
      */
     protected function _init()
     {
-        if ($channel_id = Horde_Util::getFormData('channel_id')) {
+        if ($channel_id = Util::getFormData('channel_id')) {
             $url = Horde::url('delivery/rss.php', true, -1)
                 ->add('channel_id', $channel_id);
-            if ($tag_id = Horde_Util::getFormData('tag_id')) {
+            if ($tag_id = Util::getFormData('tag_id')) {
                 $url = $url->add('tag_id', $tag_id);
             }
 
@@ -234,7 +246,7 @@ class Jonah_Application extends Horde_Registry_Application
         }
 
         /* If viewing a channel, show new story links if authorized */
-        if ($channel_id = Horde_Util::getFormData('channel_id')) {
+        if ($channel_id = Util::getFormData('channel_id')) {
             $news = $GLOBALS['injector']->getInstance('Jonah_Driver');
             try {
                 $channel = $news->getChannel($channel_id);
