@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Horde\Jonah\View;
 
+use Horde\Core\Assets\ResponsiveAssets;
 use Horde\Jonah\Service\FilesystemPathHelper;
 use Horde\Jonah\Service\UrlGenerator;
 use Horde\Jonah\View\Helper\JonahImage;
@@ -31,6 +32,7 @@ class ViewFactory
     public function __construct(
         private readonly UrlGenerator $urlGenerator,
         private readonly FilesystemPathHelper $paths,
+        private readonly ResponsiveAssets $assets,
     ) {}
 
     public function createStoryListView(): StoryListView
@@ -96,6 +98,6 @@ class ViewFactory
     {
         new JonahUrl($view, $this->urlGenerator);
         new JonahLink($view);
-        new JonahImage($view, $this->paths);
+        new JonahImage($view, $this->assets);
     }
 }

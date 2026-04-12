@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Horde\Jonah\Service;
 
 use Horde_Perms;
+use Horde_Perms_Base;
 use Horde_Registry;
 
 /**
@@ -27,7 +28,7 @@ use Horde_Registry;
 class PermissionChecker
 {
     public function __construct(
-        private readonly Horde_Perms $perms,
+        private readonly Horde_Perms_Base $perms,
         private readonly Horde_Registry $registry,
     ) {}
 

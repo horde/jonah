@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Horde\Jonah\View\Helper;
 
-use Horde\Jonah\Service\FilesystemPathHelper;
+use Horde\Core\Assets\ResponsiveAssets;
 use Horde_View_Helper_Base;
 
 /**
@@ -29,7 +29,7 @@ class JonahImage extends Horde_View_Helper_Base
 {
     public function __construct(
         $view,
-        private readonly FilesystemPathHelper $paths,
+        private readonly ResponsiveAssets $assets,
     ) {
         parent::__construct($view);
     }
@@ -48,7 +48,7 @@ class JonahImage extends Horde_View_Helper_Base
         string $alt = '',
         array $attributes = [],
     ): string {
-        $resolvedSrc = rtrim($this->paths->getHordeThemesUri(), '/') . '/' . ltrim($src, '/');
+        $resolvedSrc = $this->assets->getGraphicUrl($src);
 
         $attrs = 'src="' . htmlspecialchars($resolvedSrc, ENT_QUOTES, 'UTF-8') . '"';
         $attrs .= ' alt="' . htmlspecialchars($alt, ENT_QUOTES, 'UTF-8') . '"';
