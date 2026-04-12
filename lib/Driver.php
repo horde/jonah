@@ -1,5 +1,7 @@
 <?php
 
+use Horde\Url\Url;
+
 /**
  * Jonah_Driver:: is responsible for storing, searching, sorting and filtering
  * locally generated and managed articles.
@@ -231,7 +233,7 @@ class Jonah_Driver
      * @param array $channel  A channel hash.
      * @param array $story    A story hash.
      *
-     * @return Horde_Url  The story link.
+     * @return Url  The story link.
      */
     public function getStoryLink($channel, $story)
     {
@@ -244,7 +246,7 @@ class Jonah_Driver
             $url = Horde::url('stories/view.php', true, -1)->add(['channel_id' => '%c', 'id' => '%s'])->setRaw(false);
         }
 
-        return new Horde_Url(str_replace(
+        return new Url(str_replace(
             ['%25c', '%25s', '%c', '%s'],
             ['%c', '%s', $channel['channel_id'], $story['id']],
             $url
