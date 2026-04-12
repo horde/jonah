@@ -1,5 +1,6 @@
 <?php
 
+use Horde\Url\Url;
 use Horde\Util\Util;
 
 /**
@@ -44,7 +45,7 @@ class Jonah_View_StoryList extends Jonah_View_Base
 
         /* Check if a URL has been passed. */
         if ($url = Horde::verifySignedUrl(Util::getFormData('url'))) {
-            $url = new Horde_Url($url);
+            $url = new Url($url);
         } else {
             $url = null;
         }

@@ -30,7 +30,7 @@ use Horde_PageOutput;
 use Horde_Perms;
 use Horde_Prefs;
 use Horde_Registry;
-use Horde_Url;
+use Horde\Url\Url;
 use Jonah_Driver;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -96,7 +96,7 @@ class ListController implements RequestHandlerInterface
         $parsedBody = (array) ($request->getParsedBody() ?? []);
         $signedUrl = $parsedBody['url'] ?? $queryParams['url'] ?? null;
         if ($signedUrl && ($url = $this->urlSigner->verify($signedUrl))) {
-            return $this->redirect((string) new Horde_Url($url));
+            return $this->redirect((string) new Url($url));
         }
 
         try {
@@ -122,7 +122,7 @@ class ListController implements RequestHandlerInterface
                 $stories[$key]['published_date'] = '';
             }
 
-            $stories[$key]['view_url'] = (string) $this->driver->getStoryLink($channel, $story);
+            $stories[$key]['view_url'] = (string) new Url($this->driver->getStoryLink($channel, $story));
             $stories[$key]['channel_id'] = $channel_id;
             $stories[$key]['can_edit'] = true;
             $stories[$key]['can_delete'] = $this->permissions->check('channels', Horde_Perms::DELETE, [$channel_id]);

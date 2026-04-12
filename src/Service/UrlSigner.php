@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Horde\Jonah\Service;
 
-use Horde_Url;
+use Horde\Url\Url;
 
 /**
  * Injectable HMAC-based URL signing and verification.
@@ -58,7 +58,7 @@ class UrlSigner
 
         $url .= str_contains($url, '?') ? '&' : '?';
         $url .= '_t=' . $now . '&_h=';
-        $url .= Horde_Url::uriB64Encode(
+        $url .= Url::uriB64Encode(
             hash_hmac('sha1', $url, $this->secretKey, true),
         );
 
@@ -86,7 +86,7 @@ class UrlSigner
         $url = substr($data, 0, $pos);
         $hmac = substr($data, $pos);
 
-        $expected = Horde_Url::uriB64Encode(
+        $expected = Url::uriB64Encode(
             hash_hmac('sha1', $url, $this->secretKey, true),
         );
         if (!hash_equals($expected, $hmac)) {
