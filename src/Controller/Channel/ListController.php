@@ -23,6 +23,7 @@ use Horde\Jonah\View\ViewFactory;
 use Horde_Notification_Handler;
 use Horde_PageOutput;
 use Horde_Perms;
+use Horde_Registry;
 use Jonah_Driver;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -47,6 +48,7 @@ class ListController implements RequestHandlerInterface
         private readonly PermissionChecker $permissions,
         private readonly Horde_Notification_Handler $notification,
         private readonly Horde_PageOutput $pageOutput,
+        private readonly Horde_Registry $registry,
         private readonly UrlGenerator $urlGenerator,
         private readonly ViewFactory $viewFactory,
     ) {}
@@ -65,6 +67,7 @@ class ListController implements RequestHandlerInterface
 
         if ($channels) {
             $channels = $this->permissions->check('channels', Horde_Perms::SHOW, $channels);
+            $webroot = rtrim($this->registry->get('webroot', 'jonah'), '/');
 
             foreach ($channels as $key => $channel) {
                 $cid = $channel['channel_id'];
@@ -72,16 +75,16 @@ class ListController implements RequestHandlerInterface
                     'StoryList',
                     ['channel_id' => $cid],
                 );
-                $channels[$key]['feed_html_url'] = $this->urlGenerator->absoluteUrlFor(
+                $channels[$key]['feed_html_url'] = $this->urlGenerator->urlFor(
                     'FeedHtml',
                     ['feed' => $cid],
                 );
-                $channels[$key]['feed_html_fallback'] = 'delivery/html.php?channel_id=' . $cid;
-                $channels[$key]['feed_rss_url'] = $this->urlGenerator->absoluteUrlFor(
+                $channels[$key]['feed_html_fallback'] = $webroot . '/delivery/html.php?channel_id=' . $cid;
+                $channels[$key]['feed_rss_url'] = $this->urlGenerator->urlFor(
                     'FeedRss',
                     ['channel_id' => $cid],
                 );
-                $channels[$key]['feed_rss_fallback'] = 'delivery/rss.php?channel_id=' . $cid;
+                $channels[$key]['feed_rss_fallback'] = $webroot . '/delivery/rss.php?channel_id=' . $cid;
                 $channels[$key]['can_edit'] = true;
                 $channels[$key]['can_delete'] = true;
             }
