@@ -64,8 +64,9 @@ class ViewController implements RequestHandlerInterface
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $queryParams = $request->getQueryParams();
-        $channel_id = $queryParams['channel_id'] ?? null;
-        $story_id = $queryParams['id'] ?? null;
+        $route = $request->getAttribute('route', []);
+        $channel_id = $route['channel_id'] ?? $queryParams['channel_id'] ?? null;
+        $story_id = $route['id'] ?? $queryParams['id'] ?? null;
 
         if (!$story_id) {
             try {

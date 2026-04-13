@@ -53,8 +53,9 @@ class PdfController implements RequestHandlerInterface
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $queryParams = $request->getQueryParams();
-        $story_id = $queryParams['id'] ?? null;
-        $channel_id = $queryParams['channel_id'] ?? null;
+        $route = $request->getAttribute('route', []);
+        $story_id = $route['id'] ?? $queryParams['id'] ?? null;
+        $channel_id = $route['channel_id'] ?? $queryParams['channel_id'] ?? null;
 
         if (!$story_id) {
             try {

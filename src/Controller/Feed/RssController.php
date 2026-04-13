@@ -63,12 +63,13 @@ class RssController implements RequestHandlerInterface
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $queryParams = $request->getQueryParams();
+        $route = $request->getAttribute('route', []);
 
         /* Accept criteria from the REST dispatcher (delivery/index.php) */
         $criteria = $request->getAttribute('criteria');
         if (!$criteria) {
             $criteria = [
-                'channel_id' => $queryParams['channel_id'] ?? null,
+                'channel_id' => $route['channel_id'] ?? $queryParams['channel_id'] ?? null,
                 'feed_type' => basename($queryParams['type'] ?? ''),
                 'limit' => 10,
             ];

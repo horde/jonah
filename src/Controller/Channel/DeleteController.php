@@ -57,9 +57,10 @@ class DeleteController implements RequestHandlerInterface
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $vars = Horde_Variables::getDefaultVariables();
+        $route = $request->getAttribute('route', []);
 
         $form_submit = $vars->get('submitbutton');
-        $channel_id = $vars->get('channel_id');
+        $channel_id = $route['channel_id'] ?? $vars->get('channel_id');
 
         try {
             $channel = $this->driver->getChannel($channel_id);

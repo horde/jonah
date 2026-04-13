@@ -28,8 +28,8 @@ use Horde_Exception_AuthenticationFailure;
 use Horde_Notification_Handler;
 use Horde_PageOutput;
 use Horde_Perms;
-use Horde_Prefs;
 use Horde_Registry;
+use Horde\Core\Service\PrefsService;
 use Horde\Url\Url;
 use Jonah_Driver;
 use Psr\Http\Message\ResponseInterface;
@@ -56,7 +56,7 @@ class ListController implements RequestHandlerInterface
         private readonly Horde_Notification_Handler $notification,
         private readonly Horde_PageOutput $pageOutput,
         private readonly Horde_Registry $registry,
-        private readonly Horde_Prefs $prefs,
+        private readonly PrefsService $prefs,
         private readonly LoggerInterface $logger,
         private readonly LegacyMergedConfig $config,
         private readonly UrlGenerator $urlGenerator,
@@ -67,7 +67,8 @@ class ListController implements RequestHandlerInterface
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $queryParams = $request->getQueryParams();
-        $channel_id = $queryParams['channel_id'] ?? null;
+        $route = $request->getAttribute('route', []);
+        $channel_id = $route['channel_id'] ?? $queryParams['channel_id'] ?? null;
 
         if (empty($channel_id)) {
             $this->notification->push(_("No channel requested."), 'horde.error');
@@ -115,8 +116,9 @@ class ListController implements RequestHandlerInterface
 
         foreach ($stories as $key => $story) {
             if (!empty($stories[$key]['published'])) {
-                $dateFormat = $this->prefs->getValue('date_format') . ', '
-                    . ($this->prefs->getValue('twentyFour') ? '%H:%M' : '%I:%M%p');
+                $uid = $this->registry->getAuth() ?: '';
+                $dateFormat = ($this->prefs->getValue($uid, 'horde', 'date_format') ?? '%x') . ', '
+                    . ($this->prefs->getValue($uid, 'horde', 'twentyFour') ? '%H:%M' : '%I:%M%p');
                 $stories[$key]['published_date'] = (new Horde_Date($stories[$key]['published']))->strftime($dateFormat);
             } else {
                 $stories[$key]['published_date'] = '';

@@ -61,11 +61,18 @@ class PermissionChecker
         $auth = $this->registry->getAuth();
 
         if ($filter === 'channels') {
+            /* If no jonah:news permission is defined at all, allow access
+             * (default-open — admin can restrict later). */
+            if (!$this->perms->exists('jonah:news')) {
+                return empty($in) ? (is_array($in) ? [] : true) : $in;
+            }
+
             $out = [];
             foreach (($in ?? []) as $key => $val) {
+                $id = is_array($val) ? $val['channel_id'] : $val;
                 if ($this->perms->hasPermission('jonah:news', $auth, $permission)
                     || $this->perms->hasPermission(
-                        'jonah:news:' . $val['channel_id'],
+                        'jonah:news:' . $id,
                         $auth,
                         $permission,
                     )
