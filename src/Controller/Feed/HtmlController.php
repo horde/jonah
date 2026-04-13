@@ -53,12 +53,15 @@ class HtmlController implements RequestHandlerInterface
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $queryParams = $request->getQueryParams();
+        $route = $request->getAttribute('route', []);
 
         /* Accept criteria from the REST dispatcher (delivery/index.php) */
         $criteria = $request->getAttribute('criteria');
         if (!$criteria) {
             $criteria = [
-                'feed' => $queryParams['channel_id'] ?? null,
+                'feed' => $route['feed'] ?? $queryParams['channel_id'] ?? null,
+                'filter' => $route['filter'] ?? $queryParams['filter'] ?? '',
+                'value' => $route['value'] ?? $queryParams['value'] ?? '',
                 'format' => $queryParams['format'] ?? null,
             ];
         }

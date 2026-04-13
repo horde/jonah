@@ -62,7 +62,7 @@ class ListController implements RequestHandlerInterface
                 sprintf(_("An error occurred fetching channels: %s"), $e->getMessage()),
                 'horde.error',
             );
-            $channels = false;
+            $channels = [];
         }
 
         if ($channels) {

@@ -57,10 +57,11 @@ class EditController implements RequestHandlerInterface
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $vars = Horde_Variables::getDefaultVariables();
+        $route = $request->getAttribute('route', []);
         $form = new Jonah_Form_Feed($vars);
 
         $formname = $vars->get('formname');
-        $channel_id = $vars->get('channel_id');
+        $channel_id = $route['channel_id'] ?? $vars->get('channel_id');
 
         /* Form not yet submitted and is being edited. */
         if (!$formname && $channel_id) {

@@ -59,8 +59,9 @@ class ShareController implements RequestHandlerInterface
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $vars = Horde_Variables::getDefaultVariables();
-        $channel_id = $vars->get('channel_id');
-        $story_id = $vars->get('id');
+        $route = $request->getAttribute('route', []);
+        $channel_id = $route['channel_id'] ?? $vars->get('channel_id');
+        $story_id = $route['id'] ?? $vars->get('id');
 
         if (!$this->config->get('sharing.allow')) {
             return $this->redirect(

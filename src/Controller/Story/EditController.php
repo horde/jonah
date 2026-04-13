@@ -56,9 +56,18 @@ class EditController implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $vars = Horde_Variables::getDefaultVariables();
+        $route = $request->getAttribute('route', []);
+        $channel_id = $route['channel_id'] ?? null;
+        $story_id = $route['id'] ?? null;
 
-        $channel_id = $vars->get('channel_id');
+        /* Merge route params into Variables so the form sees them */
+        $vars = Horde_Variables::getDefaultVariables();
+        if ($channel_id !== null) {
+            $vars->set('channel_id', $channel_id);
+        }
+        if ($story_id !== null) {
+            $vars->set('id', $story_id);
+        }
 
         try {
             $channel = $this->driver->getChannel($channel_id);
@@ -78,11 +87,14 @@ class EditController implements RequestHandlerInterface
             throw new Horde_Exception_AuthenticationFailure();
         }
 
-        $story_id = $vars->get('id');
+        /* On POST, form may provide id via hidden field */
+        $story_id = $vars->get('id') ?? $story_id;
         if ($story_id && !$vars->get('formname')) {
             try {
                 $story = $this->driver->getStory($story_id);
                 $story['tags'] = implode(',', array_values($story['tags'] ?? []));
+                /* Ensure route params survive the vars replacement */
+                $story['channel_id'] = $channel_id;
                 $vars = new Horde_Variables($story);
             } catch (Exception $e) {
                 $this->notification->push(
@@ -116,7 +128,7 @@ class EditController implements RequestHandlerInterface
             }
         }
 
-        $html = $this->renderChrome($form->getTitle(), function () use ($form, $vars) {
+        $html = $this->renderChrome($form->getTitle(), function () use ($form, $vars, $channel_id) {
             $form->renderActive(
                 $form->getRenderer(),
                 $vars,
