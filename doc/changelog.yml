@@ -1,4 +1,23 @@
 ---
+1.0.0-beta4:
+  api: 1.0.0-beta4
+  state:
+    release: beta
+    api: beta
+  date: 2026-04-13
+  license:
+    identifier: BSD-2-Clause
+    uri: https://spdx.org/licenses/BSD-2-Clause.html
+  notes: |-
+    fix: Horde_Variables must be populated by details getDefaultVariables doesn't have.
+    fix: use PrefsService instead of Horde_Prefs which is not DI safe
+    docs: create/update conf.php.dist
+    fix: Use correct template name suffix
+    test: Add route test to test.php framework for jonah
+    fix: use webroot for generating URIs
+    feat: Add a Delivery URL column to list of feeds
+    refactor: Use Horde\Url\Url instead of Horde_Url
+    fix: Cast url to string
 1.0.0-beta3:
   api: 1.0.0-beta3
   state:
