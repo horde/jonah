@@ -84,7 +84,11 @@ class HtmlController implements RequestHandlerInterface
         }
 
         if (empty($criteria['channel_id']) && !empty($criteria['feed'])) {
-            $criteria['channel_id'] = $this->driver->getChannelId($criteria['feed']);
+            if (ctype_digit((string) $criteria['feed'])) {
+                $criteria['channel_id'] = (int) $criteria['feed'];
+            } else {
+                $criteria['channel_id'] = $this->driver->getChannelId($criteria['feed']) ?: null;
+            }
         }
 
         if (empty($criteria['channel_id'])) {
@@ -94,7 +98,7 @@ class HtmlController implements RequestHandlerInterface
         $view = $this->viewFactory->createFeedHtmlView();
         $view->url = (string) $request->getUri();
         $view->session = Util::formInput();
-        $view->channel_id = $criteria['channel_id'] ?? '';
+        $view->channel_id = (string) ($criteria['channel_id'] ?? '');
         $view->format = $criteria['channel_format'];
         $view->options = $options;
 

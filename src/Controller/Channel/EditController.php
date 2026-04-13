@@ -56,17 +56,23 @@ class EditController implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $vars = Horde_Variables::getDefaultVariables();
         $route = $request->getAttribute('route', []);
-        $form = new Jonah_Form_Feed($vars);
+        $channel_id = $route['channel_id'] ?? null;
+
+        /* Merge route params into Variables so the form sees them */
+        $vars = Horde_Variables::getDefaultVariables();
+        if ($channel_id !== null) {
+            $vars->set('channel_id', $channel_id);
+        }
 
         $formname = $vars->get('formname');
-        $channel_id = $route['channel_id'] ?? $vars->get('channel_id');
 
         /* Form not yet submitted and is being edited. */
         if (!$formname && $channel_id) {
             try {
-                $vars = new Horde_Variables($this->driver->getChannel($channel_id));
+                $channelData = $this->driver->getChannel($channel_id);
+                $channelData['channel_id'] = $channel_id;
+                $vars = new Horde_Variables($channelData);
             } catch (Exception $e) {
                 $this->notification->push(
                     sprintf(_("Invalid channel requested. %s"), $e->getMessage()),
@@ -87,6 +93,8 @@ class EditController implements RequestHandlerInterface
             throw new Horde_Exception_AuthenticationFailure();
         }
 
+        /* Create form AFTER vars are fully populated so it sees channel_id */
+        $form = new Jonah_Form_Feed($vars);
         $form->setExtraFields($channel_id);
         if ($formname) {
             if ($form->validate($vars)) {
