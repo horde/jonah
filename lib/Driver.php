@@ -1,5 +1,6 @@
 <?php
 
+use Horde\Injector\Attribute\Factory;
 use Horde\Url\Url;
 
 /**
@@ -18,6 +19,7 @@ use Horde\Url\Url;
  * @author  Michael J. Rubinsky <mrubinsk@horde.org>
  * @package Jonah
  */
+#[Factory(factory: Jonah_Factory_Driver::class, method: 'create')]
 class Jonah_Driver
 {
     /**
