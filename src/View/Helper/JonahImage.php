@@ -48,7 +48,7 @@ class JonahImage extends Horde_View_Helper_Base
         string $alt = '',
         array $attributes = [],
     ): string {
-        $resolvedSrc = $this->assets->getGraphicUrl($src);
+        $resolvedSrc = $this->assets->getGraphicUrl($src, 'jonah');
 
         $attrs = 'src="' . htmlspecialchars($resolvedSrc, ENT_QUOTES, 'UTF-8') . '"';
         $attrs .= ' alt="' . htmlspecialchars($alt, ENT_QUOTES, 'UTF-8') . '"';
