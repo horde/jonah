@@ -153,8 +153,9 @@ class Jonah_Application extends Horde_Registry_Application
         $injector->bindClosure(
             Horde\Core\Assets\ResponsiveAssets::class,
             function ($injector) {
+                $registry = $injector->getInstance('Horde_Registry');
                 return new Horde\Core\Assets\ResponsiveAssets(
-                    $injector->getInstance('Horde_Registry'),
+                    new \Horde\Core\Config\RegistryState($registry->applications),
                 );
             },
         );
