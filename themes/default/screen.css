@@ -74,13 +74,20 @@ table#feeds td {
     border-right: 1px solid #ddd;
     border-bottom: 1px solid #ddd;
 }
+table#feeds td.nowrap img {
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+}
 table#feeds th.sortup {
     background: #bbcbff url("graphics/za.png") center left no-repeat;
-    padding-left: 10px;
+    background-size: 16px 16px;
+    padding-left: 20px;
 }
 table#feeds th.sortdown {
     background: #bbcbff url("graphics/az.png") center left no-repeat;
-    padding-left: 10px;
+    background-size: 16px 16px;
+    padding-left: 20px;
 }
 
 /* QuickFinder */
@@ -98,9 +105,27 @@ table#feeds th.sortdown {
     background-image: url("graphics/search.png");
     background-repeat: no-repeat;
     background-position: 2px center;
+    background-size: 16px 16px;
     padding: 1px 0 1px 20px;
 }
 #quicksearch a {
     display: inline-block;
     padding: 2px 4px;
+}
+
+/* Sidebar icons (class names are literal filenames from Horde_Menu). */
+.horde-subnavi-icon.jonah\.png {
+    background-image: url("graphics/jonah.png");
+    background-size: contain;
+}
+.horde-subnavi-icon.new\.png {
+    background-image: url("graphics/new.png");
+    background-size: contain;
+}
+
+/* Header action icons. */
+.header img {
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
 }
