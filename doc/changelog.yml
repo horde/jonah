@@ -1,4 +1,18 @@
 ---
+1.0.0-beta5:
+  api: 1.0.0-beta5
+  state:
+    release: beta
+    api: beta
+  date: 2026-05-02
+  license:
+    identifier: BSD-2-Clause
+    uri: https://spdx.org/licenses/BSD-2-Clause.html
+  notes: |-
+    docs: Add note on lucide icons licenses
+    style: Changed CSS and icon assets to Lucide Icons with proper attribution
+    refactor(registry): Evolve to a format more independent of legacy stack
+    feat: Add #[Factory] attribute to Jonah_Driver
 1.0.0-beta4:
   api: 1.0.0-beta4
   state:
