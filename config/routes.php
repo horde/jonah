@@ -14,6 +14,7 @@
 
 namespace Horde\Jonah;
 
+use Horde\Core\Middleware\DefaultStack;
 use Horde\Jonah\Controller\Channel;
 use Horde\Jonah\Controller\Story;
 use Horde\Jonah\Controller\Feed;
@@ -23,12 +24,14 @@ use Horde\Jonah\Controller\TagSearchController;
 
 $mapper->buildRoute(uri: '/channels', name: 'ChannelList')
     ->withController(Channel\ListController::class)
+    ->withMiddleware(DefaultStack::get())
     ->withSecondaryRoute('/channels/index.php')
     ->add();
 
 $mapper->buildRoute(uri: '/channels/edit', name: 'ChannelCreate')
     ->withController(Channel\EditController::class)
     ->withDefaults(['action' => 'create'])
+    ->withMiddleware(DefaultStack::get())
     ->withSecondaryRoute('/channels/edit.php')
     ->add();
 
@@ -36,11 +39,13 @@ $mapper->buildRoute(uri: '/channels/edit/:channel_id', name: 'ChannelEdit')
     ->withController(Channel\EditController::class)
     ->withDefaults(['action' => 'edit'])
     ->withRequirements(['channel_id' => '\d+'])
+    ->withMiddleware(DefaultStack::get())
     ->add();
 
 $mapper->buildRoute(uri: '/channels/delete/:channel_id', name: 'ChannelDelete')
     ->withController(Channel\DeleteController::class)
     ->withRequirements(['channel_id' => '\d+'])
+    ->withMiddleware(DefaultStack::get())
     ->withSecondaryRoute('/channels/delete.php')
     ->add();
 
@@ -48,17 +53,20 @@ $mapper->buildRoute(uri: '/channels/delete/:channel_id', name: 'ChannelDelete')
 
 $mapper->buildRoute(uri: '/stories', name: 'StoryListDefault')
     ->withController(Story\ListController::class)
+    ->withMiddleware(DefaultStack::get())
     ->withSecondaryRoute('/stories/index.php')
     ->add();
 
 $mapper->buildRoute(uri: '/stories/:channel_id', name: 'StoryList')
     ->withController(Story\ListController::class)
     ->withRequirements(['channel_id' => '\d+'])
+    ->withMiddleware(DefaultStack::get())
     ->add();
 
 $mapper->buildRoute(uri: '/stories/view/:channel_id/:id', name: 'StoryView')
     ->withController(Story\ViewController::class)
     ->withRequirements(['channel_id' => '\d+', 'id' => '\d+'])
+    ->withMiddleware(DefaultStack::get())
     ->withSecondaryRoute('/stories/view.php')
     ->add();
 
@@ -66,6 +74,7 @@ $mapper->buildRoute(uri: '/stories/edit/:channel_id', name: 'StoryCreate')
     ->withController(Story\EditController::class)
     ->withDefaults(['action' => 'create'])
     ->withRequirements(['channel_id' => '\d+'])
+    ->withMiddleware(DefaultStack::get())
     ->withSecondaryRoute('/stories/edit.php')
     ->add();
 
@@ -73,23 +82,27 @@ $mapper->buildRoute(uri: '/stories/edit/:channel_id/:id', name: 'StoryEdit')
     ->withController(Story\EditController::class)
     ->withDefaults(['action' => 'edit'])
     ->withRequirements(['channel_id' => '\d+', 'id' => '\d+'])
+    ->withMiddleware(DefaultStack::get())
     ->add();
 
 $mapper->buildRoute(uri: '/stories/delete/:channel_id/:id', name: 'StoryDelete')
     ->withController(Story\DeleteController::class)
     ->withRequirements(['channel_id' => '\d+', 'id' => '\d+'])
+    ->withMiddleware(DefaultStack::get())
     ->withSecondaryRoute('/stories/delete.php')
     ->add();
 
 $mapper->buildRoute(uri: '/stories/share/:channel_id/:id', name: 'StoryShare')
     ->withController(Story\ShareController::class)
     ->withRequirements(['channel_id' => '\d+', 'id' => '\d+'])
+    ->withMiddleware(DefaultStack::get())
     ->withSecondaryRoute('/stories/share.php')
     ->add();
 
 $mapper->buildRoute(uri: '/stories/pdf/:channel_id/:id', name: 'StoryPdf')
     ->withController(Story\PdfController::class)
     ->withRequirements(['channel_id' => '\d+', 'id' => '\d+'])
+    ->withMiddleware(DefaultStack::get())
     ->withSecondaryRoute('/stories/pdf.php')
     ->add();
 
@@ -98,15 +111,18 @@ $mapper->buildRoute(uri: '/stories/pdf/:channel_id/:id', name: 'StoryPdf')
 $mapper->buildRoute(uri: '/feeds/:feed', name: 'FeedHtml')
     ->withController(Feed\HtmlController::class)
     ->withDefaults(['filter' => '', 'value' => ''])
+    ->withMiddleware(DefaultStack::get())
     ->add();
 
 $mapper->buildRoute(uri: '/feeds/:feed/:filter/:value', name: 'FeedFiltered')
     ->withController(Feed\HtmlController::class)
+    ->withMiddleware(DefaultStack::get())
     ->add();
 
 $mapper->buildRoute(uri: '/rss/:channel_id', name: 'FeedRss')
     ->withController(Feed\RssController::class)
     ->withRequirements(['channel_id' => '\d+'])
+    ->withMiddleware(DefaultStack::get())
     ->withSecondaryRoute('/delivery/rss.php')
     ->add();
 
@@ -114,5 +130,6 @@ $mapper->buildRoute(uri: '/rss/:channel_id', name: 'FeedRss')
 
 $mapper->buildRoute(uri: '/search/tags', name: 'TagSearch')
     ->withController(TagSearchController::class)
+    ->withMiddleware(DefaultStack::get())
     ->withSecondaryRoute('/stories/results.php')
     ->add();
