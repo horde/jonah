@@ -117,9 +117,11 @@ class ListController implements RequestHandlerInterface
         foreach ($stories as $key => $story) {
             if (!empty($stories[$key]['published'])) {
                 $uid = $this->registry->getAuth() ?: '';
-                $dateFormat = ($this->prefs->getValue($uid, 'horde', 'date_format') ?? '%x') . ', '
-                    . ($this->prefs->getValue($uid, 'horde', 'twentyFour') ? '%H:%M' : '%I:%M%p');
-                $stories[$key]['published_date'] = (new Horde_Date($stories[$key]['published']))->strftime($dateFormat);
+                $pubDate = new Horde_Date($stories[$key]['published']);
+                $dateFormat = $this->prefs->getValue($uid, 'horde', 'date_format') ?? 'short';
+                $timeFormat = $this->prefs->getValue($uid, 'horde', 'twentyFour') ? 'HH:mm' : 'h:mma';
+                $stories[$key]['published_date'] = $pubDate->format($dateFormat, new \Horde\Date\Formatter\IcuFormatter(), $GLOBALS['language'] ?? 'en_US')
+                    . ', ' . $pubDate->format($timeFormat, new \Horde\Date\Formatter\IcuFormatter(), $GLOBALS['language'] ?? 'en_US');
             } else {
                 $stories[$key]['published_date'] = '';
             }
