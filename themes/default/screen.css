@@ -123,6 +123,13 @@ table#feeds th.sortdown {
     background-size: contain;
 }
 
+/* Story list action icons. */
+table.linedRow td img {
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+}
+
 /* Header action icons. */
 .header img {
     width: 16px;
