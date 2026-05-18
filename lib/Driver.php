@@ -218,12 +218,12 @@ class Jonah_Driver
         /* Format dates. */
         $date_format = $GLOBALS['prefs']->getValue('date_format');
         if (!empty($story['updated'])) {
-            $story['updated_date'] = (new Horde_Date($story['updated']))->strftime($date_format);
+            $story['updated_date'] = (new Horde_Date($story['updated']))->format($date_format, new \Horde\Date\Formatter\IcuFormatter(), $GLOBALS['language'] ?? 'en_US');
         } else {
             $story['updated_date'] = '';
         }
         if (!empty($story['published'])) {
-            $story['published_date'] = (new Horde_Date($story['published']))->strftime($date_format);
+            $story['published_date'] = (new Horde_Date($story['published']))->format($date_format, new \Horde\Date\Formatter\IcuFormatter(), $GLOBALS['language'] ?? 'en_US');
         }
 
         return $story;
