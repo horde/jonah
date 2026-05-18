@@ -122,10 +122,9 @@ class TagSearchController implements RequestHandlerInterface
 
             /* Format date */
             if (!empty($stories[$key]['published'])) {
-                $dateFormat = $this->prefs->getValue('date_format') . ', '
-                    . ($this->prefs->getValue('twentyFour') ? '%H:%M' : '%I:%M%p');
-                $stories[$key]['published_date'] = (new Horde_Date($stories[$key]['published']))
-                    ->strftime($dateFormat);
+                $pubDate = new Horde_Date($stories[$key]['published']);
+                $stories[$key]['published_date'] = $pubDate->format($this->prefs->getValue('date_format'), new \Horde\Date\Formatter\IcuFormatter(), $GLOBALS['language'] ?? 'en_US')
+                    . ', ' . $pubDate->format($this->prefs->getValue('twentyFour') ? 'HH:mm' : 'h:mma', new \Horde\Date\Formatter\IcuFormatter(), $GLOBALS['language'] ?? 'en_US');
             } else {
                 $stories[$key]['published_date'] = '';
             }

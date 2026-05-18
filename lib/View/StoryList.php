@@ -70,8 +70,9 @@ class Jonah_View_StoryList extends Jonah_View_Base
         foreach ($stories as $key => $story) {
             /* published is the publication/release date, updated is the last change date. */
             if (!empty($stories[$key]['published'])) {
-                $dateFormat = $prefs->getValue('date_format') . ', ' . ($prefs->getValue('twentyFour') ? '%H:%M' : '%I:%M%p');
-                $stories[$key]['published_date'] = (new Horde_Date($stories[$key]['published']))->strftime($dateFormat);
+                $pubDate = new Horde_Date($stories[$key]['published']);
+                $stories[$key]['published_date'] = $pubDate->format($prefs->getValue('date_format'), new \Horde\Date\Formatter\IcuFormatter(), $GLOBALS['language'] ?? 'en_US')
+                    . ', ' . $pubDate->format($prefs->getValue('twentyFour') ? 'HH:mm' : 'h:mma', new \Horde\Date\Formatter\IcuFormatter(), $GLOBALS['language'] ?? 'en_US');
             } else {
                 $stories[$key]['published_date'] = '';
             }
