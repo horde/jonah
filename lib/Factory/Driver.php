@@ -1,4 +1,5 @@
 <?php
+use Horde\Injector\Injector;
 
 /**
  * Jonah_Driver factory.
@@ -30,7 +31,7 @@ class Jonah_Factory_Driver extends Horde_Core_Factory_Injector
      * @return Jonah_Driver
      * @throws Jonah_Exception
      */
-    public function create(Horde_Injector $injector)
+    public function create(Horde_Injector|Injector $injector)
     {
         $driver = Horde_String::ucfirst($GLOBALS['conf']['news']['storage']['driver']);
         $driver = basename($driver);
