@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Horde\Jonah\Test\Integration\View\Helper;
 
 use Horde\Jonah\Service\UrlGenerator;
+use Horde\Jonah\Test\Stub\GroupMapperRoutesProvider;
 use Horde\Jonah\View\Helper\JonahUrl;
-use Horde\Routes\Mapper;
+use Horde\Routes\GroupMapper;
 use Horde_View;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -19,11 +20,13 @@ class JonahUrlTest extends TestCase
 
     protected function setUp(): void
     {
-        $mapper = new Mapper();
-        $mapper->connect('ChannelList', '/channels/', ['controller' => 'channel_list']);
-        $mapper->connect('StoryEdit', '/stories/edit/:id', ['controller' => 'story_edit']);
+        $mapper = new GroupMapper();
+        $mapper->buildRoute(uri: '/jonah/channels', name: 'ChannelList')->add();
+        $mapper->buildRoute(uri: '/jonah/stories/edit/:id', name: 'StoryEdit')->add();
+        $mapper->compile();
 
-        $urlGenerator = new UrlGenerator($mapper, '/jonah');
+        $provider = new GroupMapperRoutesProvider($mapper);
+        $urlGenerator = new UrlGenerator($provider, '/jonah');
 
         $this->view = new Horde_View();
         $this->helper = new JonahUrl($this->view, $urlGenerator);

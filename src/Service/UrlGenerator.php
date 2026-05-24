@@ -13,19 +13,12 @@ declare(strict_types=1);
 
 namespace Horde\Jonah\Service;
 
-use Horde\Routes\Mapper;
-use Horde\Routes\Utils;
+use Horde\Core\Uri\RoutesProvider;
 
 /**
- * Injectable URL generator wrapping Horde\Routes\Utils.
+ * Injectable URL generator wrapping RoutesProvider.
  *
- * Provides named-route URL generation for Jonah controllers, replacing
- * direct Horde::url() static calls.
- *
- * NOTE: New code should use Horde\Core\Uri\RouteUrlWriter instead.
- * RouteUrlWriter consumes the RoutesProvider interface and works in both
- * Rampage (without legacy bootstrap) and legacy flows. This class remains
- * for existing callers wired through _bootstrap() in Application.php.
+ * Provides named-route URL generation for Jonah controllers.
  *
  * @category Horde
  * @license  http://www.horde.org/licenses/bsd BSD
@@ -33,43 +26,38 @@ use Horde\Routes\Utils;
  */
 class UrlGenerator
 {
-    private Utils $utils;
-
     public function __construct(
-        private readonly Mapper $mapper,
+        private readonly RoutesProvider $provider,
         private readonly string $webroot,
-    ) {
-        $this->mapper->environ['SCRIPT_NAME'] = rtrim($webroot, '/');
-        $this->utils = new Utils($this->mapper);
-    }
+        private readonly array $environ = [],
+    ) {}
 
     /**
      * Generate a relative URL for a named route.
-     *
-     * Extra params not in the route path become query string parameters.
-     *
-     * @param string $routeName  The route name from config/routes.php.
-     * @param array  $params     Route parameters and/or extra query params.
-     *
-     * @return string  The generated URL.
      */
     public function urlFor(string $routeName, array $params = []): string
     {
-        return $this->utils->urlFor($routeName, $params);
+        return $this->provider->generateNamedPath($routeName, $params) ?? '';
     }
 
     /**
      * Generate a fully qualified (absolute) URL for a named route.
-     *
-     * @param string $routeName  The route name from config/routes.php.
-     * @param array  $params     Route parameters and/or extra query params.
-     *
-     * @return string  The generated URL with scheme and host.
      */
     public function absoluteUrlFor(string $routeName, array $params = []): string
     {
-        $params['qualified'] = true;
+        $path = $this->provider->generateNamedPath($routeName, $params);
+        if ($path === null) {
+            return '';
+        }
 
-        return $this->utils->urlFor($routeName, $params);
+        $host = $this->environ['HTTP_HOST']
+            ?? $this->environ['SERVER_NAME']
+            ?? 'localhost';
+
+        $scheme = (!empty($this->environ['HTTPS']) && $this->environ['HTTPS'] !== 'off')
+            ? 'https'
+            : 'http';
+
+        return $scheme . '://' . $host . $path;
     }
 }
