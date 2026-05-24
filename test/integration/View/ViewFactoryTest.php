@@ -6,13 +6,14 @@ namespace Horde\Jonah\Test\Integration\View;
 
 use Horde\Jonah\Service\FilesystemPathHelper;
 use Horde\Jonah\Service\UrlGenerator;
+use Horde\Jonah\Test\Stub\GroupMapperRoutesProvider;
 use Horde\Jonah\View\ChannelListView;
 use Horde\Jonah\View\FeedHtmlView;
 use Horde\Jonah\View\FeedRssView;
 use Horde\Jonah\View\StoryListView;
 use Horde\Jonah\View\StoryView;
 use Horde\Jonah\View\ViewFactory;
-use Horde\Routes\Mapper;
+use Horde\Routes\GroupMapper;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -23,9 +24,12 @@ class ViewFactoryTest extends TestCase
 
     protected function setUp(): void
     {
-        $mapper = new Mapper();
-        $mapper->connect('ChannelList', '/channels/', ['controller' => 'channel_list']);
-        $urlGenerator = new UrlGenerator($mapper, '/jonah');
+        $mapper = new GroupMapper();
+        $mapper->buildRoute(uri: '/jonah/channels', name: 'ChannelList')->add();
+        $mapper->compile();
+
+        $provider = new GroupMapperRoutesProvider($mapper);
+        $urlGenerator = new UrlGenerator($provider, '/jonah');
 
         $paths = new FilesystemPathHelper(
             '/srv/www/jonah',
@@ -47,7 +51,6 @@ class ViewFactoryTest extends TestCase
     public function testCreateStoryListViewHasJonahHelpers(): void
     {
         $view = $this->factory->createStoryListView();
-        // Helpers are registered — calling them should not throw
         $url = $view->jonahUrl('ChannelList');
         $this->assertSame('/jonah/channels', $url);
     }
