@@ -22,6 +22,11 @@ use Horde\Routes\Utils;
  * Provides named-route URL generation for Jonah controllers, replacing
  * direct Horde::url() static calls.
  *
+ * NOTE: New code should use Horde\Core\Uri\RouteUrlWriter instead.
+ * RouteUrlWriter consumes the RoutesProvider interface and works in both
+ * Rampage (without legacy bootstrap) and legacy flows. This class remains
+ * for existing callers wired through _bootstrap() in Application.php.
+ *
  * @category Horde
  * @license  http://www.horde.org/licenses/bsd BSD
  * @package  Jonah
