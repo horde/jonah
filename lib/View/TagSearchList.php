@@ -72,8 +72,8 @@ class Jonah_View_TagSearchList extends Jonah_View_Base
 
             if (!empty($stories[$key]['published'])) {
                 $pubDate = new Horde_Date($stories[$key]['published']);
-                $stories[$key]['published_date'] = $pubDate->format($prefs->getValue('date_format'), new \Horde\Date\Formatter\IcuFormatter(), $GLOBALS['language'] ?? 'en_US')
-                    . ', ' . $pubDate->format($prefs->getValue('twentyFour') ? 'HH:mm' : 'h:mma', new \Horde\Date\Formatter\IcuFormatter(), $GLOBALS['language'] ?? 'en_US');
+                $stories[$key]['published_date'] = $pubDate->format($prefs->getValue('date_format'), new Horde\Date\Formatter\IcuFormatter(), $GLOBALS['language'] ?? 'en_US')
+                    . ', ' . $pubDate->format($prefs->getValue('twentyFour') ? 'HH:mm' : 'h:mma', new Horde\Date\Formatter\IcuFormatter(), $GLOBALS['language'] ?? 'en_US');
             } else {
                 $stories[$key]['published_date'] = '';
             }
