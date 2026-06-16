@@ -28,7 +28,7 @@ require_once HORDE_BASE . '/lib/core.php';
 
 class Jonah_Application extends Horde_Registry_Application
 {
-    public $version = '1.0.0-RC1';
+    public $version = '1.0.0-RC2';
 
     /**
      */
