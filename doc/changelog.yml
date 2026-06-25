@@ -1,4 +1,14 @@
 ---
+1.0.0-RC3:
+  api: 1.0.0-RC3
+  state:
+    release: RC
+    api: RC
+  date: 2026-06-25
+  license:
+    identifier: BSD-2-Clause
+    uri: https://spdx.org/licenses/BSD-2-Clause.html
+  notes: 'fix(dispatcher): strip webroot path and attach matched route to request'
 1.0.0-RC2:
   api: 1.0.0-RC2
   state:
@@ -8,12 +18,7 @@
   license:
     identifier: BSD-2-Clause
     uri: https://spdx.org/licenses/BSD-2-Clause.html
-  notes: |-
-    style: php-cs-fixer
-    refactor(routes): resolve RegistryState via RegistryConfigLoader
-    refactor(routes): replace Mapper with RoutesProvider in UrlGenerator and test fixtures
-    docs(UrlGenerator): comment future migration to RouteUrlWriter
-    chore: Update workflow dependency
+  notes: "style: php-cs-fixer\nrefactor(routes): resolve RegistryState via RegistryConfigLoader\nrefactor(routes): replace Mapper with RoutesProvider in UrlGenerator and test fixtures\ndocs(UrlGenerator): comment future migration to RouteUrlWriter\nchore: Update workflow dependency"
 1.0.0-RC1:
   api: 1.0.0-RC1
   state:
@@ -23,13 +28,7 @@
   license:
     identifier: BSD-2-Clause
     uri: https://spdx.org/licenses/BSD-2-Clause.html
-  notes: |-
-    refactor(injector): Widen type hints from Horde_Injector to Horde_Injector|Injector
-    fix(css): Resize icons in story list view
-    Merge pull request #8 from horde/refactor/modern-controller-migration
-    refactor(strftime): Migrate to native usage of IntlDateFormatter and DateTime
-    refactor: Explicitly declare the default stack as a prestep to removing fallback logic
-    refactor: Explicitly declare the default stack as a prestep to removing fallback logic
+  notes: "refactor(injector): Widen type hints from Horde_Injector to Horde_Injector|Injector\nfix(css): Resize icons in story list view\nMerge pull request #8 from horde/refactor/modern-controller-migration\nrefactor(strftime): Migrate to native usage of IntlDateFormatter and DateTime\nrefactor: Explicitly declare the default stack as a prestep to removing fallback logic\nrefactor: Explicitly declare the default stack as a prestep to removing fallback logic"
 1.0.0-beta5:
   api: 1.0.0-beta5
   state:
@@ -39,11 +38,7 @@
   license:
     identifier: BSD-2-Clause
     uri: https://spdx.org/licenses/BSD-2-Clause.html
-  notes: |-
-    docs: Add note on lucide icons licenses
-    style: Changed CSS and icon assets to Lucide Icons with proper attribution
-    refactor(registry): Evolve to a format more independent of legacy stack
-    feat: Add #[Factory] attribute to Jonah_Driver
+  notes: "docs: Add note on lucide icons licenses\nstyle: Changed CSS and icon assets to Lucide Icons with proper attribution\nrefactor(registry): Evolve to a format more independent of legacy stack\nfeat: Add #[Factory] attribute to Jonah_Driver"
 1.0.0-beta4:
   api: 1.0.0-beta4
   state:
@@ -53,16 +48,7 @@
   license:
     identifier: BSD-2-Clause
     uri: https://spdx.org/licenses/BSD-2-Clause.html
-  notes: |-
-    fix: Horde_Variables must be populated by details getDefaultVariables doesn't have.
-    fix: use PrefsService instead of Horde_Prefs which is not DI safe
-    docs: create/update conf.php.dist
-    fix: Use correct template name suffix
-    test: Add route test to test.php framework for jonah
-    fix: use webroot for generating URIs
-    feat: Add a Delivery URL column to list of feeds
-    refactor: Use Horde\Url\Url instead of Horde_Url
-    fix: Cast url to string
+  notes: "fix: Horde_Variables must be populated by details getDefaultVariables doesn't have.\nfix: use PrefsService instead of Horde_Prefs which is not DI safe\ndocs: create/update conf.php.dist\nfix: Use correct template name suffix\ntest: Add route test to test.php framework for jonah\nfix: use webroot for generating URIs\nfeat: Add a Delivery URL column to list of feeds\nrefactor: Use Horde\\Url\\Url instead of Horde_Url\nfix: Cast url to string"
 1.0.0-beta3:
   api: 1.0.0-beta3
   state:
@@ -72,9 +58,7 @@
   license:
     identifier: BSD-2-Clause
     uri: https://spdx.org/licenses/BSD-2-Clause.html
-  notes: |-
-    refactor: Use modern Horde\Util\Util class where possible
-    refactor: Use ResponsiveAssets for resolving theme images
+  notes: "refactor: Use modern Horde\\Util\\Util class where possible\nrefactor: Use ResponsiveAssets for resolving theme images"
 1.0.0-beta2:
   api: 1.0.0-beta2
   state:
@@ -84,29 +68,7 @@
   license:
     identifier: BSD-2-Clause
     uri: https://spdx.org/licenses/BSD-2-Clause.html
-  notes: |-
-    chore: Add missing dependency on horde/routes
-    test: Extend unit and integration tests for jonah
-    refactor: update and document templates
-    refactor: Use new infrastructure in controllers
-    feat: FilesystemPathHelper facade abstracts registry and constants
-    refactor: PSR-7 migration for delivery and dispatcher
-    refactor: ListController replaces getFormData with PSR-7 native method
-    refactor: Controllers use injection rather than globals and a UrlGenerator class rather than static Horde::url
-    chore: Don't lose original authors while migrating to controllers
-    refactor: stories.php now delegates to TagSearchController
-    feat: TagSearchController replaces Jonah_View_TagSearchList
-    fix: autoloader
-    chore: Delete test script for delete FeedParser class
-    refactor: feed.php endpoint is now just a wrapper around HtmlController
-    feat: Turn dispatcher and delivery endpoints into wrappers around controllers
-    refactor: Use PSR-3 logger instead of Horde::log
-    feat: Add Feed Controller
-    feat: Create new PSR story controllers
-    refactor: Turn legacy channel entrypoints into thin wrappers around Controllers
-    feat: Implement Channel List, Edit, Delete endpoints as controllers
-    feat: Add routes to router definition file.
-    refactor: Phase 1 - Build OO Service infrastructure and delegate from existing static calls
+  notes: "chore: Add missing dependency on horde/routes\ntest: Extend unit and integration tests for jonah\nrefactor: update and document templates\nrefactor: Use new infrastructure in controllers\nfeat: FilesystemPathHelper facade abstracts registry and constants\nrefactor: PSR-7 migration for delivery and dispatcher\nrefactor: ListController replaces getFormData with PSR-7 native method\nrefactor: Controllers use injection rather than globals and a UrlGenerator class rather than static Horde::url\nchore: Don't lose original authors while migrating to controllers\nrefactor: stories.php now delegates to TagSearchController\nfeat: TagSearchController replaces Jonah_View_TagSearchList\nfix: autoloader\nchore: Delete test script for delete FeedParser class\nrefactor: feed.php endpoint is now just a wrapper around HtmlController\nfeat: Turn dispatcher and delivery endpoints into wrappers around controllers\nrefactor: Use PSR-3 logger instead of Horde::log\nfeat: Add Feed Controller\nfeat: Create new PSR story controllers\nrefactor: Turn legacy channel entrypoints into thin wrappers around Controllers\nfeat: Implement Channel List, Edit, Delete endpoints as controllers\nfeat: Add routes to router definition file.\nrefactor: Phase 1 - Build OO Service infrastructure and delegate from existing static calls"
 1.0.0-beta1:
   api: 1.0.0-beta1
   state:
@@ -116,15 +78,7 @@
   license:
     identifier: BSD-2-Clause
     uri: https://spdx.org/licenses/BSD-2-Clause.html
-  notes: |-
-    refactor: Nothing we do here throws PEAR_Error so remove handling
-    fix: Explicit exits and returns in dead ends, explicit initial data structures
-    fix: various null safety / typing issues in classes
-    style: php-cs-fixer
-    Merge pull request #1 from horde/feat/replace-horde-template
-    feat: Replace Horde_Template with Horde_View
-    fix: More defensive code when trying to drop tables
-    docs: Clarify where to put local overrides
+  notes: "refactor: Nothing we do here throws PEAR_Error so remove handling\nfix: Explicit exits and returns in dead ends, explicit initial data structures\nfix: various null safety / typing issues in classes\nstyle: php-cs-fixer\nMerge pull request #1 from horde/feat/replace-horde-template\nfeat: Replace Horde_Template with Horde_View\nfix: More defensive code when trying to drop tables\ndocs: Clarify where to put local overrides"
 1.0.0-alpha6:
   api: 1.0.0-alpha6
   state:
@@ -134,9 +88,7 @@
   license:
     identifier: BSD-2-Clause
     uri: https://spdx.org/licenses/BSD-2-Clause.html
-  notes: |-
-    fix: Drop unnecessary / uninitialized form parameter
-    fix: getInfo() no longer writes back to second parameter. Use return value.
+  notes: "fix: Drop unnecessary / uninitialized form parameter\nfix: getInfo() no longer writes back to second parameter. Use return value."
 1.0.0-alpha5:
   api: 1.0.0-alpha1
   state:
@@ -146,9 +98,7 @@
   license:
     identifier: BSD-2-Clause
     uri: http://www.horde.org/licenses/bsd
-  notes: |
-    fix: Use return value from Horde_Form as returning by parameter reference is no longer supported in Horde_Form::getInfo
-    fix: Signature of getInfo in Story form
+  notes: "fix: Use return value from Horde_Form as returning by parameter reference is no longer supported in Horde_Form::getInfo\nfix: Signature of getInfo in Story form\n"
 1.0.0-alpha4:
   api: 1.0.0-alpha1
   state:
@@ -158,12 +108,7 @@
   license:
     identifier: BSD-2-Clause
     uri: http://www.horde.org/licenses/bsd
-  notes: |
-    fix: Replace deprecated call to Horde::img
-    fix: Remove reference symbol from Jonah_Form_Story signature and remove explicit require_once of Horde_Form_Action
-    fix: Turn php4 style constructor into a __construct()
-    fix: PHPDoc Type annotation, by PHP 8 the XMLParser Resource was turned into a class.
-    fix: Fix key name for permission check of individual channels
+  notes: "fix: Replace deprecated call to Horde::img\nfix: Remove reference symbol from Jonah_Form_Story signature and remove explicit require_once of Horde_Form_Action\nfix: Turn php4 style constructor into a __construct()\nfix: PHPDoc Type annotation, by PHP 8 the XMLParser Resource was turned into a class.\nfix: Fix key name for permission check of individual channels\n"
 1.0.0-alpha3:
   api: 1.0.0-alpha1
   state:
@@ -173,8 +118,7 @@
   license:
     identifier: BSD-2-Clause
     uri: http://www.horde.org/licenses/bsd
-  notes: |
-    ci: Add stub phpunit 12 test
+  notes: "ci: Add stub phpunit 12 test\n"
 1.0.0-alpha2:
   api: 1.0.0-alpha1
   state:
@@ -184,9 +128,7 @@
   license:
     identifier: BSD-2-Clause
     uri: http://www.horde.org/licenses/bsd
-  notes: |
-    fix: Use classmap autoloader as jonah is not strictly psr-0 compliant.
-    style: Apply php-cs-fixer
+  notes: "fix: Use classmap autoloader as jonah is not strictly psr-0 compliant.\nstyle: Apply php-cs-fixer\n"
 1.0.0-alpha1:
   api: 1.0.0alpha1
   state:
@@ -196,83 +138,8 @@
   license:
     identifier: BSD-2-Clause
     uri: http://www.horde.org/licenses/bsd
-  notes: |
-    Original version string was 1.0.0alpha1
-    [rla] Add FW6 dependencies
-    [jan] Officially support PHP 7.
-    [jan] Add Latvian translation (Jānis Eisaks <jancs@dv.lv>).
-    [jan] Provide default configuration files instead of .dist versions.
-    [bak/mjr/mms] Converted to H4.
-    [jan] Enable output compression.
-    [cjh] Remove the Jonah-specific portal (Bug #7584).
-    [cjh] Add support for full-content feeds (Request #6400).
-    [cjh] Remove delivery lists.
-    [jan] Add Turkish translation (METU <horde-tr@metu.edu.tr>).
-    [mjr] Add a media block for displaying feeds containing media namespace nodes.
-    [mjr] Add support for parsing the media namespace extensions to RSS 2.0 feeds.
-    [mjr] Add searchTag api support to allow other applications to list tags and perform tag searches of Jonah resources.
-    [mjr] Add tagging support for internal channels.
-    [cjh] Allow the story and latest blocks to count story reads.
-    [cjh] Add PDF generation of stories.
-    [cjh] Detect charset information from XML prologue as well as the Content-Type header (s_gatterbauer@idlm.net, Bug #4340).
-    [jan] Add RSS 2.0 feed generator.
-    [jan] Add permalink field for stories.
-    [jan] Add URL field to channel configuration for paged story lists.
-    [cjh] Deliver RSS feeds in a way that supports USM (http://www.kbcafe.com/rss/usm.html, Request #2593).
-    [cjh] Standardize the date fields for stories with an updated field that is always the timestamp that the story was last modified, and a published field which is controlled by the author and determines the release date.
-    [ben] Better support for MS-SQL.
-    [cjh] Use Horde_Block_Layout_View for the My News page.
-    [cjh] Add jonah:admin permission (tevans@tachometry.com, Bug #2571).
-    [cjh] Add internal template type for internal stories (tevans@tachometry.com, Bug #2571).
-    [cjh] Add a block for showing the latest story from an internal channel (Roel Gloudemans <roel@gloudemans.info>).
-    [cjh] Initial feeds script now uses Jonah objects to do feed creation to avoid sequence problems.
-    [jan] Add Dutch translation (Resan Sa-Ardnuam <horde@sa-ardnuam.nl>).
-    [cjh] Initial Atom feed support (Bug #1581).
-    [jan] Add support for release dates.
-    [jan] Show links to internal channels in sidebar menu.
-    [jan] Allow comments on stories.
-    [jan] Add support for composite channels.
-    [jan] Allow to specify an alternative story URL.
-    [jan] Track how many times a story was read.
-    [jan] Add support for aggregating channels.
-    [jon] Add the ability to share stories with friends via email.
-    [mdj] newsfeed.php is no longer used, now there is a /delivery/ directory offering for now the RSS feed as before and an email delivery.
-    [mdj] Added option for HTML composition of stories.
-    [cjh] Stocks code has been moved to Juno.
-    [cjh] Remove the last weather code from Jonah.
-    [cjh] Remove METAR code in favor of the Horde-level METAR block.
-    [jan] Add Romanian translation (Eugen Hoanca <eugenh@urban-grafx.ro>).
-    [jan] Add Finnish translation (Leena Heino <Leena.Heino@uta.fi>).
-    [cjh] Clean up Jonah_Headlines:: to require fewer special cases.
-    [cjh] Move all channel HTML generation over to Horde_Template::
-    [cjh] Add an RSS generation class.
-    [cjh] Start adding news-authoring capabilities.
-    [jan] Add German translation.
-    [cjh] Add option of using a DB to store weather stations (Ben Scott <bscott@chiark.greenend.org.uk>).
-    [cjh] Add the option to update a channel by executing a script (Mario Andres Yepes C <marioy@upb.edu.co>).
-    [jan] Add Traditional Chinese translation (Chih-Wei Yeh <cwyeh@ccca.nctu.edu.tw>).
-    [cjh] Add a preference for using metric units (Tim Gorter <email@teletechnics.com>).
-    [cjh] Revamp headline management and subscriptions; add multiple sizes for each channel, add weather and stock support, and many more channels (Eric Rechlin <eric@hpcalc.org>).
-    [cjh] Add a Block system and an experimental portal-like interface.
-    [cjh] Add menu to all pages.
-    [cjh] Add user preference for which channels to display.
-    [cjh] License is the Horde BSD license.
-    [cjh] Close a potential problem with register_globals On and $js_onLoad.
-    [cjh] Don't redirect from backend.php to any login screen; either authentication is there, or we exit().
-    [cjh] Use JONAH_TEMPLATES constant for all template paths.
-    [cjh] Use $registry->get() for all Registry information.
-    [cjh] Update cli-backend.php so that it can actually be useful.
-    [cjh] Use Horde admin settings.
-    [max] Greatly modernize and update.
-    [avsm] Replace $conf['paths'] with the $registry equivalents.
-    [cjh] Get rid of package.HTMLDocument.php use.
+  notes: "Original version string was 1.0.0alpha1\n[rla] Add FW6 dependencies\n[jan] Officially support PHP 7.\n[jan] Add Latvian translation (Jānis Eisaks <jancs@dv.lv>).\n[jan] Provide default configuration files instead of .dist versions.\n[bak/mjr/mms] Converted to H4.\n[jan] Enable output compression.\n[cjh] Remove the Jonah-specific portal (Bug #7584).\n[cjh] Add support for full-content feeds (Request #6400).\n[cjh] Remove delivery lists.\n[jan] Add Turkish translation (METU <horde-tr@metu.edu.tr>).\n[mjr] Add a media block for displaying feeds containing media namespace nodes.\n[mjr] Add support for parsing the media namespace extensions to RSS 2.0 feeds.\n[mjr] Add searchTag api support to allow other applications to list tags and perform tag searches of Jonah resources.\n[mjr] Add tagging support for internal channels.\n[cjh] Allow the story and latest blocks to count story reads.\n[cjh] Add PDF generation of stories.\n[cjh] Detect charset information from XML prologue as well as the Content-Type header (s_gatterbauer@idlm.net, Bug #4340).\n[jan] Add RSS 2.0 feed generator.\n[jan] Add permalink field for stories.\n[jan] Add URL field to channel configuration for paged story lists.\n[cjh] Deliver RSS feeds in a way that supports USM (http://www.kbcafe.com/rss/usm.html, Request #2593).\n[cjh] Standardize the date fields for stories with an updated field that is always the timestamp that the story was last modified, and a published field which is controlled by the author and determines the release date.\n[ben] Better support for MS-SQL.\n[cjh] Use Horde_Block_Layout_View for the My News page.\n[cjh] Add jonah:admin permission (tevans@tachometry.com, Bug #2571).\n[cjh] Add internal template type for internal stories (tevans@tachometry.com, Bug #2571).\n[cjh] Add a block for showing the latest story from an internal channel (Roel Gloudemans <roel@gloudemans.info>).\n[cjh] Initial feeds script now uses Jonah objects to do feed creation to avoid sequence problems.\n[jan] Add Dutch translation (Resan Sa-Ardnuam <horde@sa-ardnuam.nl>).\n[cjh] Initial Atom feed support (Bug #1581).\n[jan] Add support for release dates.\n[jan] Show links to internal channels in sidebar menu.\n[jan] Allow comments on stories.\n[jan] Add support for composite channels.\n[jan] Allow to specify an alternative story URL.\n[jan] Track how many times a story was read.\n[jan] Add support for aggregating channels.\n[jon] Add the ability to share stories with friends via email.\n[mdj] newsfeed.php is no longer used, now there is a /delivery/ directory offering for now the RSS feed as before and an email delivery.\n[mdj] Added option for HTML composition of stories.\n[cjh] Stocks code has been moved to Juno.\n[cjh] Remove the last weather code from Jonah.\n[cjh] Remove METAR code in favor of the Horde-level METAR block.\n[jan] Add Romanian translation (Eugen Hoanca <eugenh@urban-grafx.ro>).\n[jan] Add Finnish translation (Leena Heino <Leena.Heino@uta.fi>).\n[cjh] Clean up Jonah_Headlines:: to require fewer special cases.\n[cjh] Move all channel HTML generation over to Horde_Template::\n[cjh] Add an RSS generation class.\n[cjh] Start adding news-authoring capabilities.\n[jan] Add German translation.\n[cjh] Add option of using a DB to store weather stations (Ben Scott <bscott@chiark.greenend.org.uk>).\n[cjh] Add the option to update a channel by executing a script (Mario Andres Yepes C <marioy@upb.edu.co>).\n[jan] Add Traditional Chinese translation (Chih-Wei Yeh <cwyeh@ccca.nctu.edu.tw>).\n[cjh] Add a preference for using metric units (Tim Gorter <email@teletechnics.com>).\n[cjh] Revamp headline management and subscriptions; add multiple sizes for each channel, add weather and stock support, and many more channels (Eric Rechlin <eric@hpcalc.org>).\n[cjh] Add a Block system and an experimental portal-like interface.\n[cjh] Add menu to all pages.\n[cjh] Add user preference for which channels to display.\n[cjh] License is the Horde BSD license.\n[cjh] Close a potential problem with register_globals On and $js_onLoad.\n[cjh] Don't redirect from backend.php to any login screen; either authentication is there, or we exit().\n[cjh] Use JONAH_TEMPLATES constant for all template paths.\n[cjh] Use $registry->get() for all Registry information.\n[cjh] Update cli-backend.php so that it can actually be useful.\n[cjh] Use Horde admin settings.\n[max] Greatly modernize and update.\n[avsm] Replace $conf['paths'] with the $registry equivalents.\n[cjh] Get rid of package.HTMLDocument.php use.\n"
 0.0.2:
-  notes: |
-    [cjh] Everything now works with call-time pass-by-reference disabled, and with the current state of XML in php4.
-    [cjh] Added a simple update.sh script that can be run from cron.
-    [cjh] The backend can now be restricted with username/password or by IP.
-    [cjh] Updated test.php to recognize php4 stable releases.
+  notes: "[cjh] Everything now works with call-time pass-by-reference disabled, and with the current state of XML in php4.\n[cjh] Added a simple update.sh script that can be run from cron.\n[cjh] The backend can now be restricted with username/password or by IP.\n[cjh] Updated test.php to recognize php4 stable releases.\n"
 0.0.1:
-  notes: |
-    [cjh] More or less complete documentation.
-    [cjh] Supports RSS and My.Userland site summary files.
+  notes: "[cjh] More or less complete documentation.\n[cjh] Supports RSS and My.Userland site summary files.\n"
