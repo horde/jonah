@@ -21,6 +21,7 @@ Horde_Registry::appInit('jonah', [
 
 use Horde\Http\RequestFactory;
 use Horde\Http\StreamFactory;
+use Horde\Http\Uri;
 use Horde\Http\UriFactory;
 use Horde\Http\Server\RequestBuilder;
 use Horde\Http\Server\ResponseWriterWeb;
@@ -36,6 +37,10 @@ if (file_exists(JONAH_BASE . '/config/routes.local.php')) {
 /*
  * Build PSR-7 request and extract the URL path to match against routes.
  * Strip the Jonah webroot prefix so the mapper sees paths relative to the app.
+ *
+ * Note: the configured webroot may be either a bare path ("/apps/jonah") or a
+ * fully qualified URL ("https://example.org/apps/jonah"). Parse it through
+ * Uri::getPath() so str_starts_with() compares path-against-path either way.
  */
 $request = (new RequestBuilder(
     new RequestFactory(),
@@ -43,7 +48,8 @@ $request = (new RequestBuilder(
     new UriFactory(),
 ))->withGlobalVariables()->build();
 
-$webroot = rtrim($GLOBALS['registry']->get('webroot', 'jonah'), '/');
+$webrootConfig = (string) $GLOBALS['registry']->get('webroot', 'jonah');
+$webroot = rtrim((new Uri($webrootConfig))->getPath(), '/');
 $path = $request->getUri()->getPath();
 if ($webroot !== '' && str_starts_with($path, $webroot)) {
     $path = substr($path, strlen($webroot));
@@ -75,6 +81,13 @@ switch ($result['controller']) {
          */
         $controllerClass = $result['controller'];
         if (class_exists($controllerClass)) {
+            /*
+             * Expose matched route parameters (e.g. channel_id, id) to the
+             * controller as the 'route' request attribute. Without this, every
+             * controller would see an empty $request->getAttribute('route', [])
+             * and redirect to ChannelList with "No channel requested."
+             */
+            $request = $request->withAttribute('route', $result);
             $controller = $GLOBALS['injector']->getInstance($controllerClass);
             $response = $controller->handle($request);
             (new ResponseWriterWeb())->writeResponse($response);
