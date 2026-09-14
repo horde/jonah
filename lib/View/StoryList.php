@@ -68,6 +68,11 @@ class Jonah_View_StoryList extends Jonah_View_Base
 
         /* Build story specific fields. */
         foreach ($stories as $key => $story) {
+            $stories[$key]['channel_id'] = $channel_id;
+            $stories[$key]['view_url'] = (string) $GLOBALS['injector']->getInstance('Jonah_Driver')->getStoryLink($channel, $story);
+            $stories[$key]['can_edit'] = true;
+            $stories[$key]['can_delete'] = Jonah::checkPermissions('channels', Horde_Perms::DELETE, [$channel_id]);
+
             /* published is the publication/release date, updated is the last change date. */
             if (!empty($stories[$key]['published'])) {
                 $pubDate = new Horde_Date($stories[$key]['published']);
@@ -111,7 +116,8 @@ class Jonah_View_StoryList extends Jonah_View_Base
 
         /* Render page */
         $title = $channel['channel_name'];
-        $view = new Horde_View(['templatePath' => JONAH_TEMPLATES . '/stories']);
+        $view = $GLOBALS['injector']->getInstance(Horde\Jonah\View\ViewFactory::class)
+            ->createStoryListView();
         $view->stories = $stories;
         $view->read = true;
         $view->comments = !empty($conf['comments']['allow']) && $registry->hasMethod('forums/numMessages');
