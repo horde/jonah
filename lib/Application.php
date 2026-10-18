@@ -1,4 +1,5 @@
 <?php
+use Horde\Jonah\JonahConfig;
 
 use Horde\Util\Util;
 
@@ -62,8 +63,9 @@ class Jonah_Application extends Horde_Registry_Application
         $injector->bindClosure(
             Horde\Jonah\Service\StoryConfig::class,
             function () {
+        $config = $injector->get('JonahConfig');
                 return new Horde\Jonah\Service\StoryConfig(
-                    $GLOBALS['conf']['news']['story_types'] ?? [],
+                    $config->get('news.story_types') ?? [],
                 );
             },
         );
@@ -125,9 +127,10 @@ class Jonah_Application extends Horde_Registry_Application
         $injector->bindClosure(
             Horde\Jonah\Service\UrlSigner::class,
             function () {
+        $config = $injector->get('JonahConfig');
                 return new Horde\Jonah\Service\UrlSigner(
-                    $GLOBALS['conf']['secret_key'] ?? '',
-                    (int) ($GLOBALS['conf']['urls']['hmac_lifetime'] ?? 30),
+                    $config->get('secret_key') ?? '',
+                    (int) ($config->get('urls.hmac_lifetime') ?? 30),
                 );
             },
         );
