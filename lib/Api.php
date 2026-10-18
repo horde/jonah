@@ -1,4 +1,5 @@
 <?php
+use Horde\Jonah\JonahConfig;
 
 /**
  * Jonah external API interface.
@@ -133,7 +134,8 @@ class Jonah_Api extends Horde_Registry_Api
      */
     public function commentCallback($story_id)
     {
-        if (empty($GLOBALS['conf']['comments']['allow'])) {
+        $config = $injector->get('JonahConfig');
+        if (empty($config->get('comments.allow'))) {
             return false;
         }
         $story = $GLOBALS['injector']->getInstance('Jonah_Driver')->getStory($story_id);
@@ -148,7 +150,8 @@ class Jonah_Api extends Horde_Registry_Api
      */
     public function hasComments()
     {
-        return !empty($GLOBALS['conf']['comments']['allow']);
+        $config = $injector->get('JonahConfig');
+        return !empty($config->get('comments.allow'));
     }
 
     /**
@@ -213,6 +216,7 @@ class Jonah_Api extends Horde_Registry_Api
      */
     public function searchTags($names, $filter = [], $raw = false)
     {
+        $config = $injector->get('JonahConfig');
         global $registry, $injector;
 
         $filter = new Horde_Support_Array($filter);
@@ -235,7 +239,7 @@ class Jonah_Api extends Horde_Registry_Api
             // Requesting the raw story information as returned from searchTags,
             // but add some additional information that external apps might
             // find useful.
-            $comments = $GLOBALS['conf']['comments']['allow']
+            $comments = $config->get('comments.allow')
                 && $registry->hasMethod('forums/numMessages');
 
             foreach ($results as $story) {

@@ -1,4 +1,5 @@
 <?php
+use Horde\Jonah\JonahConfig;
 
 /**
  * Form for editing a new Story.
@@ -25,6 +26,7 @@ class Jonah_Form_Story extends Horde_Form
      */
     public function __construct($vars)
     {
+        $config = $injector->get('JonahConfig');
         parent::__construct($vars, $vars->get('id') ? _("Edit Story") : _("Add New Story"));
 
         $this->setButtons(_("Save"));
@@ -73,7 +75,7 @@ class Jonah_Form_Story extends Horde_Form
 
         $this->addVariable(_("Tags"), 'tags', 'text', false, false, _("Enter keywords to tag this story, separated by commas"));
         /* Only show URL insertion if it has been enabled in config. */
-        if (in_array('links', $GLOBALS['conf']['news']['story_types'])) {
+        if (in_array('links', $config->get('news.story_types'))) {
             $this->addVariable(_("Story URL"), 'url', 'text', false, false, _("If you enter a URL without a full story text, clicking on the story will send the reader straight to the URL, otherwise it will be shown at the end of the full story."));
         }
     }
